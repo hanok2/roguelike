@@ -90,7 +90,9 @@ def main():
     # Game loop
     while not tcod.console_is_window_closed():
         # Capture new user input
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
+        # tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
+        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
+
 
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
@@ -110,6 +112,7 @@ def main():
             bar_width,
             panel_height,
             panel_y,
+            mouse,
             colors
         )
 
