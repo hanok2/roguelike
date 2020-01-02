@@ -5,6 +5,7 @@ from game_map import GameMap
 from fov import initialize_fov, recompute_fov
 from game_states import GameStates
 from components import Fighter
+from input_handling import handle_keys
 
 
 def main():
@@ -123,29 +124,6 @@ def main():
                     entity.ai.take_turn(player, fov_map, game_map, entities)
 
             game_state = GameStates.PLAYERS_TURN
-
-
-def handle_keys(key):
-    # Movement
-    if key.vk == tcod.KEY_UP:
-        return {'move': (0, -1)}
-    elif key.vk == tcod.KEY_DOWN:
-        return {'move': (0, 1)}
-    elif key.vk == tcod.KEY_LEFT:
-        return {'move': (-1, 0)}
-    elif key.vk == tcod.KEY_RIGHT:
-        return {'move': (1, 0)}
-
-    if key.vk == tcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: Toggle full screen
-        return {'fullscreen': True}
-
-    elif key.vk == tcod.KEY_ESCAPE:
-        # Exit
-        return {'exit': True}
-
-    # No key was pressed
-    return {}
 
 
 if __name__ == "__main__":
