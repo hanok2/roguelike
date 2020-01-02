@@ -1,6 +1,8 @@
 from random import randint
+import tcod
 from tile import Tile
 from rect import Rect
+from entity import Entity
 
 class GameMap(object):
     def __init__(self, width, height):
@@ -39,7 +41,7 @@ class GameMap(object):
             self.tiles[x][y].block_sight = False
 
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player):
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room):
         # procedurally generate a dungeon map
 
         rooms = []
@@ -92,5 +94,26 @@ class GameMap(object):
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
 
+                # Add entities/monsters
+                self.place_entities(new_room, entities, max_monsters_per_room)
+
                 rooms.append(new_room)
                 num_rooms += 1
+
+    def place_entities(self, room, entities, max_monsters_per_room):
+        # Get a random # of monsters
+        num_monsters = randint(0, max_monsters_per_room)
+
+        for i in range(num_monsters):
+            # Choose a random location in the room
+            x = randint(room.x1 + 1, room.x2 - 1)
+            y = randint(room.y1 + 1, room.y2 - 1)
+
+            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+                if randint(0, 100) < 80:
+                    monster = Entity(x, y, 'o', tcod.desaturated_green)
+                else:
+                    monster = Entity(x, y, 'T', tcod.darker_green)
+
+                entities.append(monster)
+

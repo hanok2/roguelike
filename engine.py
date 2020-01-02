@@ -14,6 +14,7 @@ def main():
     room_max_size = 10
     room_min_size = 4
     max_rooms = 30
+    max_monsters_per_room = 3
 
     fov_algorithm = 0               # 0 is default alg tcod uses
     fov_light_walls = True          # Light up walls we see
@@ -28,13 +29,7 @@ def main():
     }
 
     # Create entities
-    player = Entity(
-        x=screen_width // 2,
-        y=screen_height // 2,
-        char='@',
-        color=tcod.white
-    )
-
+    player = Entity(0, 0, '@', tcod.white)
     entities = [player]
 
     tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
@@ -47,7 +42,16 @@ def main():
 
     # Initialize the game map
     game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
+    game_map.make_map(
+        max_rooms,
+        room_min_size,
+        room_max_size,
+        map_width,
+        map_height,
+        player,
+        entities,
+        max_monsters_per_room
+    )
 
     # Initialize fov
     fov_map = initialize_fov(game_map)
