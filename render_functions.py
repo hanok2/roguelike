@@ -8,7 +8,7 @@ class RenderOrder(Enum):
     ACTOR = 3
 
 
-def render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, colors):
+def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     # Draw all the tiles in the game map
 
     if fov_recompute:
@@ -44,18 +44,36 @@ def render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_w
     for entity in sorted_entities:
         draw_entity(con, entity, fov_map)
 
-    tcod.console_set_default_foreground(con, tcod.white)
-    hp_display = 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp)
-    tcod.console_print_ex(
-        con,
-        1,
-        screen_height - 2,
-        tcod.BKGND_NONE,
-        tcod.LEFT,
-        hp_display
-    )
+    # Display console
+    # tcod.console_set_default_foreground(con, tcod.white)
+    # hp_display = 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp)
+
+    # tcod.console_print_ex(
+        # con,
+        # 1,
+        # screen_height - 2,
+        # tcod.BKGND_NONE,
+        # tcod.LEFT,
+        # hp_display
+    # )
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+
+    tcod.console_set_default_background(panel, tcod.black)
+    tcod.console_clear(panel)
+
+    render_bar(
+        panel,
+        1, 1,
+        bar_width,
+        'HP',
+        player.fighter.hp,
+        player.fighter.max_hp,
+        tcod.light_red,
+        tcod.darker_red
+    )
+
+    tcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
 
 def clear_all(con, entities):
@@ -75,3 +93,40 @@ def draw_entity(con, entity, fov_map):
 def clear_entity(con, entity):
     # Erase the character that represents this object
     tcod.console_put_char(con, entity.x, entity.y, ' ', tcod.BKGND_NONE)
+
+def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
+    bar_width = int(float(value) / maximum * total_width)
+
+    tcod.console_set_default_background(panel, back_color)
+    tcod.console_rect(
+        panel,
+        x, y,
+        total_width,
+        1,
+        False,
+        tcod.BKGND_SCREEN
+    )
+
+    tcod.console_set_default_background(panel, bar_color)
+    if bar_width > 0:
+        tcod.console_rect(
+            panel,
+            x, y,
+            bar_width,
+            1,
+            False,
+            tcod.BKGND_SCREEN
+        )
+
+
+    tcod.console_set_default_foreground(panel, tcod.white)
+
+    tcod.console_print_ex(
+        panel,
+        int(x + total_width / 2),
+        y,
+        tcod.BKGND_NONE,
+        tcod.CENTER,
+        '{}: {}/{}'.format(name, value, maximum)
+    )
+
