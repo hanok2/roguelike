@@ -1,4 +1,5 @@
 import tcod
+from game_messages import Message
 
 class Fighter(object):
     def __init__(self, hp, defense, power):
@@ -22,19 +23,17 @@ class Fighter(object):
         dmg = self.power - target.fighter.defense
 
         if dmg > 0:
-            msg = {'msg':'{} attacks {} for {} HP.'.format(
-                self.owner.name,
-                target.name,
-                str(dmg)
-            )}
+            msg = {'msg': Message('{} attacks {} for {} HP.'.format(
+                self.owner.name, target.name, str(dmg)),
+                                  tcod.white)}
+
             results.append(msg)
             results.extend(target.fighter.take_dmg(dmg))
 
         else:
-            msg = {'msg':'{} attacks {} but does no damage.'.format(
-                self.owner.name,
-                target.name,
-            )}
+            msg = {'msg': Message('{} attacks {} but does no damage.'.format(
+                self.owner.name, target.name),
+                                  tcod.white)}
             results.append(msg)
 
         return results

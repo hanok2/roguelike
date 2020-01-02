@@ -8,7 +8,7 @@ class RenderOrder(Enum):
     ACTOR = 3
 
 
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
+def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, msg_log, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     # Draw all the tiles in the game map
 
     if fov_recompute:
@@ -61,6 +61,13 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, s
 
     tcod.console_set_default_background(panel, tcod.black)
     tcod.console_clear(panel)
+
+    # Print the game messages, one line at a time
+    y = 1
+    for msg in msg_log.messages:
+        tcod.console_set_default_foreground(panel, msg.color)
+        tcod.console_print_ex(panel, msg_log.x, y, tcod.BKGND_NONE, tcod.LEFT, msg.text)
+        y += 1
 
     render_bar(
         panel,
