@@ -93,6 +93,7 @@ def main():
     mouse = tcod.Mouse()
 
     game_state = GameStates.PLAYERS_TURN
+    prev_game_state = game_state
 
     # Game loop
     while not tcod.console_is_window_closed():
@@ -120,7 +121,8 @@ def main():
             panel_height,
             panel_y,
             mouse,
-            colors
+            colors,
+            game_state
         )
 
         fov_recompute = False       # Mandatory
@@ -136,6 +138,7 @@ def main():
 
         move = action.get('move')
         pickup = action.get('pickup')
+        show_inv = action.get('inventory')
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -173,8 +176,16 @@ def main():
             else:
                 msg_log.add(Message('There is nothing here to pick up.', tcod.yellow))
 
+        if show_inv:
+            prev_game_state = game_state
+            game_state = GameStates.INVENTORY
+
         if gameexit:
-            return True
+            if game_state == GameStates.INVENTORY:
+                game_state = prev_game_state
+            else:
+                return True
+
 
         if fullscreen:
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())

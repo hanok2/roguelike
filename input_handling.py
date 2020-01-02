@@ -6,6 +6,8 @@ def handle_keys(key):
     # Actions
     if key_char == 'g' or key_char == ',':
         return {'pickup': True}
+    elif key_char == 'i':
+        return {'inventory': True}
 
     # Movement
     # Note: Add support for number pad movement

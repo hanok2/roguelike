@@ -1,5 +1,7 @@
 from enum import Enum
 import tcod
+from game_states import GameStates
+from menus import inv_menu
 
 
 class RenderOrder(Enum):
@@ -8,7 +10,7 @@ class RenderOrder(Enum):
     ACTOR = 3
 
 
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, msg_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors):
+def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, msg_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state):
     # Draw all the tiles in the game map
 
     if fov_recompute:
@@ -58,6 +60,16 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     # )
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+
+    if game_state == GameStates.INVENTORY:
+        inv_menu(
+            con,
+            'Press the key next to an item to use it, or ESC to cancel.\n',
+            player.inv,
+            50,
+            screen_width,
+            screen_height,
+        )
 
     tcod.console_set_default_background(panel, tcod.black)
     tcod.console_clear(panel)
