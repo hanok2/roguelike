@@ -4,6 +4,7 @@ def handle_keys(key):
     key_char = chr(key.c)
 
     # Movement
+    # Note: Add support for number pad movement
     if key.vk == tcod.KEY_UP or key_char == 'k':
         return {'move': (0, -1)}
     elif key.vk == tcod.KEY_DOWN or key_char == 'j':
