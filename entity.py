@@ -6,7 +6,7 @@ from render_functions import RenderOrder
 class Entity(object):
     """ A generic object to represent players, enemies, items, etc."""
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None):
         self.x = x
         self.y = y
         self.char = char
@@ -16,12 +16,20 @@ class Entity(object):
         self.render_order = render_order
         self.fighter = fighter
         self.ai = ai
+        self.item = item
+        self.inv = inv
 
         if self.fighter:
             self.fighter.owner = self
 
         if self.ai:
             self.ai.owner = self
+
+        if self.item:
+            self.item.owner = self
+
+        if self.inv:
+            self.inv.owner = self
 
     def move(self, dx, dy):
         # Move the entity by a given amount

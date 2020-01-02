@@ -55,3 +55,8 @@ class BasicMonster(object):
                 results.extend(attack_results)
 
         return results
+
+
+class Item(object):
+    def __init__(self):
+        pass

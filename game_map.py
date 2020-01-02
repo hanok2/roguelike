@@ -3,7 +3,7 @@ import tcod
 from tile import Tile
 from rect import Rect
 from entity import Entity
-from components import Fighter, BasicMonster
+from components import Fighter, BasicMonster, Item
 from render_functions import RenderOrder
 
 
@@ -159,12 +159,14 @@ class GameMap(object):
             y = randint(room.y1 + 1, room.y2 - 1)
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
 
+                item_comp = Item()
                 item = Entity(
                     x, y,
                     '!',
                     tcod.violet,
                     "Healing potion",
-                    render_order=RenderOrder.ITEM
+                    render_order=RenderOrder.ITEM,
+                    item=item_comp,
                 )
 
                 entities.append(item)

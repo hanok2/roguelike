@@ -3,6 +3,10 @@ import tcod
 def handle_keys(key):
     key_char = chr(key.c)
 
+    # Actions
+    if key_char == 'g' or key_char == ',':
+        return {'pickup': True}
+
     # Movement
     # Note: Add support for number pad movement
     if key.vk == tcod.KEY_UP or key_char == 'k':

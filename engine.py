@@ -5,9 +5,10 @@ from game_map import GameMap
 from fov import initialize_fov, recompute_fov
 from game_states import GameStates
 from components import Fighter
+from inventory import Inventory
 from input_handling import handle_keys
 from death_functions import kill_monster, kill_player
-from game_messages import Messagelog
+from game_messages import Message, Messagelog
 
 
 def main():
@@ -41,8 +42,11 @@ def main():
         'light_ground': tcod.Color(200, 180, 50)
     }
 
-    # Create entities
+    # Player components
     fighter_comp = Fighter(hp=30, defense=2, power=5)
+    inv_comp = Inventory(26)
+
+    # Create entities
     player = Entity(
         0, 0,
         '@',
@@ -50,7 +54,8 @@ def main():
         'Player',
         blocks=True,
         render_order=RenderOrder.ACTOR,
-        fighter=fighter_comp
+        fighter=fighter_comp,
+        inv=inv_comp,
     )
     entities = [player]
 
@@ -130,6 +135,7 @@ def main():
         action = handle_keys(key)
 
         move = action.get('move')
+        pickup = action.get('pickup')
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -155,6 +161,18 @@ def main():
                 # Player's turn is over
                 game_state = GameStates.ENEMY_TURN
 
+        elif pickup and game_state == GameStates.PLAYERS_TURN:
+            for entity in entities:
+                item_pos_at_our_pos = entity.x == player.x and entity.y == player.y
+
+                if entity.item and item_pos_at_our_pos:
+                    pickup_results = player.inv.add_item(entity)
+                    player_turn_results.extend(pickup_results)
+
+                    break
+            else:
+                msg_log.add(Message('There is nothing here to pick up.', tcod.yellow))
+
         if gameexit:
             return True
 
@@ -165,6 +183,7 @@ def main():
         for result in player_turn_results:
             msg = result.get('msg')
             dead_entity = result.get('dead')
+            item_added = result.get('item_added')
 
             if msg:
                 msg_log.add(msg)
@@ -176,6 +195,10 @@ def main():
                     msg = kill_monster(dead_entity)
 
                 msg_log.add(msg)
+
+            if item_added:
+                entities.remove(item_added)
+                game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
