@@ -7,6 +7,25 @@ class Fighter(object):
         self.defense = defense
         self.power = power
 
+    def take_dmg(self, amt):
+        self.hp -= amt
+
+    def attack(self, target):
+        dmg = self.power - target.fighter.defense
+
+        if dmg > 0:
+            target.fighter.take_dmg(dmg)
+            print('{} attacks {} for {} HP.'.format(
+                self.owner.name,
+                target.name,
+                str(dmg))
+                 )
+        else:
+            print('{} attacks {} but does no damage.'.format(
+                self.owner.name,
+                target.name,
+            ))
+
 
 class BasicMonster(object):
     """AI for a BasicMonster"""
@@ -19,4 +38,5 @@ class BasicMonster(object):
                 monster.move_astar(target, entities, game_map)
 
             elif target.fighter.hp > 0:
-                print('The {} insults you!'.format(monster.name))
+                # print('The {} insults you!'.format(monster.name))
+                monster.fighter.attack(target)
