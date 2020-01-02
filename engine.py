@@ -3,6 +3,7 @@ from entity import Entity, get_blocking_entities_at_location
 from render_functions import clear_all, render_all
 from game_map import GameMap
 from fov import initialize_fov, recompute_fov
+from game_states import GameStates
 
 
 def main():
@@ -59,6 +60,8 @@ def main():
     key = tcod.Key()
     mouse = tcod.Mouse()
 
+    game_state = GameStates.PLAYERS_TURN
+
     # Game loop
     while not tcod.console_is_window_closed():
         # Capture new user input
@@ -85,7 +88,7 @@ def main():
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
-        if move:
+        if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
             dest_x = player.x + dx
             dest_y = player.y + dy
@@ -102,12 +105,21 @@ def main():
                     # Need to redraw FOV
                     fov_recompute = True
 
+                # Player's turn is over
+                game_state = GameStates.ENEMY_TURN
+
         if gameexit:
             return True
 
         if fullscreen:
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
 
+        if game_state == GameStates.ENEMY_TURN:
+            for entity in entities:
+                if entity != player:
+                    print('The {} ponders the meaning of its existence...'.format(entity.name))
+
+            game_state = GameStates.PLAYERS_TURN
 
 def handle_keys(key):
     # Movement
