@@ -4,6 +4,7 @@ from render_functions import clear_all, render_all
 from game_map import GameMap
 from fov import initialize_fov, recompute_fov
 from game_states import GameStates
+from components import Fighter
 
 
 def main():
@@ -30,7 +31,8 @@ def main():
     }
 
     # Create entities
-    player = Entity(0, 0, '@', tcod.white, 'Player', blocks=True)
+    fighter_comp = Fighter(hp=30, defense=2, power=5)
+    player = Entity(0, 0, '@', tcod.white, 'Player', blocks=True, fighter=fighter_comp)
     entities = [player]
 
     tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
@@ -116,10 +118,12 @@ def main():
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity != player:
-                    print('The {} ponders the meaning of its existence...'.format(entity.name))
+                # if entity != player:
+                if entity.ai:
+                    entity.ai.take_turn()
 
             game_state = GameStates.PLAYERS_TURN
+
 
 def handle_keys(key):
     # Movement
