@@ -43,6 +43,7 @@ def main():
 
     # Initialize the game map
     game_map = GameMap(map_width, map_height)
+    game_map.make_map()
 
     key = tcod.Key()
     mouse = tcod.Mouse()
