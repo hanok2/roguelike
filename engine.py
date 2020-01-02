@@ -16,6 +16,9 @@ def main():
     # Creates the screen. (Boolean specifies full screen)
     tcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
 
+    con = tcod.console_new(screen_width, screen_height)
+
+
     key = tcod.Key()
     mouse = tcod.Mouse()
 
@@ -24,14 +27,21 @@ def main():
         # Capture new user input
         tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
 
-        tcod.console_set_default_foreground(0, tcod.white)
+
+        # tcod.console_set_default_foreground(0, tcod.white)
+        tcod.console_set_default_foreground(con, tcod.white)
 
         # Game symbol
         # tcod.console_put_char(0, 1, 1, '@', tcod.BKGND_NONE)
-        tcod.console_put_char(0, player_x, player_y, '@', tcod.BKGND_NONE)
+        # tcod.console_put_char(0, player_x, player_y, '@', tcod.BKGND_NONE)
+        tcod.console_put_char(con, player_x, player_y, '@', tcod.BKGND_NONE)
+
+        tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
         # Presents everything on screen
         tcod.console_flush()
+
+        tcod.console_put_char(con, player_x, player_y, ' ', tcod.BKGND_NONE)
 
         # Get keyboard input
         # key = tcod.console_check_for_keypress()
