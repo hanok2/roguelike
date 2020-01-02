@@ -1,12 +1,20 @@
 import tcod
 from entity import Entity
 from render_functions import clear_all, render_all
+from game_map import GameMap
 
 
 def main():
     img_file = 'images/arial10x10.png'
     screen_width = 80
     screen_height = 50
+    map_width= 80
+    map_height = 45
+
+    colors = {
+        'dark_wall': tcod.Color(0, 0, 100),
+        'dark_ground': tcod.Color(50, 50, 150)
+    }
 
     # Create entities
     player = Entity(
@@ -30,7 +38,11 @@ def main():
     # Creates the screen. (Boolean specifies full screen)
     tcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
 
+    # Initialize the console
     con = tcod.console_new(screen_width, screen_height)
+
+    # Initialize the game map
+    game_map = GameMap(map_width, map_height)
 
     key = tcod.Key()
     mouse = tcod.Mouse()
@@ -41,7 +53,7 @@ def main():
         tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
 
         # Render all entities
-        render_all(con, entities, screen_width, screen_height)
+        render_all(con, entities, game_map, screen_width, screen_height, colors)
 
         # Presents everything on screen
         tcod.console_flush()
@@ -58,8 +70,9 @@ def main():
 
         if move:
             dx, dy = move
-            player.move(dx, dy)
 
+            if not game_map.is_blocked(player.x + dx, player.y +dy):
+                player.move(dx, dy)
 
         if gameexit:
             return True
