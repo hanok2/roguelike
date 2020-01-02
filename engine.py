@@ -2,21 +2,29 @@ import tcod
 from entity import Entity
 from render_functions import clear_all, render_all
 from game_map import GameMap
+from fov import initialize_fov, recompute_fov
 
 
 def main():
     img_file = 'images/arial10x10.png'
     screen_width = 80
     screen_height = 50
-    map_width= 80
+    map_width = 80
     map_height = 45
     room_max_size = 10
     room_min_size = 4
     max_rooms = 30
 
+    fov_algorithm = 0               # 0 is default alg tcod uses
+    fov_light_walls = True          # Light up walls we see
+    fov_radius = 10                 # How far can we see?
+    fov_recompute = True
+
     colors = {
         'dark_wall': tcod.Color(0, 0, 100),
-        'dark_ground': tcod.Color(50, 50, 150)
+        'dark_ground': tcod.Color(50, 50, 150),
+        'light_wall': tcod.Color(130, 110, 50),
+        'light_ground': tcod.Color(200, 180, 50)
     }
 
     # Create entities
@@ -41,6 +49,9 @@ def main():
     game_map = GameMap(map_width, map_height)
     game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
+    # Initialize fov
+    fov_map = initialize_fov(game_map)
+
     key = tcod.Key()
     mouse = tcod.Mouse()
 
@@ -49,8 +60,13 @@ def main():
         # Capture new user input
         tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
 
+        if fov_recompute:
+            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
+
         # Render all entities
-        render_all(con, entities, game_map, screen_width, screen_height, colors)
+        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+
+        fov_recompute = False       # Mandatory
 
         # Presents everything on screen
         tcod.console_flush()
@@ -70,6 +86,9 @@ def main():
 
             if not game_map.is_blocked(player.x + dx, player.y +dy):
                 player.move(dx, dy)
+
+                # Need to redraw FOV
+                fov_recompute = True
 
         if gameexit:
             return True
