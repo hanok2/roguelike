@@ -4,6 +4,7 @@ from tile import Tile
 from rect import Rect
 from entity import Entity
 from components import Fighter, BasicMonster
+from render_functions import RenderOrder
 
 
 class GameMap(object):
@@ -123,6 +124,7 @@ class GameMap(object):
                         tcod.desaturated_green,
                         'Orc',
                         blocks=True,
+                        render_order=RenderOrder.ACTOR,
                         fighter=fighter_comp,
                         ai=ai_comp
                     )
@@ -137,6 +139,7 @@ class GameMap(object):
                         tcod.darker_green,
                         'Troll',
                         blocks=True,
+                        render_order=RenderOrder.ACTOR,
                         fighter=fighter_comp,
                         ai=ai_comp
                     )

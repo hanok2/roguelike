@@ -1,6 +1,6 @@
 import tcod
 from entity import Entity, get_blocking_entities_at_location
-from render_functions import clear_all, render_all
+from render_functions import clear_all, render_all, RenderOrder
 from game_map import GameMap
 from fov import initialize_fov, recompute_fov
 from game_states import GameStates
@@ -34,7 +34,15 @@ def main():
 
     # Create entities
     fighter_comp = Fighter(hp=30, defense=2, power=5)
-    player = Entity(0, 0, '@', tcod.white, 'Player', blocks=True, fighter=fighter_comp)
+    player = Entity(
+        0, 0,
+        '@',
+        tcod.white,
+        'Player',
+        blocks=True,
+        render_order=RenderOrder.ACTOR,
+        fighter=fighter_comp
+    )
     entities = [player]
 
     tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
@@ -75,7 +83,8 @@ def main():
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
         # Render all entities
-        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        # render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
 
         fov_recompute = False       # Mandatory
 

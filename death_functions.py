@@ -1,5 +1,7 @@
 import tcod
 from game_states import GameStates
+from render_functions import RenderOrder
+
 
 def kill_player(player):
     player.char = '%'
@@ -13,6 +15,7 @@ def kill_monster(monster):
     monster.char = '%'
     monster.color = tcod.dark_red
     monster.blocks = False
+    monster.render_order = RenderOrder.CORPSE
     monster.fighter = None
     monster.ai = None
     monster.name = 'remains of ' + monster.name
