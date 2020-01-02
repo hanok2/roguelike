@@ -134,11 +134,12 @@ def main():
         clear_all(con, entities)
 
         # Get keyboard input
-        action = handle_keys(key)
+        action = handle_keys(key, game_state)
 
         move = action.get('move')
         pickup = action.get('pickup')
         show_inv = action.get('inventory')
+        inv_index = action.get('inv_index')
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -180,12 +181,18 @@ def main():
             prev_game_state = game_state
             game_state = GameStates.INVENTORY
 
+        if inv_index is not None and prev_game_state != GameStates.PLAYER_DEAD and inv_index < len(player.inv.items):
+            item = player.inv.items[inv_index]
+
+            # "using" the item
+            # print(item)
+            player_turn_results.extend(player.inv.use(item))
+
         if gameexit:
             if game_state == GameStates.INVENTORY:
                 game_state = prev_game_state
             else:
                 return True
-
 
         if fullscreen:
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
@@ -195,6 +202,7 @@ def main():
             msg = result.get('msg')
             dead_entity = result.get('dead')
             item_added = result.get('item_added')
+            item_consumed = result.get('consumed')
 
             if msg:
                 msg_log.add(msg)
@@ -209,6 +217,9 @@ def main():
 
             if item_added:
                 entities.remove(item_added)
+                game_state = GameStates.ENEMY_TURN
+
+            if item_consumed:
                 game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:

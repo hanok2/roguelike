@@ -24,3 +24,32 @@ class Inventory(object):
             self.items.append(item)
 
         return results
+
+    def use(self, item_entity, **kwargs):
+        results = []
+        item_comp = item_entity.item
+
+        if item_comp.use_func is None:
+            results.append({
+                'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
+            })
+        else:
+            print('Attempting to use item')
+
+            # How does this work? Is there a cleaner way to do this??
+            # kwargs = {**item_comp.func_kwargs, **kwargs}  #
+
+            kwargs.update(item_comp.func_kwargs)
+
+            item_use_results = item_comp.use_func(self.owner, **kwargs)
+
+            for result in item_use_results:
+                if result.get('consumed'):
+                    self.rm_item(item_entity)
+
+            results.extend(item_use_results)
+
+        return results
+
+    def rm_item(self, item):
+        self.items.remove(item)

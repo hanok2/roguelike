@@ -17,6 +17,12 @@ class Fighter(object):
 
         return results
 
+    def heal(self, amt):
+        self.hp += amt
+
+        if self.hp > self.max_hp:
+            self.hp = self.max_hp
+
     def attack(self, target):
         results = []
 
@@ -58,5 +64,6 @@ class BasicMonster(object):
 
 
 class Item(object):
-    def __init__(self):
-        pass
+    def __init__(self, use_func=None, **kwargs):
+        self.use_func = use_func
+        self.func_kwargs = kwargs

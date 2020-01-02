@@ -5,6 +5,7 @@ from rect import Rect
 from entity import Entity
 from components import Fighter, BasicMonster, Item
 from render_functions import RenderOrder
+from item_functions import heal
 
 
 class GameMap(object):
@@ -153,13 +154,15 @@ class GameMap(object):
 
                 entities.append(monster)
 
+        # Item placement
         for i in range(num_items):
             # Choose a random location in the room
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
+
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
 
-                item_comp = Item()
+                item_comp = Item(use_func=heal, amt=4)
                 item = Entity(
                     x, y,
                     '!',
