@@ -27,14 +27,7 @@ def main():
         color=tcod.white
     )
 
-    npc = Entity(
-        x=screen_width // 2 - 5,
-        y=screen_height // 2,
-        char='@',
-        color=tcod.yellow
-    )
-
-    entities = [npc, player]
+    entities = [player]
 
     tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
 

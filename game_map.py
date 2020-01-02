@@ -75,5 +75,22 @@ class GameMap(object):
                     player.x = new_x
                     player.y = new_y
 
+                else:
+                    # For all rooms after the first:
+                    # Connect it to the previous room with a tunnel.
+
+                    # Center coordinates of previous room
+                    (prev_x, prev_y) = rooms[num_rooms - 1].center()
+
+                    # Flip a coin
+                    if randint(0, 1) == 1:
+                        # First move horizontally, then vertically.
+                        self.create_h_tunnel(prev_x, new_x, prev_y)
+                        self.create_v_tunnel(prev_y, new_y, new_x)
+                    else:
+                        self.create_v_tunnel(prev_y, new_y, prev_x)
+                        self.create_h_tunnel(prev_x, new_x, new_y)
+
+
                 rooms.append(new_room)
                 num_rooms += 1
