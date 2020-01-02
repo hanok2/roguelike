@@ -10,6 +10,9 @@ def main():
     screen_height = 50
     map_width= 80
     map_height = 45
+    room_max_size = 10
+    room_min_size = 4
+    max_rooms = 30
 
     colors = {
         'dark_wall': tcod.Color(0, 0, 100),
@@ -43,7 +46,7 @@ def main():
 
     # Initialize the game map
     game_map = GameMap(map_width, map_height)
-    game_map.make_map()
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
     key = tcod.Key()
     mouse = tcod.Mouse()

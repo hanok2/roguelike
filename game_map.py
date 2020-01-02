@@ -1,3 +1,4 @@
+from random import randint
 from tile import Tile
 from rect import Rect
 
@@ -38,12 +39,41 @@ class GameMap(object):
             self.tiles[x][y].block_sight = False
 
 
-    def make_map(self):
-        # Create 2 rooms for demo purposes
-        room1 = Rect(20, 15, 10, 15)
-        room2 = Rect(35, 15, 10, 15)
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player):
+        # procedurally generate a dungeon map
 
-        self.create_room(room1)
-        self.create_room(room2)
-        self.create_h_tunnel(25, 40, 23)
+        rooms = []
+        num_rooms = 0
 
+        for r in range(max_rooms):
+            # random width and height
+            w = randint(room_min_size, room_max_size)
+            h = randint(room_min_size, room_max_size)
+
+            # Random position w/o going out of the map boundaries
+            x = randint(0, map_width - w - 1)
+            y = randint(0, map_height- h - 1)
+
+            # Generate new Rect
+            new_room = Rect(x, y, w, h)
+
+            # Double check the other rooms to make sure there are no
+            # intersections.
+            for other_room in rooms:
+                if new_room.intersect(other_room):
+                    break
+
+            else:
+                # There are no intersections, valid room.
+                self.create_room(new_room)
+
+                # Get center coordinates
+                (new_x, new_y) = new_room.center()
+
+                if num_rooms == 0:
+                    # If this is the first room, place the player there.
+                    player.x = new_x
+                    player.y = new_y
+
+                rooms.append(new_room)
+                num_rooms += 1
