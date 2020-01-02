@@ -20,6 +20,7 @@ def main():
     room_min_size = 4
     max_rooms = 30
     max_monsters_per_room = 3
+    max_items_per_room = 2
     bar_width = 20
     panel_height = 7
     panel_y = screen_height - panel_height
@@ -74,7 +75,8 @@ def main():
         map_height,
         player,
         entities,
-        max_monsters_per_room
+        max_monsters_per_room,
+        max_items_per_room
     )
 
     # Initialize fov
