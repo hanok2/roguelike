@@ -8,28 +8,42 @@ class Fighter(object):
         self.power = power
 
     def take_dmg(self, amt):
+        results = []
         self.hp -= amt
 
+        if self.hp <= 0:
+            results.append({'dead': self.owner})
+
+        return results
+
     def attack(self, target):
+        results = []
+
         dmg = self.power - target.fighter.defense
 
         if dmg > 0:
-            target.fighter.take_dmg(dmg)
-            print('{} attacks {} for {} HP.'.format(
+            msg = {'msg':'{} attacks {} for {} HP.'.format(
                 self.owner.name,
                 target.name,
-                str(dmg))
-                 )
-        else:
-            print('{} attacks {} but does no damage.'.format(
-                self.owner.name,
-                target.name,
-            ))
+                str(dmg)
+            )}
+            results.append(msg)
+            results.extend(target.fighter.take_dmg(dmg))
 
+        else:
+            msg = {'msg':'{} attacks {} but does no damage.'.format(
+                self.owner.name,
+                target.name,
+            )}
+            results.append(msg)
+
+        return results
 
 class BasicMonster(object):
     """AI for a BasicMonster"""
     def take_turn(self, target, fov_map, game_map, entities):
+        results = []
+
         monster = self.owner
 
         if tcod.map_is_in_fov(fov_map, monster.x, monster.y):
@@ -38,5 +52,7 @@ class BasicMonster(object):
                 monster.move_astar(target, entities, game_map)
 
             elif target.fighter.hp > 0:
-                # print('The {} insults you!'.format(monster.name))
-                monster.fighter.attack(target)
+                attack_results = monster.fighter.attack(target)
+                results.extend(attack_results)
+
+        return results
