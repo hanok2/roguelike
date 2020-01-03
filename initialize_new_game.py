@@ -90,10 +90,7 @@ msg_log = Messagelog(
     CONSTANTS['msg_height']
 )
 
-GAME_DATA = {
-    'player': player,
-    'entities': entities,
-    'game_map': game_map,
-    'msg_log': msg_log,
-    'game_state': GameStates.PLAYERS_TURN
-}
+game_state = GameStates.PLAYERS_TURN
+
+def get_game_data():
+    return player, entities, game_map, msg_log, game_state

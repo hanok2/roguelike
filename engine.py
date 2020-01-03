@@ -1,12 +1,12 @@
 import tcod
-from entity import get_blocking_entities_at_location
-from render_functions import clear_all, render_all
-from fov import initialize_fov, recompute_fov
-from game_states import GameStates
-from input_handling import handle_keys, handle_mouse
 from death_functions import kill_monster, kill_player
+from entity import get_blocking_entities_at_location
+from fov import initialize_fov, recompute_fov
 from game_messages import Message
-from initialize_new_game import CONSTANTS, GAME_DATA
+from game_states import GameStates
+from initialize_new_game import CONSTANTS, get_game_data
+from input_handling import handle_keys, handle_mouse
+from render_functions import clear_all, render_all
 
 
 def main():
@@ -33,12 +33,9 @@ def main():
         CONSTANTS['screen_width'],
         CONSTANTS['panel_height']
     )
+
     # Initialize game data
-    player = GAME_DATA['player']
-    entities = GAME_DATA['entities']
-    game_map = GAME_DATA['game_map']
-    msg_log = GAME_DATA['msg_log']
-    game_state = GAME_DATA['game_state']
+    player, entities, game_map, msg_log, game_state = get_game_data()
 
     # Initialize fov
     fov_map = initialize_fov(game_map)
