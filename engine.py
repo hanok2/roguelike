@@ -267,12 +267,12 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
         if level_up:
             # todo: Move stat boosts to constants
             if level_up == 'hp':
-                player.fighter.max_hp += 20
+                player.fighter.base_max_hp += 20
                 player.fighter.hp += 20
             elif level_up == 'str':
-                player.fighter.power += 1
+                player.fighter.base_power += 1
             elif level_up == 'def':
-                player.fighter.defense += 1
+                player.fighter.base_defense += 1
 
             game_state = prev_game_state
 
@@ -315,6 +315,7 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
             item_added = result.get('item_added')
             item_consumed = result.get('consumed')
             item_dropped = result.get('item_dropped')
+            equip = result.get('equip')
             targeting = result.get('targeting')
             targeting_cancelled = result.get('targeting_cancelled')
             xp = result.get('xp')
@@ -361,11 +362,24 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
                 targeting_item = targeting
                 msg_log.add(targeting_item.item.targeting_msg)
 
-
             if item_dropped:
                 entities.append(item_dropped)
                 game_state = GameStates.ENEMY_TURN
 
+            if equip:
+                equip_results = player.equipment.toggle_equip(equip)
+
+                for equip_result in equip_results:
+                    equipped = equip_result.get('equipped')
+                    dequipped = equip_result.get('dequipped')
+
+                    if equipped:
+                        msg_log.add(Message('You equipped the {}'.format(equipped.name)))
+
+                    if dequipped:
+                        msg_log.add(Message('You dequipped the {}'.format(dequipped.name)))
+
+                game_state = GameStates.ENEMY_TURN
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:

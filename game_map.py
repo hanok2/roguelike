@@ -3,7 +3,7 @@ import tcod
 from tile import Tile
 from rect import Rect
 from entity import Entity
-from components import Fighter, BasicMonster, Item
+from components import Fighter, BasicMonster, Item, EquipmentSlots, Equippable
 from render_functions import RenderOrder
 from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
 from game_messages import Message
@@ -154,7 +154,11 @@ class GameMap(object):
             'healing_potion': 35,
             'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
             'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
-            'confusion_scroll': from_dungeon_level([[10, 2]], self.dungeon_level)
+            'confusion_scroll': from_dungeon_level([[10, 2]], self.dungeon_level),
+            'sword': 35,
+            'shield': 35,
+            # 'sword': from_dungeon_level([[5, 4]], self.dungeon_level),
+            # 'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
         }
 
         for i in range(num_monsters):
@@ -217,6 +221,25 @@ class GameMap(object):
                         "Healing potion",
                         render_order=RenderOrder.ITEM,
                         item=item_comp,
+                    )
+
+                elif item_choice == 'sword':
+                    equippable_comp = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
+                    item = Entity(
+                        x, y,
+                        '(',
+                        tcod.sky,
+                        'Sword',
+                        equippable=equippable_comp
+                    )
+                elif item_choice == 'shield':
+                    equippable_comp = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=2)
+                    item = Entity(
+                        x, y,
+                        '[',
+                        tcod.darker_orange,
+                        'Shield',
+                        equippable=equippable_comp
                     )
 
                 elif item_choice == 'fireball_scroll':

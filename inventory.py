@@ -30,9 +30,18 @@ class Inventory(object):
         item_comp = item_entity.item
 
         if item_comp.use_func is None:
-            results.append({
-                'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
-            })
+            # results.append({
+                # 'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
+            # })
+
+            equippable_comp = item_entity.equippable
+
+            if equippable_comp:
+                results.append({'equip': item_entity})
+            else:
+                results.append({
+                    'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
+                })
         else:
             # How does this work? Is there a cleaner way to do this??
             # kwargs = {**item_comp.func_kwargs, **kwargs}  #
@@ -75,6 +84,11 @@ class Inventory(object):
 
     def drop(self, item):
         results = []
+
+        # Check if a piece of equipment is equipped. If it is, dequip it before dropping.
+        if self.owner.equipment.main_hand == item or self.owner.equipment.off_hand == item:
+            self.owner.equipment.toggle_equip(item)
+
         item.x = self.owner.x
         item.y = self.owner.y
 

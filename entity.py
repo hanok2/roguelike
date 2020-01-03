@@ -1,12 +1,13 @@
 import math
 import tcod
 from render_functions import RenderOrder
+from components import Item
 
 
 class Entity(object):
     """ A generic object to represent players, enemies, items, etc."""
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stairs=None, level=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stairs=None, level=None, equipment=None, equippable=None):
         self.x = x
         self.y = y
         self.char = char
@@ -20,6 +21,8 @@ class Entity(object):
         self.inv = inv
         self.stairs = stairs
         self.level = level
+        self.equipment = equipment
+        self.equippable = equippable
 
         if self.fighter:
             self.fighter.owner = self
@@ -38,6 +41,21 @@ class Entity(object):
 
         if self.level:
             self.level.owner = self
+
+        if self.equipment:
+            self.equipment.owner = self
+
+        if self.equippable:
+            self.equippable.owner = self
+
+            # Note: Why is this needed?
+            # Notice that if the entity does not have an Item component, then we
+            # add one. This is because every piece of equipment is also an item
+            # by definition, because it gets added to the inventory, picked up, and dropped.
+            if not self.item:
+                item = Item()
+                self.item = item
+                self.item.owner = self
 
     def move(self, dx, dy):
         # Move the entity by a given amount

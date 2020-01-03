@@ -73,7 +73,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         inv_menu(
             con,
             inv_title,
-            player.inv,
+            player,
             50,
             screen_width,
             screen_height

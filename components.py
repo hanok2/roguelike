@@ -1,15 +1,52 @@
 from random import randint
 import tcod
 from game_messages import Message
+from equipment_slots import EquipmentSlots
 
 
 class Fighter(object):
     def __init__(self, hp, defense, power, xp=0):
-        self.max_hp = hp
+        # self.max_hp = hp
+        self.base_max_hp = hp
+
         self.hp = hp
-        self.defense = defense
-        self.power = power
+
+        # self.defense = defense
+        self.base_defense = defense
+
+        # self.power = power
+        self.base_power = power
+
         self.xp = xp
+
+    @property
+    def max_hp(self):
+        if self.owner and self.owner.equipment:
+            # Take into account what equipment is equipped
+            bonus = self.owner.equipment.max_hp_bonus
+        else:
+            bonus = 0
+        return self.base_max_hp + bonus
+
+    @property
+    def power(self):
+        if self.owner and self.owner.equipment:
+            # Take into account what equipment is equipped
+            bonus = self.owner.equipment.power_bonus
+        else:
+            bonus = 0
+        return self.base_power + bonus
+
+    @property
+    def defense(self):
+        if self.owner and self.owner.equipment:
+            # Take into account what equipment is equipped
+            bonus = self.owner.equipment.defense_bonus
+        else:
+            bonus = 0
+        return self.base_defense + bonus
+
+
 
     def take_dmg(self, amt):
         results = []
@@ -136,4 +173,86 @@ class Level(object):
             return False
 
 
+class Equippable(object):
+    def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0):
+        self.slot = slot
+        self.power_bonus = power_bonus
+        self.defense_bonus = defense_bonus
+        self.max_hp_bonus = max_hp_bonus
 
+
+class Equipment(object):
+    """Since we’re using properties, these values can be accessed like a regular
+    variable, which will come in handy soon enough. If the player has equipment
+    in both the main hand and off hand that increases attack, for instance, then
+    we’ll get the bonus the same either way.
+    """
+    def __init__(self, main_hand=None, off_hand=None):
+        self.main_hand = main_hand
+        self.off_hand = off_hand
+
+    @property
+    def max_hp_bonus(self):
+        bonus = 0
+        if self.main_hand and self.main_hand.equippable:
+            bonus += self.main_hand.equippable.max_hp_bonus
+        if self.off_hand and self.off_hand.equippable:
+            bonus += self.off_hand.equippable.max_hp_bonus
+        return bonus
+
+    @property
+    def power_bonus(self):
+        bonus = 0
+        if self.main_hand and self.main_hand.equippable:
+            bonus += self.main_hand.equippable.power_bonus
+        if self.off_hand and self.off_hand.equippable:
+            bonus += self.off_hand.equippable.power_bonus
+        return bonus
+
+    @property
+    def defense_bonus(self):
+        bonus = 0
+        if self.main_hand and self.main_hand.equippable:
+            bonus += self.main_hand.equippable.defense_bonus
+        if self.off_hand and self.off_hand.equippable:
+            bonus += self.off_hand.equippable.defense_bonus
+        return bonus
+
+    def toggle_equip(self, equippable_entity):
+        """toggle_equip is what we'll call when we're either equipping or dequipping
+            an item. If the item was not previously equipped, we equip it, removing
+            any previously equipped item. If it's equipped already, we'll assume
+            the player meant to remove it, and just dequip it.
+
+            The two variables main_hand and off_hand will hold the entities that
+            we're equipping. If they are set to None, then that means nothing is
+            equipped to that slot.
+        """
+
+        results = []
+
+        slot = equippable_entity.equippable.slot
+
+        if slot == EquipmentSlots.MAIN_HAND:
+            if self.main_hand == equippable_entity:
+                self.main_hand = None
+                results.append({'dequipped': equippable_entity})
+            else:
+                if self.main_hand:
+                    results.append({'dequipped': self.main_hand})
+
+                self.main_hand = equippable_entity
+                results.append({'equipped': equippable_entity})
+
+        elif slot == EquipmentSlots.OFF_HAND:
+            if self.off_hand == equippable_entity:
+                self.off_hand = None
+                results.append({'dequipped': equippable_entity})
+            else:
+                if self.off_hand:
+                    results.append({'dequipped': self.off_hand})
+
+                self.off_hand = equippable_entity
+                results.append({'equipped': equippable_entity})
+
+        return results

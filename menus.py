@@ -58,12 +58,21 @@ def menu(con, header, options, width, screen_width, screen_height):
     tcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
 
-def inv_menu(con, header, inv, inv_width, screen_width, screen_height):
+def inv_menu(con, header, player, inv_width, screen_width, screen_height):
     # Show a menu w/ each item of the inventory as an option
-    if len(inv.items) == 0:
+    if len(player.inv.items) == 0:
         options = ['Inventory is empty.']
     else:
-        options = [item.name for item in inv.items]
+        # options = [item.name for item in inv.items]
+        options = []
+
+        for item in player.inv.items:
+            if player.equipment.main_hand == item:
+                options.append('{} (on main hand)'.format(item.name))
+            elif player.equipment.off_hand == item:
+                options.append('{} (on off hand)'.format(item.name))
+            else:
+                options.append(item.name)
 
     menu(con, header, options, inv_width, screen_width, screen_height)
 

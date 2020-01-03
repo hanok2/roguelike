@@ -3,7 +3,8 @@ from entity import Entity
 from render_functions import RenderOrder
 from game_map import GameMap
 from game_states import GameStates
-from components import Fighter, Level
+from components import Fighter, Level, Equipment, Equippable
+from equipment_slots import EquipmentSlots
 from inventory import Inventory
 from game_messages import Messagelog
 
@@ -49,9 +50,10 @@ constants = {
 }
 
 # Player components
-fighter_comp = Fighter(hp=100, defense=1, power=4)
+fighter_comp = Fighter(hp=100, defense=1, power=2)
 inv_comp = Inventory(26)
 level_comp = Level()
+equipment_comp = Equipment()
 
 # Create entities
 player = Entity(
@@ -63,10 +65,22 @@ player = Entity(
     render_order=RenderOrder.ACTOR,
     fighter=fighter_comp,
     inv=inv_comp,
-    level=level_comp
+    level=level_comp,
+    equipment=equipment_comp,
 )
 
 entities = [player]
+
+equippable_comp = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
+dagger = Entity(
+    0, 0,
+    '(',
+    tcod.sky,
+    'Dagger',
+    equippable=equippable_comp
+)
+player.inv.add_item(dagger)
+player.equipment.toggle_equip(dagger)
 
 # Initialize the game map
 game_map = GameMap(
