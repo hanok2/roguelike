@@ -24,7 +24,7 @@ colors = {
     'light_ground': tcod.Color(200, 180, 50)
 }
 
-CONSTANTS = {
+constants = {
     'window_title': 'Roguelike Tutorial Revised',
     'screen_width': screen_width,
     'screen_height': screen_height,
@@ -68,26 +68,26 @@ entities = [player]
 
 # Initialize the game map
 game_map = GameMap(
-    CONSTANTS['map_width'],
-    CONSTANTS['map_height']
+    constants['map_width'],
+    constants['map_height']
 )
 
 game_map.make_map(
-    CONSTANTS['max_rooms'],
-    CONSTANTS['room_min_size'],
-    CONSTANTS['room_max_size'],
-    CONSTANTS['map_width'],
-    CONSTANTS['map_height'],
+    constants['max_rooms'],
+    constants['room_min_size'],
+    constants['room_max_size'],
+    constants['map_width'],
+    constants['map_height'],
     player,
     entities,
-    CONSTANTS['max_monsters_per_room'],
-    CONSTANTS['max_items_per_room']
+    constants['max_monsters_per_room'],
+    constants['max_items_per_room']
 )
 
 msg_log = Messagelog(
-    CONSTANTS['msg_x'],
-    CONSTANTS['msg_width'],
-    CONSTANTS['msg_height']
+    constants['msg_x'],
+    constants['msg_width'],
+    constants['msg_height']
 )
 
 game_state = GameStates.PLAYERS_TURN

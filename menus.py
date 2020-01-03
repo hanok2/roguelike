@@ -86,7 +86,7 @@ def main_menu(con, bg_img, screen_width, screen_height):
         0,
         int(screen_width / 2),
         int(screen_height - 2),
-        tcod.BKGND_HONE,
+        tcod.BKGND_NONE,
         tcod.CENTER,
         'By hackemslashem'
     )
@@ -94,3 +94,7 @@ def main_menu(con, bg_img, screen_width, screen_height):
     options = ['Play a new game', 'Continue last game', 'Quit']
 
     menu(con, '', options, 24, screen_width, screen_height)
+
+
+def msg_box(con, header, width, screen_width, screen_height):
+    menu(con, header, [], width, screen_width, screen_height)
