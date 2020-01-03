@@ -42,6 +42,9 @@ def handle_player_turn_keys(key):
     elif key_char == '\\':
         return {'show_character_screen': True}
 
+    if key_char == '.':
+        return {'wait': True}
+
     # Movement
     # Note: Add support for number pad movement
     if key.vk == tcod.KEY_UP or key_char == 'k':
