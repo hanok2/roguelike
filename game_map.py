@@ -147,7 +147,7 @@ class GameMap(object):
 
                 if randint(0, 100) < 80:
                     # ORC
-                    fighter_comp = Fighter(hp=10, defense=0, power=3)
+                    fighter_comp = Fighter(hp=10, defense=0, power=3, xp=35)
                     ai_comp = BasicMonster()
                     monster = Entity(
                         x, y,
@@ -162,7 +162,7 @@ class GameMap(object):
 
                 else:
                     # TROLL
-                    fighter_comp = Fighter(hp=16, defense=1, power=4)
+                    fighter_comp = Fighter(hp=16, defense=1, power=4, xp=100)
                     ai_comp = BasicMonster()
                     monster = Entity(
                         x, y,

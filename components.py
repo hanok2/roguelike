@@ -4,18 +4,22 @@ from game_messages import Message
 
 
 class Fighter(object):
-    def __init__(self, hp, defense, power):
+    def __init__(self, hp, defense, power, xp=0):
         self.max_hp = hp
         self.hp = hp
         self.defense = defense
         self.power = power
+        self.xp = xp
 
     def take_dmg(self, amt):
         results = []
         self.hp -= amt
 
         if self.hp <= 0:
-            results.append({'dead': self.owner})
+            results.append({
+                'dead': self.owner,
+                'xp': self.xp
+            })
 
         return results
 
@@ -99,3 +103,37 @@ class Item(object):
         self.targeting = targeting
         self.targeting_msg = targeting_msg
         self.func_kwargs = kwargs
+
+
+class Level(object):
+    def __init__(self, current_level=1, current_xp=0, level_up_base=200, level_up_factor=150):
+        # Note: Consider putting defaults in constants dict.
+        self.current_level = current_level
+        self.current_xp = current_xp
+        self.level_up_base = level_up_base
+        self.level_up_factor = level_up_factor
+
+
+    @property
+    def experience_to_next_level(self):
+        # Read-only variable that we can easily access inside the clas and on
+        # the objects we create.
+        return self.level_up_base + self.current_level * self.level_up_factor
+
+    def add_xp(self, xp):
+        self.current_xp += xp
+
+        if self.current_xp > self.experience_to_next_level:
+            # Maybe remove this line, seems like we are short-changing the player
+            # self.current_xp -= self.experience_to_next_level
+
+            # For now - reset the XP
+            self.current_xp = 0
+            self.current_level += 1
+
+            return True
+        else:
+            return False
+
+
+

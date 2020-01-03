@@ -1,7 +1,7 @@
 from enum import Enum
 import tcod
 from game_states import GameStates
-from menus import inv_menu
+from menus import inv_menu, level_up_menu, character_screen
 
 
 class RenderOrder(Enum):
@@ -78,6 +78,19 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
             screen_width,
             screen_height
         )
+
+    elif game_state == GameStates.LEVEL_UP:
+        level_up_menu(
+            con,
+            'Level up! Choos a stat to raise:',
+            player,
+            40,
+            screen_width,
+            screen_height
+        )
+
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        character_screen(player, 30, 10, screen_width, screen_height)
 
     tcod.console_set_default_background(panel, tcod.black)
     tcod.console_clear(panel)

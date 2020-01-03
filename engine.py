@@ -176,6 +176,8 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
         drop_inv = action.get('drop_inv')
         inv_index = action.get('inv_index')
         take_stairs = action.get('take_stairs')
+        level_up = action.get('level_up')
+        show_character_screen = action.get('show_character_screen')
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -257,6 +259,22 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
                     'There are no stairs here.', tcod.yellow
                 ))
 
+        if level_up:
+            # todo: Move stat boosts to constants
+            if level_up == 'hp':
+                player.fighter.max_hp += 20
+                player.fighte.hp += 20
+            elif level_up == 'str':
+                player.fighter.power += 1
+            elif level_up == 'def':
+                player.fighter.defense += 1
+
+            game_state = prev_game_state
+
+        if show_character_screen:
+            prev_game_state = game_state
+            game_state = GameStates.CHARACTER_SCREEN
+
         if game_state == GameStates.TARGETING:
             if left_click:
                 target_x, target_y = left_click
@@ -274,7 +292,7 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
                 player_turn_results.append({'targeting_cancelled': True})
 
         if gameexit:
-            if game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
+            if game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY, GameStates.CHARACTER_SCREEN):
                 game_state = prev_game_state
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled': True})
@@ -294,6 +312,7 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
             item_dropped = result.get('item_dropped')
             targeting = result.get('targeting')
             targeting_cancelled = result.get('targeting_cancelled')
+            xp = result.get('xp')
 
             if msg:
                 msg_log.add(msg)
@@ -301,6 +320,19 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
             if targeting_cancelled:
                 game_state = prev_game_state
                 msg_log.add(Message('Targeting cancelled'))
+
+            if xp:
+                leveled_up = player.level.add_xp(xp)
+                msg_log.add(Message('You gain {} XP points.'.format(xp)))
+
+                if leveled_up:
+                    msg_log.add(Message(
+                        'Your battle skills grow stronger! You reached level {}!'.format(
+                            player.level.current_level), tcod.yellow
+                        )
+                    )
+                    prev_game_state = game_state
+                    game_state = GameStates.LEVEL_UP
 
             if dead_entity:
                 if dead_entity == player:

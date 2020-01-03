@@ -3,7 +3,7 @@ from entity import Entity
 from render_functions import RenderOrder
 from game_map import GameMap
 from game_states import GameStates
-from components import Fighter
+from components import Fighter, Level
 from inventory import Inventory
 from game_messages import Messagelog
 
@@ -51,6 +51,7 @@ constants = {
 # Player components
 fighter_comp = Fighter(hp=30, defense=2, power=5)
 inv_comp = Inventory(26)
+level_comp = Level()
 
 # Create entities
 player = Entity(
@@ -62,6 +63,7 @@ player = Entity(
     render_order=RenderOrder.ACTOR,
     fighter=fighter_comp,
     inv=inv_comp,
+    level=level_comp
 )
 
 entities = [player]

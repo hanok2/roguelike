@@ -15,6 +15,11 @@ def handle_keys(key, game_state):
     elif game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
         return handle_inv_keys(key)
 
+    elif game_state == GameStates.LEVEL_UP:
+        return handle_level_up_menu(key)
+
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        return handle_character_screen(key)
 
     return {}
 
@@ -29,9 +34,13 @@ def handle_player_turn_keys(key):
         return {'inventory': True}
     elif key_char == 'd':
         return {'drop_inv': True}
+
     # Trouble shoot > input later
     elif key_char == '>' or key.vk == tcod.KEY_ENTER:
         return {'take_stairs': True}
+
+    elif key_char == '\\':
+        return {'show_character_screen': True}
 
     # Movement
     # Note: Add support for number pad movement
@@ -111,11 +120,13 @@ def handle_main_menu(key):
 
     return {}
 
+
 def handle_targeting_keys(key):
     if key.vk == tcod.KEY_ESCAPE:
         return {'exit': True}
 
     return {}
+
 
 def handle_mouse(mouse):
     (x, y) = (mouse.cx, mouse.cy)
@@ -125,4 +136,25 @@ def handle_mouse(mouse):
     elif mouse.rbutton_pressed:
         return {'right_click': (x, y)}
 
+    return {}
+
+
+def handle_level_up_menu(key):
+    if key:
+        key_char = chr(key.c)
+
+
+        if key_char == 'a':
+            return {'level_up': 'hp'}
+        elif key_char == 'b':
+            return {'level_up': 'str'}
+        elif key_char == 'c':
+            return {'level_up': 'def'}
+
+    return {}
+
+
+def handle_character_screen(key):
+    if key.vk == tcod.KEY_ESCAPE:
+        return {'exit': True}
     return {}
