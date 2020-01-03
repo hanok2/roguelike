@@ -66,3 +66,31 @@ def inv_menu(con, header, inv, inv_width, screen_width, screen_height):
         options = [item.name for item in inv.items]
 
     menu(con, header, options, inv_width, screen_width, screen_height)
+
+
+def main_menu(con, bg_img, screen_width, screen_height):
+    tcod.image_blit_2x(bg_img, 0, 0, 0)
+
+    tcod.console_set_default_foreground(0, tcod.light_yellow)
+
+    tcod.console_print_ex(
+        0,
+        int(screen_width / 2),
+        int(screen_height / 2) - 4,
+        tcod.BKGND_NONE,
+        tcod.CENTER,
+        'STEAMPUNK LEGENDS'
+    )
+
+    tcod.console_print_ex(
+        0,
+        int(screen_width / 2),
+        int(screen_height - 2),
+        tcod.BKGND_HONE,
+        tcod.CENTER,
+        'By hackemslashem'
+    )
+
+    options = ['Play a new game', 'Continue last game', 'Quit']
+
+    menu(con, '', options, 24, screen_width, screen_height)
