@@ -9,38 +9,12 @@ from inventory import Inventory
 from input_handling import handle_keys, handle_mouse
 from death_functions import kill_monster, kill_player
 from game_messages import Message, Messagelog
+from initialize_new_game import CONSTANTS
 
 
 def main():
     img_file = 'images/arial10x10.png'
-    screen_width = 80
-    screen_height = 50
-    map_width = 80
-    map_height = 43
-    room_max_size = 10
-    room_min_size = 4
-    max_rooms = 30
-    max_monsters_per_room = 3
-    max_items_per_room = 2
-    bar_width = 20
-    panel_height = 7
-    panel_y = screen_height - panel_height
-
-    msg_x = bar_width + 2
-    msg_width = screen_width - bar_width - 2
-    msg_height = panel_height - 1
-
-    fov_algorithm = 0               # 0 is default alg tcod uses
-    fov_light_walls = True          # Light up walls we see
-    fov_radius = 10                 # How far can we see?
     fov_recompute = True
-
-    colors = {
-        'dark_wall': tcod.Color(0, 0, 100),
-        'dark_ground': tcod.Color(50, 50, 150),
-        'light_wall': tcod.Color(130, 110, 50),
-        'light_ground': tcod.Color(200, 180, 50)
-    }
 
     # Player components
     fighter_comp = Fighter(hp=30, defense=2, power=5)
@@ -62,32 +36,50 @@ def main():
     tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
 
     # Creates the screen. (Boolean specifies full screen)
-    tcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
+    tcod.console_init_root(
+        CONSTANTS['screen_width'],
+        CONSTANTS['screen_height'],
+        'libtcod tutorial revised',
+        False
+    )
 
     # Initialize the console
-    con = tcod.console_new(screen_width, screen_height)
+    con = tcod.console_new(
+        CONSTANTS['screen_width'],
+        CONSTANTS['screen_height']
+    )
 
     # Initialize the panel
-    panel = tcod.console_new(screen_width, panel_height)
+    panel = tcod.console_new(
+        CONSTANTS['screen_width'],
+        CONSTANTS['panel_height']
+    )
 
     # Initialize the game map
-    game_map = GameMap(map_width, map_height)
+    game_map = GameMap(
+        CONSTANTS['map_width'],
+        CONSTANTS['map_height']
+    )
     game_map.make_map(
-        max_rooms,
-        room_min_size,
-        room_max_size,
-        map_width,
-        map_height,
+        CONSTANTS['max_rooms'],
+        CONSTANTS['room_min_size'],
+        CONSTANTS['room_max_size'],
+        CONSTANTS['map_width'],
+        CONSTANTS['map_height'],
         player,
         entities,
-        max_monsters_per_room,
-        max_items_per_room
+        CONSTANTS['max_monsters_per_room'],
+        CONSTANTS['max_items_per_room']
     )
 
     # Initialize fov
     fov_map = initialize_fov(game_map)
 
-    msg_log = Messagelog(msg_x, msg_width, msg_height)
+    msg_log = Messagelog(
+        CONSTANTS['msg_x'],
+        CONSTANTS['msg_width'],
+        CONSTANTS['msg_height']
+    )
 
     key = tcod.Key()
     mouse = tcod.Mouse()
@@ -106,7 +98,14 @@ def main():
 
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
+            recompute_fov(
+                fov_map,
+                player.x,
+                player.y,
+                CONSTANTS['fov_radius'],
+                CONSTANTS['fov_light_walls'],
+                CONSTANTS['fov_algorithm']
+            )
 
         # Render all entities
         render_all(
@@ -118,13 +117,13 @@ def main():
             fov_map,
             fov_recompute,
             msg_log,
-            screen_width,
-            screen_height,
-            bar_width,
-            panel_height,
-            panel_y,
+            CONSTANTS['screen_width'],
+            CONSTANTS['screen_height'],
+            CONSTANTS['bar_width'],
+            CONSTANTS['panel_height'],
+            CONSTANTS['panel_y'],
             mouse,
-            colors,
+            CONSTANTS['colors'],
             game_state
         )
 
