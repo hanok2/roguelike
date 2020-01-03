@@ -139,6 +139,7 @@ def main():
         move = action.get('move')
         pickup = action.get('pickup')
         show_inv = action.get('inventory')
+        drop_inv = action.get('drop_inv')
         inv_index = action.get('inv_index')
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
@@ -181,15 +182,26 @@ def main():
             prev_game_state = game_state
             game_state = GameStates.INVENTORY
 
+        if drop_inv:
+            prev_game_state == game_state
+            game_state = GameStates.DROP_INVENTORY
+
         if inv_index is not None and prev_game_state != GameStates.PLAYER_DEAD and inv_index < len(player.inv.items):
             item = player.inv.items[inv_index]
 
             # "using" the item
             # print(item)
-            player_turn_results.extend(player.inv.use(item))
+            # player_turn_results.extend(player.inv.use(item))
+
+            if game_state == GameStates.INVENTORY:
+                player_turn_results.extend(player.inv.use(item))
+            elif game_state == GameStates.DROP_INVENTORY:
+                player_turn_results.extend(player.inv.drop(item))
+
+
 
         if gameexit:
-            if game_state == GameStates.INVENTORY:
+            if game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
                 game_state = prev_game_state
             else:
                 return True
@@ -203,6 +215,7 @@ def main():
             dead_entity = result.get('dead')
             item_added = result.get('item_added')
             item_consumed = result.get('consumed')
+            item_dropped = result.get('item_dropped')
 
             if msg:
                 msg_log.add(msg)
@@ -221,6 +234,11 @@ def main():
 
             if item_consumed:
                 game_state = GameStates.ENEMY_TURN
+
+            if item_dropped:
+                entities.append(item_dropped)
+                game_state = GameStates.ENEMY_TURN
+
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:

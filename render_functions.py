@@ -61,14 +61,19 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
-    if game_state == GameStates.INVENTORY:
+    if game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
+        if game_state == GameStates.INVENTORY:
+            inv_title = 'Press the key next to an item to use it, or ESC to cancel.\n'
+        else:
+            inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
+
         inv_menu(
             con,
-            'Press the key next to an item to use it, or ESC to cancel.\n',
+            inv_title,
             player.inv,
             50,
             screen_width,
-            screen_height,
+            screen_height
         )
 
     tcod.console_set_default_background(panel, tcod.black)

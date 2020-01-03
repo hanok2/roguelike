@@ -9,7 +9,7 @@ def handle_keys(key, game_state):
     elif game_state == GameStates.PLAYER_DEAD:
         return handle_player_dead_keys(key)
 
-    elif game_state == GameStates.INVENTORY:
+    elif game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
         return handle_inv_keys(key)
 
     return {}
@@ -23,6 +23,8 @@ def handle_player_turn_keys(key):
         return {'pickup': True}
     elif key_char == 'i':
         return {'inventory': True}
+    elif key_char == 'd':
+        return {'drop_inv': True}
 
     # Movement
     # Note: Add support for number pad movement

@@ -34,8 +34,6 @@ class Inventory(object):
                 'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
             })
         else:
-            print('Attempting to use item')
-
             # How does this work? Is there a cleaner way to do this??
             # kwargs = {**item_comp.func_kwargs, **kwargs}  #
 
@@ -53,3 +51,17 @@ class Inventory(object):
 
     def rm_item(self, item):
         self.items.remove(item)
+
+    def drop(self, item):
+        results = []
+        item.x = self.owner.x
+        item.y = self.owner.y
+
+        self.rm_item(item)
+
+        results.append({
+            'item_dropped': item,
+            'msg': Message('You dropped the {}.'.format(item.name), tcod.yellow)
+        })
+
+        return results
