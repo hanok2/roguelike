@@ -100,6 +100,15 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         tcod.darker_red
     )
 
+    # Display level
+    tcod.console_print_ex(
+        panel,
+        1, 3,
+        tcod.BKGND_NONE,
+        tcod.LEFT,
+        'Dungeon level: {}'.format(game_map.dungeon_level)
+    )
+
     tcod.console_set_default_foreground(panel, tcod.light_gray)
     tcod.console_print_ex(
         panel,

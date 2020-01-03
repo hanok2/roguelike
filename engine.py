@@ -175,6 +175,7 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
         show_inv = action.get('inventory')
         drop_inv = action.get('drop_inv')
         inv_index = action.get('inv_index')
+        take_stairs = action.get('take_stairs')
         gameexit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
@@ -223,6 +224,7 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
             prev_game_state == game_state
             game_state = GameStates.DROP_INVENTORY
 
+        # Item usage
         if inv_index is not None and prev_game_state != GameStates.PLAYER_DEAD and inv_index < len(player.inv.items):
             item = player.inv.items[inv_index]
 
@@ -240,6 +242,20 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
 
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player.inv.drop(item))
+
+        if take_stairs and game_state == GameStates.PLAYERS_TURN:
+            for entity in entities:
+                if entity.stairs and entity.x == player.x and entity.y == player.y:
+                    entities = game_map.next_floor(player, msg_log, constants)
+                    fov_map = initialize_fov(game_map)
+                    fov_recompute = True
+                    tcod.console_clear(con)
+
+                    break
+            else:
+                msg_log.add(Message(
+                    'There are no stairs here.', tcod.yellow
+                ))
 
         if game_state == GameStates.TARGETING:
             if left_click:

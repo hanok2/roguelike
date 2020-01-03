@@ -127,8 +127,8 @@ class GameMap(object):
             '>',
             tcod.white,
             'Stairs',
-            'render_roder=RenderOrder.STAIRS',
-            stairs =stairs_comp
+            render_order=RenderOrder.STAIRS,
+            stairs=stairs_comp
         )
         entities.append(down_stairs)
 
@@ -247,3 +247,30 @@ class GameMap(object):
                         item=item_comp,
                     )
                 entities.append(item)
+
+    def next_floor(self, player, msg_log, constants):
+        self.dungeon_level += 1
+        entities = [player]
+
+        self.tiles = self.initialize_tiles()
+
+        self.make_map(
+            constants['max_rooms'],
+            constants['room_min_size'],
+            constants['room_max_size'],
+            constants['map_width'],
+            constants['map_height'],
+            player,
+            entities,
+            constants['max_monsters_per_room'],
+            constants['max_items_per_room']
+        )
+
+        # Heal the player
+        player.fighter.heal(player.fighter.max_hp // 2)
+
+        msg_log.add(Message(
+            'You take a moment to rest, and recover your strength.', tcod.light_violet)
+        )
+
+        return entities

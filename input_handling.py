@@ -29,6 +29,9 @@ def handle_player_turn_keys(key):
         return {'inventory': True}
     elif key_char == 'd':
         return {'drop_inv': True}
+    # Trouble shoot > input later
+    elif key_char == '>' or key.vk == tcod.KEY_ENTER:
+        return {'take_stairs': True}
 
     # Movement
     # Note: Add support for number pad movement
