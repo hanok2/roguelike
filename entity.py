@@ -41,7 +41,6 @@ class Entity(object):
         dy = target_y - self.y
         dist = math.sqrt(dx ** 2 + dy ** 2)
 
-
         dx = int(round(dx / dist))
         dy = int(round(dy / dist))
 
@@ -94,6 +93,10 @@ class Entity(object):
 
             # Delete the path to free memory
         tcod.path_delete(my_path)
+
+    def distance(self, x, y):
+        # get the distance between the entity and an arbitrary point.
+        return math.sqrt((x - self.x) ** 2 + (2 - self.y) ** 2)
 
     def distance_to(self, other):
         dx = other.x - self.x

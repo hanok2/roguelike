@@ -5,7 +5,8 @@ from rect import Rect
 from entity import Entity
 from components import Fighter, BasicMonster, Item
 from render_functions import RenderOrder
-from item_functions import heal, cast_lightning
+from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
+from game_messages import Message
 
 
 class GameMap(object):
@@ -172,6 +173,42 @@ class GameMap(object):
                         '!',
                         tcod.violet,
                         "Healing potion",
+                        render_order=RenderOrder.ITEM,
+                        item=item_comp,
+                    )
+
+                elif item_chance < 80:
+                    # Scroll of Fireball
+                    item_comp = Item(
+                        use_func=cast_fireball,
+                        targeting=True,
+                        targeting_msg=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
+                        dmg=12,
+                        radius=3
+                    )
+
+                    item = Entity(
+                        x, y,
+                        '?',
+                        tcod.yellow,
+                        "Fireball Scroll",
+                        render_order=RenderOrder.ITEM,
+                        item=item_comp,
+                    )
+
+                elif item_chance < 90:
+                    # Scroll of Confuse Monster
+                    item_comp = Item(
+                        use_func=cast_confuse,
+                        targeting=True,
+                        targeting_msg=Message('Left-click an enemy to confuse it, or right-click to cancel.', tcod.light_cyan),
+                    )
+
+                    item = Entity(
+                        x, y,
+                        '?',
+                        tcod.yellow,
+                        "Confuse Scroll",
                         render_order=RenderOrder.ITEM,
                         item=item_comp,
                     )

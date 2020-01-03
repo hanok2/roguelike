@@ -37,15 +37,36 @@ class Inventory(object):
             # How does this work? Is there a cleaner way to do this??
             # kwargs = {**item_comp.func_kwargs, **kwargs}  #
 
-            kwargs.update(item_comp.func_kwargs)
+            # kwargs.update(item_comp.func_kwargs)
 
-            item_use_results = item_comp.use_func(self.owner, **kwargs)
+            # item_use_results = item_comp.use_func(self.owner, **kwargs)
 
-            for result in item_use_results:
-                if result.get('consumed'):
-                    self.rm_item(item_entity)
+            # for result in item_use_results:
+                # if result.get('consumed'):
+                    # self.rm_item(item_entity)
 
-            results.extend(item_use_results)
+            # results.extend(item_use_results)
+
+            # Check if the item has targeting set to True, and if it does, also
+            # check if we received the target x/y variables.
+            # If we didn't get coordinates, we can assume that the target has
+            # not yet been selected, and the gamestate needs to switch to
+            # targeting.
+
+            if item_comp.targeting and not (kwargs.get('target_x') or kwargs.get('target_y')):
+                results.append({
+                    'targeting': item_entity
+                })
+            else:
+                kwargs.update(item_comp.func_kwargs)
+
+                item_use_results = item_comp.use_func(self.owner, **kwargs)
+
+                for result in item_use_results:
+                    if result.get('consumed'):
+                        self.rm_item(item_entity)
+
+                results.extend(item_use_results)
 
         return results
 

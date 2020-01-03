@@ -1,5 +1,7 @@
+from random import randint
 import tcod
 from game_messages import Message
+
 
 class Fighter(object):
     def __init__(self, hp, defense, power):
@@ -44,6 +46,7 @@ class Fighter(object):
 
         return results
 
+
 class BasicMonster(object):
     """AI for a BasicMonster"""
     def take_turn(self, target, fov_map, game_map, entities):
@@ -63,7 +66,36 @@ class BasicMonster(object):
         return results
 
 
+class ConfusedMonster(object):
+    def __init__(self, prev_ai, num_turns=10):
+        self.prev_ai = prev_ai
+        self.num_turns = num_turns
+
+    def take_turn(self, target, fov_map, game_map, entities):
+        results = []
+
+        if self.num_turns > 0:
+            random_x = self.owner.x + randint(0, 2) - 1
+            random_y = self.owner.y + randint(0, 2) - 1
+
+            if random_x != self.owner.x and random_y != self.owner.y:
+                self.owner.move_towards(random_x, random_y, game_map, entities)
+
+            self.num_turns -= 1
+
+        else:
+            # Spell has run out
+            self.owner.ai = self.prev_ai
+            results.append({
+                'msg': Message('The {} is no longer confused!'.format(self.owner.name), tcod.red)
+            })
+
+        return results
+
+
 class Item(object):
-    def __init__(self, use_func=None, **kwargs):
+    def __init__(self, use_func=None, targeting=False, targeting_msg=None, **kwargs):
         self.use_func = use_func
+        self.targeting = targeting
+        self.targeting_msg = targeting_msg
         self.func_kwargs = kwargs
