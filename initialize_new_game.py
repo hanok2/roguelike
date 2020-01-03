@@ -49,7 +49,7 @@ constants = {
 }
 
 # Player components
-fighter_comp = Fighter(hp=30, defense=2, power=5)
+fighter_comp = Fighter(hp=100, defense=1, power=4)
 inv_comp = Inventory(26)
 level_comp = Level()
 
@@ -82,8 +82,6 @@ game_map.make_map(
     constants['map_height'],
     player,
     entities,
-    constants['max_monsters_per_room'],
-    constants['max_items_per_room']
 )
 
 msg_log = Messagelog(

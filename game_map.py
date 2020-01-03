@@ -8,6 +8,7 @@ from render_functions import RenderOrder
 from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
 from game_messages import Message
 from stairs import Stairs
+from random_utils import rnd_choice_from_dict, from_dungeon_level
 
 
 class GameMap(object):
@@ -49,7 +50,7 @@ class GameMap(object):
             self.tiles[x][y].block_sight = False
 
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room, max_items_per_room):
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities):
         # procedurally generate a dungeon map
 
         rooms = []
@@ -112,8 +113,6 @@ class GameMap(object):
                 self.place_entities(
                     new_room,
                     entities,
-                    max_monsters_per_room,
-                    max_items_per_room
                 )
 
                 rooms.append(new_room)
@@ -132,11 +131,31 @@ class GameMap(object):
         )
         entities.append(down_stairs)
 
-    def place_entities(self, room, entities, max_monsters_per_room, max_items_per_room):
+    def place_entities(self, room, entities):
+
+        max_monsters_per_room = from_dungeon_level(
+            [[2, 1], [3, 4], [5, 6]], self.dungeon_level
+        )
+        max_items_per_room = from_dungeon_level(
+            [[1, 1], [2, 4]], self.dungeon_level
+        )
+
         # Get a random # of monsters
         num_monsters = randint(0, max_monsters_per_room)
         num_items = randint(0, max_items_per_room)
 
+        monster_chances = {
+            'orc': 80,
+            # 'troll': 20,
+            'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
+        }
+
+        item_chances = {
+            'healing_potion': 35,
+            'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
+            'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
+            'confusion_scroll': from_dungeon_level([[10, 2]], self.dungeon_level)
+        }
 
         for i in range(num_monsters):
             # Choose a random location in the room
@@ -145,9 +164,11 @@ class GameMap(object):
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
 
-                if randint(0, 100) < 80:
+                monster_choice = rnd_choice_from_dict(monster_chances)
+
+                if monster_choice == 'orc':
                     # ORC
-                    fighter_comp = Fighter(hp=10, defense=0, power=3, xp=35)
+                    fighter_comp = Fighter(hp=20, defense=0, power=4, xp=35)
                     ai_comp = BasicMonster()
                     monster = Entity(
                         x, y,
@@ -162,7 +183,7 @@ class GameMap(object):
 
                 else:
                     # TROLL
-                    fighter_comp = Fighter(hp=16, defense=1, power=4, xp=100)
+                    fighter_comp = Fighter(hp=30, defense=2, power=8, xp=100)
                     ai_comp = BasicMonster()
                     monster = Entity(
                         x, y,
@@ -185,11 +206,10 @@ class GameMap(object):
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
 
-                item_chance = randint(0, 100)
+                item_choice = rnd_choice_from_dict(item_chances)
 
-                if item_chance < 70:
-                    # Healing Potion
-                    item_comp = Item(use_func=heal, amt=4)
+                if item_choice == 'healing_potion':
+                    item_comp = Item(use_func=heal, amt=40)
                     item = Entity(
                         x, y,
                         '!',
@@ -199,13 +219,12 @@ class GameMap(object):
                         item=item_comp,
                     )
 
-                elif item_chance < 80:
-                    # Scroll of Fireball
+                elif item_choice == 'fireball_scroll':
                     item_comp = Item(
                         use_func=cast_fireball,
                         targeting=True,
                         targeting_msg=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
-                        dmg=12,
+                        dmg=25,
                         radius=3
                     )
 
@@ -218,8 +237,7 @@ class GameMap(object):
                         item=item_comp,
                     )
 
-                elif item_chance < 90:
-                    # Scroll of Confuse Monster
+                elif item_choice == 'confusion_scroll':
                     item_comp = Item(
                         use_func=cast_confuse,
                         targeting=True,
@@ -237,7 +255,7 @@ class GameMap(object):
 
                 else:
                     # Scroll of lightning bolt
-                    item_comp = Item(use_func=cast_lightning, dmg=20, max_range=5)
+                    item_comp = Item(use_func=cast_lightning, dmg=40, max_range=5)
                     item = Entity(
                         x, y,
                         '?',
@@ -262,8 +280,6 @@ class GameMap(object):
             constants['map_height'],
             player,
             entities,
-            constants['max_monsters_per_room'],
-            constants['max_items_per_room']
         )
 
         # Heal the player

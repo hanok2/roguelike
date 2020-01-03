@@ -268,7 +268,7 @@ def play_game(player, entities, game_map, msg_log, game_state, con, panel, const
             # todo: Move stat boosts to constants
             if level_up == 'hp':
                 player.fighter.max_hp += 20
-                player.fighte.hp += 20
+                player.fighter.hp += 20
             elif level_up == 'str':
                 player.fighter.power += 1
             elif level_up == 'def':
