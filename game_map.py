@@ -7,13 +7,16 @@ from components import Fighter, BasicMonster, Item
 from render_functions import RenderOrder
 from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
 from game_messages import Message
+from stairs import Stairs
 
 
 class GameMap(object):
-    def __init__(self, width, height):
+    def __init__(self, width, height, dungeon_level=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+
+        self.dungeon_level = dungeon_level
 
     def initialize_tiles(self):
         # tiles = [[Tile(False) for y in range(self.height)] for x in range(self.width)]
@@ -52,6 +55,9 @@ class GameMap(object):
         rooms = []
         num_rooms = 0
 
+        center_of_last_room_x = None
+        center_of_last_room_y = None
+
         for r in range(max_rooms):
             # random width and height
             w = randint(room_min_size, room_max_size)
@@ -76,6 +82,9 @@ class GameMap(object):
 
                 # Get center coordinates
                 (new_x, new_y) = new_room.center()
+
+                center_of_last_room_x = new_x
+                center_of_last_room_y = new_y
 
                 if num_rooms == 0:
                     # If this is the first room, place the player there.
@@ -109,6 +118,19 @@ class GameMap(object):
 
                 rooms.append(new_room)
                 num_rooms += 1
+
+        # Add the Stairs
+        stairs_comp = Stairs(self.dungeon_level + 1)
+        down_stairs = Entity(
+            center_of_last_room_x,
+            center_of_last_room_y,
+            '>',
+            tcod.white,
+            'Stairs',
+            'render_roder=RenderOrder.STAIRS',
+            stairs =stairs_comp
+        )
+        entities.append(down_stairs)
 
     def place_entities(self, room, entities, max_monsters_per_room, max_items_per_room):
         # Get a random # of monsters

@@ -5,9 +5,12 @@ from menus import inv_menu
 
 
 class RenderOrder(Enum):
-    CORPSE = 1
-    ITEM = 2
-    ACTOR = 3
+    # Does auto work? - Does not seem to work by default or builtin - fix
+    # later.
+    STAIRS = 1
+    CORPSE = 2
+    ITEM = 3
+    ACTOR = 4
 
 
 def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, msg_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state):
@@ -44,7 +47,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     sorted_entities = sorted(entities, key=lambda x: x.render_order.value)
 
     for entity in sorted_entities:
-        draw_entity(con, entity, fov_map)
+        draw_entity(con, entity, fov_map, game_map)
 
     # Display console
     # tcod.console_set_default_foreground(con, tcod.white)
@@ -122,12 +125,12 @@ def clear_all(con, entities):
         clear_entity(con, entity)
 
 
-def draw_entity(con, entity, fov_map):
+def draw_entity(con, entity, fov_map, game_map):
     # Draw an entity on the console
-    if tcod.map_is_in_fov(fov_map, entity.x, entity.y):
+    # Break into nicer boolean later...
+    if tcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
         tcod.console_set_default_foreground(con, entity.color)
         tcod.console_put_char(con, entity.x, entity.y, entity.char, tcod.BKGND_NONE)
-
 
 
 def clear_entity(con, entity):
