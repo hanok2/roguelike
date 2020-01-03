@@ -194,7 +194,9 @@ def main():
             # player_turn_results.extend(player.inv.use(item))
 
             if game_state == GameStates.INVENTORY:
-                player_turn_results.extend(player.inv.use(item))
+                # player_turn_results.extend(player.inv.use(item))
+                player_turn_results.extend(player.inv.use(item, entities=entities, fov_map=fov_map))
+
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player.inv.drop(item))
 

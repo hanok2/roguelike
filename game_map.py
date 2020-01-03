@@ -5,7 +5,7 @@ from rect import Rect
 from entity import Entity
 from components import Fighter, BasicMonster, Item
 from render_functions import RenderOrder
-from item_functions import heal
+from item_functions import heal, cast_lightning
 
 
 class GameMap(object):
@@ -162,14 +162,29 @@ class GameMap(object):
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
 
-                item_comp = Item(use_func=heal, amt=4)
-                item = Entity(
-                    x, y,
-                    '!',
-                    tcod.violet,
-                    "Healing potion",
-                    render_order=RenderOrder.ITEM,
-                    item=item_comp,
-                )
+                item_chance = randint(0, 100)
 
+                if item_chance < 70:
+                    # Healing Potion
+                    item_comp = Item(use_func=heal, amt=4)
+                    item = Entity(
+                        x, y,
+                        '!',
+                        tcod.violet,
+                        "Healing potion",
+                        render_order=RenderOrder.ITEM,
+                        item=item_comp,
+                    )
+
+                else:
+                    # Scroll of lightning bolt
+                    item_comp = Item(use_func=cast_lightning, dmg=20, max_range=5)
+                    item = Entity(
+                        x, y,
+                        '?',
+                        tcod.yellow,
+                        "Lightning Scroll",
+                        render_order=RenderOrder.ITEM,
+                        item=item_comp,
+                    )
                 entities.append(item)
