@@ -1,38 +1,17 @@
 import tcod
-from entity import Entity, get_blocking_entities_at_location
-from render_functions import clear_all, render_all, RenderOrder
-from game_map import GameMap
+from entity import get_blocking_entities_at_location
+from render_functions import clear_all, render_all
 from fov import initialize_fov, recompute_fov
 from game_states import GameStates
-from components import Fighter
-from inventory import Inventory
 from input_handling import handle_keys, handle_mouse
 from death_functions import kill_monster, kill_player
-from game_messages import Message, Messagelog
-from initialize_new_game import CONSTANTS
+from game_messages import Message
+from initialize_new_game import CONSTANTS, GAME_DATA
 
 
 def main():
     img_file = 'images/arial10x10.png'
     fov_recompute = True
-
-    # Player components
-    fighter_comp = Fighter(hp=30, defense=2, power=5)
-    inv_comp = Inventory(26)
-
-    # Create entities
-    player = Entity(
-        0, 0,
-        '@',
-        tcod.white,
-        'Player',
-        blocks=True,
-        render_order=RenderOrder.ACTOR,
-        fighter=fighter_comp,
-        inv=inv_comp,
-    )
-    entities = [player]
-
     tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
 
     # Creates the screen. (Boolean specifies full screen)
@@ -54,37 +33,18 @@ def main():
         CONSTANTS['screen_width'],
         CONSTANTS['panel_height']
     )
-
-    # Initialize the game map
-    game_map = GameMap(
-        CONSTANTS['map_width'],
-        CONSTANTS['map_height']
-    )
-    game_map.make_map(
-        CONSTANTS['max_rooms'],
-        CONSTANTS['room_min_size'],
-        CONSTANTS['room_max_size'],
-        CONSTANTS['map_width'],
-        CONSTANTS['map_height'],
-        player,
-        entities,
-        CONSTANTS['max_monsters_per_room'],
-        CONSTANTS['max_items_per_room']
-    )
+    # Initialize game data
+    player = GAME_DATA['player']
+    entities = GAME_DATA['entities']
+    game_map = GAME_DATA['game_map']
+    msg_log = GAME_DATA['msg_log']
+    game_state = GAME_DATA['game_state']
 
     # Initialize fov
     fov_map = initialize_fov(game_map)
-
-    msg_log = Messagelog(
-        CONSTANTS['msg_x'],
-        CONSTANTS['msg_width'],
-        CONSTANTS['msg_height']
-    )
-
     key = tcod.Key()
     mouse = tcod.Mouse()
 
-    game_state = GameStates.PLAYERS_TURN
     prev_game_state = game_state
 
     # Keep track of any targeting items that were selected.
@@ -192,7 +152,7 @@ def main():
             prev_game_state == game_state
             game_state = GameStates.DROP_INVENTORY
 
-        if inv_index is not None and prev_game_state != GameStates.PLAYER_DEAD and inv_index < len(player.inv.items):
+        if inv_index is not None and prev_game_state != GameStates.PLAYER_DEAD and inv_index < len(GAME_DATA['player'].inv.items):
             item = player.inv.items[inv_index]
 
             # "using" the item
@@ -201,7 +161,11 @@ def main():
 
             if game_state == GameStates.INVENTORY:
                 # player_turn_results.extend(player.inv.use(item))
-                player_turn_results.extend(player.inv.use(item, entities=entities, fov_map=fov_map))
+                player_turn_results.extend(
+                    player.inv.use(
+                        item, entities=entities, fov_map=fov_map
+                    )
+                )
 
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player.inv.drop(item))
@@ -282,7 +246,12 @@ def main():
             for entity in entities:
 
                 if entity.ai:
-                    enemy_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities)
+                    enemy_turn_results = entity.ai.take_turn(
+                        player,
+                        fov_map,
+                        game_map,
+                        entities
+                    )
 
                     for result in enemy_turn_results:
                         msg = result.get('msg')

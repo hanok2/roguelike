@@ -1,4 +1,11 @@
 import tcod
+from entity import Entity
+from render_functions import RenderOrder
+from game_map import GameMap
+from game_states import GameStates
+from components import Fighter
+from inventory import Inventory
+from game_messages import Messagelog
 
 screen_width = 80
 screen_height = 50
@@ -39,4 +46,54 @@ CONSTANTS = {
     'max_monsters_per_room': 3,
     'max_items_per_room': 3,
     'colors': colors,
+}
+
+# Player components
+fighter_comp = Fighter(hp=30, defense=2, power=5)
+inv_comp = Inventory(26)
+
+# Create entities
+player = Entity(
+    0, 0,
+    '@',
+    tcod.white,
+    'Player',
+    blocks=True,
+    render_order=RenderOrder.ACTOR,
+    fighter=fighter_comp,
+    inv=inv_comp,
+)
+
+entities = [player]
+
+# Initialize the game map
+game_map = GameMap(
+    CONSTANTS['map_width'],
+    CONSTANTS['map_height']
+)
+
+game_map.make_map(
+    CONSTANTS['max_rooms'],
+    CONSTANTS['room_min_size'],
+    CONSTANTS['room_max_size'],
+    CONSTANTS['map_width'],
+    CONSTANTS['map_height'],
+    player,
+    entities,
+    CONSTANTS['max_monsters_per_room'],
+    CONSTANTS['max_items_per_room']
+)
+
+msg_log = Messagelog(
+    CONSTANTS['msg_x'],
+    CONSTANTS['msg_width'],
+    CONSTANTS['msg_height']
+)
+
+GAME_DATA = {
+    'player': player,
+    'entities': entities,
+    'game_map': game_map,
+    'msg_log': msg_log,
+    'game_state': GameStates.PLAYERS_TURN
 }
