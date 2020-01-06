@@ -3,7 +3,7 @@ import tcod
 MAX_MENU_ITEMS = 26
 
 
-def menu(con, header, options, width, screen_width, screen_height):
+def menu(con, header, options, width, scr_width, scr_height):
     if len(options) > MAX_MENU_ITEMS:
         raise ValueError('Cannot have a menu with more than 26 options.')
 
@@ -12,7 +12,7 @@ def menu(con, header, options, width, screen_width, screen_height):
         con,
         0, 0,
         width,
-        screen_height,
+        scr_height,
         header
     )
 
@@ -52,40 +52,40 @@ def menu(con, header, options, width, screen_width, screen_height):
         letter_index += 1
 
     # Blit the contents of "window" to the root console
-    x = int(screen_width / 2 - width / 2)
-    y = int(screen_height / 2 - height / 2)
+    x = int(scr_width / 2 - width / 2)
+    y = int(scr_height / 2 - height / 2)
 
     tcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
 
-def inv_menu(con, header, player, inv_width, screen_width, screen_height):
+def inv_menu(con, header, hero, inv_width, scr_width, scr_height):
     # Show a menu w/ each item of the inventory as an option
-    if len(player.inv.items) == 0:
+    if len(hero.inv.items) == 0:
         options = ['Inventory is empty.']
     else:
         # options = [item.name for item in inv.items]
         options = []
 
-        for item in player.inv.items:
-            if player.equipment.main_hand == item:
+        for item in hero.inv.items:
+            if hero.equipment.main_hand == item:
                 options.append('{} (on main hand)'.format(item.name))
-            elif player.equipment.off_hand == item:
+            elif hero.equipment.off_hand == item:
                 options.append('{} (on off hand)'.format(item.name))
             else:
                 options.append(item.name)
 
-    menu(con, header, options, inv_width, screen_width, screen_height)
+    menu(con, header, options, inv_width, scr_width, scr_height)
 
 
-def main_menu(con, bg_img, screen_width, screen_height):
+def main_menu(con, bg_img, scr_width, scr_height):
     tcod.image_blit_2x(bg_img, 0, 0, 0)
 
     tcod.console_set_default_foreground(0, tcod.light_yellow)
 
     tcod.console_print_ex(
         0,
-        int(screen_width / 2),
-        int(screen_height / 2) - 4,
+        int(scr_width / 2),
+        int(scr_height / 2) - 4,
         tcod.BKGND_NONE,
         tcod.CENTER,
         'STEAMPUNK LEGENDS'
@@ -93,8 +93,8 @@ def main_menu(con, bg_img, screen_width, screen_height):
 
     tcod.console_print_ex(
         0,
-        int(screen_width / 2),
-        int(screen_height - 2),
+        int(scr_width / 2),
+        int(scr_height - 2),
         tcod.BKGND_NONE,
         tcod.CENTER,
         'By hackemslashem'
@@ -102,51 +102,51 @@ def main_menu(con, bg_img, screen_width, screen_height):
 
     options = ['Play a new game', 'Continue last game', 'Quit']
 
-    menu(con, '', options, 24, screen_width, screen_height)
+    menu(con, '', options, 24, scr_width, scr_height)
 
 
-def msg_box(con, header, width, screen_width, screen_height):
-    menu(con, header, [], width, screen_width, screen_height)
+def msg_box(con, header, width, scr_width, scr_height):
+    menu(con, header, [], width, scr_width, scr_height)
 
 
-def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
+def lvl_up_menu(con, header, hero, menu_width, scr_width, scr_height):
     options = [
-        'Constitution (+20 HP, from {})'.format(player.fighter.max_hp),
-        'Strength (+1 attack, from {})'.format(player.fighter.power),
-        'Agility (+1 defense, from {})'.format(player.fighter.defense)
+        'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
+        'Strength (+1 attack, from {})'.format(hero.fighter.power),
+        'Agility (+1 defense, from {})'.format(hero.fighter.defense)
     ]
 
-    menu(con, header, options, menu_width, screen_width, screen_height)
+    menu(con, header, options, menu_width, scr_width, scr_height)
 
 
-def character_screen(player, character_screen_width, character_screen_height, screen_width, screen_height):
-    window = tcod.console_new(character_screen_width, character_screen_height)
+def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
+    window = tcod.console_new(char_scr_width, char_scr_height)
 
     tcod.console_set_default_foreground(window, tcod.white)
 
-    tcod.console_print_rect_ex(window, 0, 1, character_screen_width, character_screen_height,
+    tcod.console_print_rect_ex(window, 0, 1, char_scr_width, char_scr_height,
         tcod.BKGND_NONE, tcod.LEFT, 'Character Information')
-    tcod.console_print_rect_ex( window, 0, 2, character_screen_width, character_screen_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Level: {0}'.format(player.level.current_level))
-    tcod.console_print_rect_ex(window, 0, 3, character_screen_width, character_screen_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Experience: {0}'.format(player.level.current_xp))
-    tcod.console_print_rect_ex(window, 0, 4, character_screen_width, character_screen_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Experience to Level: {0}'.format(player.level.experience_to_next_level))
-    tcod.console_print_rect_ex(window, 0, 6, character_screen_width, character_screen_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Maximum HP: {0}'.format(player.fighter.max_hp))
-    tcod.console_print_rect_ex(window, 0, 7, character_screen_width, character_screen_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Attack: {0}'.format(player.fighter.power))
-    tcod.console_print_rect_ex(window, 0, 8, character_screen_width, character_screen_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Defense: {0}'.format(player.fighter.defense))
+    tcod.console_print_rect_ex( window, 0, 2, char_scr_width, char_scr_height,
+        tcod.BKGND_NONE, tcod.LEFT, 'Level: {0}'.format(hero.lvl.current_lvl))
+    tcod.console_print_rect_ex(window, 0, 3, char_scr_width, char_scr_height,
+        tcod.BKGND_NONE, tcod.LEFT, 'Experience: {0}'.format(hero.lvl.current_xp))
+    tcod.console_print_rect_ex(window, 0, 4, char_scr_width, char_scr_height,
+        tcod.BKGND_NONE, tcod.LEFT, 'Experience to Level: {0}'.format(hero.lvl.xp_to_next_lvl))
+    tcod.console_print_rect_ex(window, 0, 6, char_scr_width, char_scr_height,
+        tcod.BKGND_NONE, tcod.LEFT, 'Maximum HP: {0}'.format(hero.fighter.max_hp))
+    tcod.console_print_rect_ex(window, 0, 7, char_scr_width, char_scr_height,
+        tcod.BKGND_NONE, tcod.LEFT, 'Attack: {0}'.format(hero.fighter.power))
+    tcod.console_print_rect_ex(window, 0, 8, char_scr_width, char_scr_height,
+        tcod.BKGND_NONE, tcod.LEFT, 'Defense: {0}'.format(hero.fighter.defense))
 
-    x = screen_width // 2 - character_screen_width // 2
-    y = screen_height // 2 - character_screen_height // 2
+    x = scr_width // 2 - char_scr_width // 2
+    y = scr_height // 2 - char_scr_height // 2
 
     tcod.console_blit(
         window,
         0, 0,
-        character_screen_width,
-        character_screen_height,
+        char_scr_width,
+        char_scr_height,
         0,
         x, y,
         1.0,

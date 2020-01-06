@@ -3,24 +3,23 @@ import tcod
 from tile import Tile
 from rect import Rect
 from entity import Entity
-from components import Fighter, BasicMonster, Item, EquipmentSlots, Equippable
+from components import Fighter, ApproachingBehavior, Item, EquipmentSlots, Equippable
 from render_functions import RenderOrder
 from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
-from game_messages import Message
+from messages import Msg
 from stairs import Stairs
-from random_utils import rnd_choice_from_dict, from_dungeon_level
+from random_utils import rnd_choice_from_dict, from_dungeon_lvl
 
 
 class GameMap(object):
-    def __init__(self, width, height, dungeon_level=1):
+    def __init__(self, width, height, dungeon_lvl=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
 
-        self.dungeon_level = dungeon_level
+        self.dungeon_lvl = dungeon_lvl
 
     def initialize_tiles(self):
-        # tiles = [[Tile(False) for y in range(self.height)] for x in range(self.width)]
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
 
         return tiles
@@ -50,7 +49,7 @@ class GameMap(object):
             self.tiles[x][y].block_sight = False
 
 
-    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities):
+    def make_map(self, max_rooms, room_min_len, room_max_len, map_width, map_height, hero, entities):
         # procedurally generate a dungeon map
 
         rooms = []
@@ -61,8 +60,8 @@ class GameMap(object):
 
         for r in range(max_rooms):
             # random width and height
-            w = randint(room_min_size, room_max_size)
-            h = randint(room_min_size, room_max_size)
+            w = randint(room_min_len, room_max_len)
+            h = randint(room_min_len, room_max_len)
 
             # Random position w/o going out of the map boundaries
             x = randint(0, map_width - w - 1)
@@ -88,9 +87,9 @@ class GameMap(object):
                 center_of_last_room_y = new_y
 
                 if num_rooms == 0:
-                    # If this is the first room, place the player there.
-                    player.x = new_x
-                    player.y = new_y
+                    # If this is the first room, place the hero there.
+                    hero.x = new_x
+                    hero.y = new_y
 
                 else:
                     # For all rooms after the first:
@@ -119,7 +118,7 @@ class GameMap(object):
                 num_rooms += 1
 
         # Add the Stairs
-        stairs_comp = Stairs(self.dungeon_level + 1)
+        stairs_comp = Stairs(self.dungeon_lvl + 1)
         down_stairs = Entity(
             center_of_last_room_x,
             center_of_last_room_y,
@@ -133,11 +132,11 @@ class GameMap(object):
 
     def place_entities(self, room, entities):
 
-        max_monsters_per_room = from_dungeon_level(
-            [[2, 1], [3, 4], [5, 6]], self.dungeon_level
+        max_monsters_per_room = from_dungeon_lvl(
+            [[2, 1], [3, 4], [5, 6]], self.dungeon_lvl
         )
-        max_items_per_room = from_dungeon_level(
-            [[1, 1], [2, 4]], self.dungeon_level
+        max_items_per_room = from_dungeon_lvl(
+            [[1, 1], [2, 4]], self.dungeon_lvl
         )
 
         # Get a random # of monsters
@@ -147,18 +146,18 @@ class GameMap(object):
         monster_chances = {
             'orc': 80,
             # 'troll': 20,
-            'troll': from_dungeon_level([[15, 3], [30, 5], [60, 7]], self.dungeon_level)
+            'troll': from_dungeon_lvl([[15, 3], [30, 5], [60, 7]], self.dungeon_lvl)
         }
 
         item_chances = {
             'healing_potion': 35,
-            'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
-            'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
-            'confusion_scroll': from_dungeon_level([[10, 2]], self.dungeon_level),
+            'lightning_scroll': from_dungeon_lvl([[25, 4]], self.dungeon_lvl),
+            'fireball_scroll': from_dungeon_lvl([[25, 6]], self.dungeon_lvl),
+            'confusion_scroll': from_dungeon_lvl([[10, 2]], self.dungeon_lvl),
             'sword': 35,
             'shield': 35,
-            # 'sword': from_dungeon_level([[5, 4]], self.dungeon_level),
-            # 'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
+            # 'sword': from_dungeon_lvl([[5, 4]], self.dungeon_lvl),
+            # 'shield': from_dungeon_lvl([[15, 8]], self.dungeon_lvl),
         }
 
         for i in range(num_monsters):
@@ -173,7 +172,7 @@ class GameMap(object):
                 if monster_choice == 'orc':
                     # ORC
                     fighter_comp = Fighter(hp=20, defense=0, power=4, xp=35)
-                    ai_comp = BasicMonster()
+                    ai_comp = ApproachingBehavior()
                     monster = Entity(
                         x, y,
                         'o',
@@ -188,7 +187,7 @@ class GameMap(object):
                 else:
                     # TROLL
                     fighter_comp = Fighter(hp=30, defense=2, power=8, xp=100)
-                    ai_comp = BasicMonster()
+                    ai_comp = ApproachingBehavior()
                     monster = Entity(
                         x, y,
                         'T',
@@ -246,7 +245,7 @@ class GameMap(object):
                     item_comp = Item(
                         use_func=cast_fireball,
                         targeting=True,
-                        targeting_msg=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
+                        targeting_msg=Msg('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
                         dmg=25,
                         radius=3
                     )
@@ -264,7 +263,7 @@ class GameMap(object):
                     item_comp = Item(
                         use_func=cast_confuse,
                         targeting=True,
-                        targeting_msg=Message('Left-click an enemy to confuse it, or right-click to cancel.', tcod.light_cyan),
+                        targeting_msg=Msg('Left-click an enemy to confuse it, or right-click to cancel.', tcod.light_cyan),
                     )
 
                     item = Entity(
@@ -289,26 +288,26 @@ class GameMap(object):
                     )
                 entities.append(item)
 
-    def next_floor(self, player, msg_log, constants):
-        self.dungeon_level += 1
-        entities = [player]
+    def next_floor(self, hero, msg_log, constants):
+        self.dungeon_lvl += 1
+        entities = [hero]
 
         self.tiles = self.initialize_tiles()
 
         self.make_map(
             constants['max_rooms'],
-            constants['room_min_size'],
-            constants['room_max_size'],
+            constants['room_min_len'],
+            constants['room_max_len'],
             constants['map_width'],
             constants['map_height'],
-            player,
+            hero,
             entities,
         )
 
-        # Heal the player
-        player.fighter.heal(player.fighter.max_hp // 2)
+        # Heal the hero
+        hero.fighter.heal(hero.fighter.max_hp // 2)
 
-        msg_log.add(Message(
+        msg_log.add(Msg(
             'You take a moment to rest, and recover your strength.', tcod.light_violet)
         )
 

@@ -1,11 +1,11 @@
 import tcod
-from game_messages import Message
-from components import ConfusedMonster
+from messages import Msg
+from components import ConfusedBehavior
 
 
 def heal(*args, **kwargs):
     # Entity is first arg in args
-    # 'amount' is required in kwargs
+    # 'amt' is required in kwargs
 
     entity = args[0]
     amt = kwargs.get('amt')
@@ -14,13 +14,13 @@ def heal(*args, **kwargs):
     if entity.fighter.hp == entity.fighter.max_hp:
         results.append({
             'consumed': False,
-            'msg': Message('You are already at full health', tcod.yellow)
+            'msg': Msg('You are already at full health', tcod.yellow)
         })
     else:
         entity.fighter.heal(amt)
         results.append({
             'consumed': True,
-            'msg': Message('Your wounds start to feel better!', tcod.green)
+            'msg': Msg('Your wounds start to feel better!', tcod.green)
         })
 
     return results
@@ -49,7 +49,7 @@ def cast_lightning(*args, **kwargs):
         results.append({
             'consumed': True,
             'target': target,
-            'msg': Message('A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg))
+            'msg': Msg('A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg))
         })
         results.extend(target.fighter.take_dmg(dmg))
 
@@ -57,7 +57,7 @@ def cast_lightning(*args, **kwargs):
         results.append({
             'consumed': False,
             'target': None,
-            'msg': Message('No enemy is close enough to strike.', tcod.red)
+            'msg': Msg('No enemy is close enough to strike.', tcod.red)
         })
 
     return results
@@ -76,19 +76,19 @@ def cast_fireball(*args, **kwargs):
     if not tcod.map_is_in_fov(fov_map,target_x, target_y):
         results.append({
             'consumed': False,
-            'msg': Message('You cannot target a tile outside your field of view.', tcod.yellow)
+            'msg': Msg('You cannot target a tile outside your field of view.', tcod.yellow)
         })
         return results
 
     results.append({
         'consumed': True,
-        'msg': Message('The fireball explodes, burning everything within {} tiles!'.format(radius), tcod.orange)
+        'msg': Msg('The fireball explodes, burning everything within {} tiles!'.format(radius), tcod.orange)
     })
 
     for entity in entities:
         if entity.distance(target_x, target_y) <= radius and entity.fighter:
             results.append({
-                'msg': Message('The {} gets burned for {} hit points!'.format(entity.name, dmg), tcod.orange)
+                'msg': Msg('The {} gets burned for {} hit points!'.format(entity.name, dmg), tcod.orange)
             })
             results.extend(entity.fighter.take_dmg(dmg))
 
@@ -106,26 +106,26 @@ def cast_confuse(*args, **kwargs):
     if not tcod.map_is_in_fov(fov_map, target_x, target_y):
         results.append({
             'consumed': False,
-            'msg': Message('You cannot target a tile outside your field of view.', tcod.yellow)
+            'msg': Msg('You cannot target a tile outside your field of view.', tcod.yellow)
         })
         return results
 
     for entity in entities:
         if entity.x == target_x and entity.y == target_y and entity.ai:
-            confused_ai = ConfusedMonster(prev_ai=entity.ai, num_turns=10)
+            confused_ai = ConfusedBehavior(prev_ai=entity.ai, num_turns=10)
 
             confused_ai.owner = entity
             entity.ai = confused_ai
 
             results.append({
                 'consumed': True,
-                'msg': Message('The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name), tcod.light_green)
+                'msg': Msg('The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name), tcod.light_green)
             })
             break
     else:
         results.append({
             'consumed': False,
-            'msg': Message('There is no targetable enemy at that location.', tcod.yellow)
+            'msg': Msg('There is no targetable enemy at that location.', tcod.yellow)
         })
 
     return results

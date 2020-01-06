@@ -1,7 +1,7 @@
 from enum import Enum
 import tcod
-from game_states import GameStates
-from menus import inv_menu, level_up_menu, character_screen
+from states import States
+from menus import inv_menu, lvl_up_menu, char_scr
 
 
 class RenderOrder(Enum):
@@ -13,18 +13,12 @@ class RenderOrder(Enum):
     ACTOR = 4
 
 
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, msg_log, screen_width, screen_height, bar_width, panel_height, panel_y, mouse, colors, game_state):
+def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, scr_width, scr_height, bar_width, panel_height, panel_y, mouse, colors, state):
     # Draw all the tiles in the game map
 
     if fov_recompute:
         for y in range(game_map.height):
             for x in range(game_map.width):
-                # wall = game_map.tiles[x][y].block_sight
-                # if wall:
-                    # tcod.console_set_char_background(con, x, y, colors.get('dark_wall'), tcod.BKGND_SET)
-                # else:
-                    # tcod.console_set_char_background(con, x, y, colors.get('dark_ground'), tcod.BKGND_SET)
-
                 visible = tcod.map_is_in_fov(fov_map, x, y)
 
                 wall = game_map.tiles[x][y].block_sight
@@ -50,22 +44,10 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         draw_entity(con, entity, fov_map, game_map)
 
     # Display console
-    # tcod.console_set_default_foreground(con, tcod.white)
-    # hp_display = 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp)
+    tcod.console_blit(con, 0, 0, scr_width, scr_height, 0, 0, 0)
 
-    # tcod.console_print_ex(
-        # con,
-        # 1,
-        # screen_height - 2,
-        # tcod.BKGND_NONE,
-        # tcod.LEFT,
-        # hp_display
-    # )
-
-    tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
-
-    if game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
-        if game_state == GameStates.INVENTORY:
+    if state in (States.SHOW_INV, States.DROP_INV):
+        if state == States.SHOW_INV:
             inv_title = 'Press the key next to an item to use it, or ESC to cancel.\n'
         else:
             inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
@@ -73,24 +55,24 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         inv_menu(
             con,
             inv_title,
-            player,
+            hero,
             50,
-            screen_width,
-            screen_height
+            scr_width,
+            scr_height
         )
 
-    elif game_state == GameStates.LEVEL_UP:
-        level_up_menu(
+    elif state == States.LEVEL_UP:
+        lvl_up_menu(
             con,
             'Level up! Choos a stat to raise:',
-            player,
+            hero,
             40,
-            screen_width,
-            screen_height
+            scr_width,
+            scr_height
         )
 
-    elif game_state == GameStates.CHARACTER_SCREEN:
-        character_screen(player, 30, 10, screen_width, screen_height)
+    elif state == States.SHOW_STATS:
+        char_scr(hero, 30, 10, scr_width, scr_height)
 
     tcod.console_set_default_background(panel, tcod.black)
     tcod.console_clear(panel)
@@ -107,8 +89,8 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         1, 1,
         bar_width,
         'HP',
-        player.fighter.hp,
-        player.fighter.max_hp,
+        hero.fighter.hp,
+        hero.fighter.max_hp,
         tcod.light_red,
         tcod.darker_red
     )
@@ -119,7 +101,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         1, 3,
         tcod.BKGND_NONE,
         tcod.LEFT,
-        'Dungeon level: {}'.format(game_map.dungeon_level)
+        'Dungeon level: {}'.format(game_map.dungeon_lvl)
     )
 
     tcod.console_set_default_foreground(panel, tcod.light_gray)
@@ -134,7 +116,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
     tcod.console_blit(
         panel,
         0, 0,
-        screen_width,
+        scr_width,
         panel_height,
         0, 0,
         panel_y
@@ -149,7 +131,7 @@ def clear_all(con, entities):
 
 def draw_entity(con, entity, fov_map, game_map):
     # Draw an entity on the console
-    # Break into nicer boolean later...
+    # todo: Break into nicer boolean later...
     if tcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
         tcod.console_set_default_foreground(con, entity.color)
         tcod.console_put_char(con, entity.x, entity.y, entity.char, tcod.BKGND_NONE)

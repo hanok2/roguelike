@@ -1,37 +1,37 @@
 import tcod
-from game_states import GameStates
+from states import States
 
 
-def handle_keys(key, game_state):
-    if game_state == GameStates.PLAYERS_TURN:
-        return handle_player_turn_keys(key)
+def handle_keys(key, state):
+    if state == States.HERO_TURN:
+        return handle_hero_turn_keys(key)
 
-    elif game_state == GameStates.PLAYER_DEAD:
-        return handle_player_dead_keys(key)
+    elif state == States.HERO_DEAD:
+        return handle_hero_dead_keys(key)
 
-    elif game_state == GameStates.TARGETING:
+    elif state == States.TARGETING:
         return handle_targeting_keys(key)
 
-    elif game_state in (GameStates.INVENTORY, GameStates.DROP_INVENTORY):
+    elif state in (States.SHOW_INV, States.DROP_INV):
         return handle_inv_keys(key)
 
-    elif game_state == GameStates.LEVEL_UP:
-        return handle_level_up_menu(key)
+    elif state == States.LEVEL_UP:
+        return handle_lvl_up_menu(key)
 
-    elif game_state == GameStates.CHARACTER_SCREEN:
-        return handle_character_screen(key)
+    elif state == States.SHOW_STATS:
+        return handle_char_scr(key)
 
     return {}
 
 
-def handle_player_turn_keys(key):
+def handle_hero_turn_keys(key):
     key_char = chr(key.c)
 
     # Actions
     if key_char == 'g' or key_char == ',':
         return {'pickup': True}
     elif key_char == 'i':
-        return {'inventory': True}
+        return {'show_inv': True}
     elif key_char == 'd':
         return {'drop_inv': True}
 
@@ -40,7 +40,7 @@ def handle_player_turn_keys(key):
         return {'take_stairs': True}
 
     elif key_char == '\\':
-        return {'show_character_screen': True}
+        return {'show_char_scr': True}
 
     if key_char == '.':
         return {'wait': True}
@@ -66,7 +66,7 @@ def handle_player_turn_keys(key):
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: Toggle full screen
-        return {'fullscreen': True}
+        return {'full_scr': True}
 
     elif key.vk == tcod.KEY_ESCAPE:
         # Exit
@@ -76,15 +76,15 @@ def handle_player_turn_keys(key):
     return {}
 
 
-def handle_player_dead_keys(key):
+def handle_hero_dead_keys(key):
     key_char = chr(key.c)
 
     if key_char == 'i':
-        return {'inventory': True}
+        return {'show_inv': True}
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: Toggle full screen
-        return {'fullscreen': True}
+        return {'full_scr': True}
 
     elif key.vk == tcod.KEY_ESCAPE:
         # Exit
@@ -102,7 +102,7 @@ def handle_inv_keys(key):
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: Toggle full screen
-        return {'fullscreen': True}
+        return {'full_scr': True}
 
     elif key.vk == tcod.KEY_ESCAPE:
         # Exit the menu
@@ -135,29 +135,29 @@ def handle_mouse(mouse):
     (x, y) = (mouse.cx, mouse.cy)
 
     if mouse.lbutton_pressed:
-        return {'left_click': (x, y)}
+        return {'l_click': (x, y)}
     elif mouse.rbutton_pressed:
-        return {'right_click': (x, y)}
+        return {'r_click': (x, y)}
 
     return {}
 
 
-def handle_level_up_menu(key):
+def handle_lvl_up_menu(key):
     if key:
         key_char = chr(key.c)
 
 
         if key_char == 'a':
-            return {'level_up': 'hp'}
+            return {'lvl_up': 'hp'}
         elif key_char == 'b':
-            return {'level_up': 'str'}
+            return {'lvl_up': 'str'}
         elif key_char == 'c':
-            return {'level_up': 'def'}
+            return {'lvl_up': 'def'}
 
     return {}
 
 
-def handle_character_screen(key):
+def handle_char_scr(key):
     if key.vk == tcod.KEY_ESCAPE:
         return {'exit': True}
     return {}

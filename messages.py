@@ -2,13 +2,13 @@ import tcod
 import textwrap
 
 
-class Message(object):
+class Msg(object):
     def __init__(self, text, color=tcod.white):
         self.text = text
         self.color = color
 
 
-class Messagelog(object):
+class MsgLog(object):
     def __init__(self, x, width, height):
         self.messages = []
         self.x = x
@@ -24,7 +24,7 @@ class Messagelog(object):
             if len(self.messages) == self.height:
                 del self.messages[0]
 
-            # Add the new line as a Message object, with the text and color
+            # Add the new line as a Msg object, with the text and color
             self.messages.append(
-                Message(line, msg.color)
+                Msg(line, msg.color)
             )

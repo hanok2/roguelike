@@ -7,7 +7,7 @@ from components import Item
 class Entity(object):
     """ A generic object to represent players, enemies, items, etc."""
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stairs=None, level=None, equipment=None, equippable=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stairs=None, lvl=None, equipment=None, equippable=None):
         self.x = x
         self.y = y
         self.char = char
@@ -20,7 +20,7 @@ class Entity(object):
         self.item = item
         self.inv = inv
         self.stairs = stairs
-        self.level = level
+        self.lvl = lvl
         self.equipment = equipment
         self.equippable = equippable
 
@@ -39,8 +39,8 @@ class Entity(object):
         if self.stairs:
             self.stairs.owner = self
 
-        if self.level:
-            self.level.owner = self
+        if self.lvl:
+            self.lvl.owner = self
 
         if self.equipment:
             self.equipment.owner = self
@@ -71,7 +71,7 @@ class Entity(object):
         dy = int(round(dy / dist))
 
         blocked_at = game_map.is_blocked(self.x + dx, self.y + dy)
-        occupied = get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)
+        occupied = get_blockers_at_loc(entities, self.x + dx, self.y + dy)
 
         if not (blocked_at or occupied):
             self.move(dx, dy)
@@ -129,7 +129,7 @@ class Entity(object):
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
-def get_blocking_entities_at_location(entities, dest_x, dest_y):
+def get_blockers_at_loc(entities, dest_x, dest_y):
     for entity in entities:
         matching_coords = entity.x == dest_x and entity.y == dest_y
 

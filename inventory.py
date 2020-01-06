@@ -1,5 +1,5 @@
 import tcod
-from game_messages import Message
+from messages import Msg
 
 class Inventory(object):
     def __init__(self, capacity):
@@ -13,12 +13,12 @@ class Inventory(object):
         if len(self.items) >= self.capacity:
             results.append({
                 'item_added': None,
-                'msg': Message('You cannot carry any more, your inventory is full.', tcod.yellow)
+                'msg': Msg('You cannot carry any more, your inventory is full.', tcod.yellow)
             })
         else:
             results.append({
                 'item_added': item,
-                'msg': Message('You pick up the {}!'.format(item.name), tcod.blue)
+                'msg': Msg('You pick up the {}!'.format(item.name), tcod.blue)
             })
 
             self.items.append(item)
@@ -31,7 +31,7 @@ class Inventory(object):
 
         if item_comp.use_func is None:
             # results.append({
-                # 'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
+                # 'msg': Msg('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
             # })
 
             equippable_comp = item_entity.equippable
@@ -40,7 +40,7 @@ class Inventory(object):
                 results.append({'equip': item_entity})
             else:
                 results.append({
-                    'msg': Message('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
+                    'msg': Msg('The {} cannot be used.'.format(item_entity.name), tcod.yellow)
                 })
         else:
             # How does this work? Is there a cleaner way to do this??
@@ -96,7 +96,7 @@ class Inventory(object):
 
         results.append({
             'item_dropped': item,
-            'msg': Message('You dropped the {}.'.format(item.name), tcod.yellow)
+            'msg': Msg('You dropped the {}.'.format(item.name), tcod.yellow)
         })
 
         return results

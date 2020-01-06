@@ -1,0 +1,12 @@
+amt = amount
+loc = location
+dist = distance
+msg = message
+inv = inventory
+r = right
+l = left
+scr = screen
+char = character (usually)
+lvl = level
+xp = experience
+

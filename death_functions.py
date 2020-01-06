@@ -1,13 +1,13 @@
 import tcod
-from game_states import GameStates
+from states import States
 from render_functions import RenderOrder
-from game_messages import Message
+from messages import Msg
 
 
-def kill_player(player):
-    player.char = '%'
-    player.color = tcod.dark_red
-    return Message('You died!', tcod.dark_red), GameStates.PLAYER_DEAD
+def kill_hero(hero):
+    hero.char = '%'
+    hero.color = tcod.dark_red
+    return Msg('You died!', tcod.dark_red), States.HERO_DEAD
 
 
 def kill_monster(monster):
@@ -20,4 +20,4 @@ def kill_monster(monster):
     monster.name = 'remains of ' + monster.name
 
     death_msg = '{} is dead!'.format(monster.name.capitalize())
-    return Message(death_msg, tcod.orange)
+    return Msg(death_msg, tcod.orange)

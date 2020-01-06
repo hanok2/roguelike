@@ -1,22 +1,15 @@
 from random import randint
 import tcod
-from game_messages import Message
+from messages import Msg
 from equipment_slots import EquipmentSlots
 
 
 class Fighter(object):
     def __init__(self, hp, defense, power, xp=0):
-        # self.max_hp = hp
         self.base_max_hp = hp
-
         self.hp = hp
-
-        # self.defense = defense
         self.base_defense = defense
-
-        # self.power = power
         self.base_power = power
-
         self.xp = xp
 
     @property
@@ -72,7 +65,7 @@ class Fighter(object):
         dmg = self.power - target.fighter.defense
 
         if dmg > 0:
-            msg = {'msg': Message('{} attacks {} for {} HP.'.format(
+            msg = {'msg': Msg('{} attacks {} for {} HP.'.format(
                 self.owner.name, target.name, str(dmg)),
                                   tcod.white)}
 
@@ -80,7 +73,7 @@ class Fighter(object):
             results.extend(target.fighter.take_dmg(dmg))
 
         else:
-            msg = {'msg': Message('{} attacks {} but does no damage.'.format(
+            msg = {'msg': Msg('{} attacks {} but does no damage.'.format(
                 self.owner.name, target.name),
                                   tcod.white)}
             results.append(msg)
@@ -88,8 +81,8 @@ class Fighter(object):
         return results
 
 
-class BasicMonster(object):
-    """AI for a BasicMonster"""
+class ApproachingBehavior(object):
+    """AI for an entity/monster to approach the hero when within line of sight"""
     def take_turn(self, target, fov_map, game_map, entities):
         results = []
 
@@ -107,7 +100,8 @@ class BasicMonster(object):
         return results
 
 
-class ConfusedMonster(object):
+class ConfusedBehavior(object):
+    """AI for an entity/monster to move randomly for a set number of turns."""
     def __init__(self, prev_ai, num_turns=10):
         self.prev_ai = prev_ai
         self.num_turns = num_turns
@@ -128,7 +122,7 @@ class ConfusedMonster(object):
             # Spell has run out
             self.owner.ai = self.prev_ai
             results.append({
-                'msg': Message('The {} is no longer confused!'.format(self.owner.name), tcod.red)
+                'msg': Msg('The {} is no longer confused!'.format(self.owner.name), tcod.red)
             })
 
         return results
@@ -143,30 +137,30 @@ class Item(object):
 
 
 class Level(object):
-    def __init__(self, current_level=1, current_xp=0, level_up_base=200, level_up_factor=150):
+    def __init__(self, current_lvl=1, current_xp=0, lvl_up_base=200, lvl_up_factor=150):
         # Note: Consider putting defaults in constants dict.
-        self.current_level = current_level
+        self.current_lvl = current_lvl
         self.current_xp = current_xp
-        self.level_up_base = level_up_base
-        self.level_up_factor = level_up_factor
+        self.lvl_up_base = lvl_up_base
+        self.lvl_up_factor = lvl_up_factor
 
 
     @property
-    def experience_to_next_level(self):
+    def xp_to_next_lvl(self):
         # Read-only variable that we can easily access inside the clas and on
         # the objects we create.
-        return self.level_up_base + self.current_level * self.level_up_factor
+        return self.lvl_up_base + self.current_lvl * self.lvl_up_factor
 
     def add_xp(self, xp):
         self.current_xp += xp
 
-        if self.current_xp > self.experience_to_next_level:
+        if self.current_xp > self.xp_to_next_lvl:
             # Maybe remove this line, seems like we are short-changing the player
-            # self.current_xp -= self.experience_to_next_level
+            # self.current_xp -= self.xp_to_next_lvl
 
             # For now - reset the XP
             self.current_xp = 0
-            self.current_level += 1
+            self.current_lvl += 1
 
             return True
         else:

@@ -22,10 +22,10 @@ def rnd_choice_from_dict(choice_dict):
     return choices[rnd_choice_index(chances)]
 
 
-def from_dungeon_level(table, dungeon_level):
-    # Returns the weight appropriate for the dungeon level.
-    for (value, level) in reversed(table):
-        if dungeon_level >= level:
+def from_dungeon_lvl(table, dungeon_lvl):
+    # Returns the weight appropriate for the dungeon lvl.
+    for (value, lvl) in reversed(table):
+        if dungeon_lvl >= lvl:
             return value
 
     return 0
