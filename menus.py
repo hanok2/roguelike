@@ -157,7 +157,8 @@ def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
         tcod.BKGND_NONE, tcod.LEFT, 'Defense: {0}'.format(hero.fighter.defense))
 
     x = scr_width // 2 - char_scr_width // 2
-    y = scr_height // 2 - char_scr_height // 2
+    # y = scr_height // 2 - char_scr_height // 2
+    y = 5
 
     tcod.console_blit(
         window,
