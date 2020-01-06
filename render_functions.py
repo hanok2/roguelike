@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, auto
 import tcod
 from states import States
 from menus import inv_menu, lvl_up_menu, char_scr
@@ -7,10 +7,10 @@ from menus import inv_menu, lvl_up_menu, char_scr
 class RenderOrder(Enum):
     # Does auto work? - Does not seem to work by default or builtin - fix
     # later.
-    STAIRS = 1
-    CORPSE = 2
-    ITEM = 3
-    ACTOR = 4
+    STAIRS = auto()
+    CORPSE = auto()
+    ITEM = auto()
+    ACTOR = auto()
 
 
 def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, scr_width, scr_height, bar_width, panel_height, panel_y, mouse, colors, state):
