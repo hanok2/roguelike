@@ -6,8 +6,6 @@ from menus import inv_menu, lvl_up_menu, char_scr
 
 
 class RenderOrder(Enum):
-    # Does auto work? - Does not seem to work by default or builtin - fix
-    # later.
     STAIRS = auto()
     CORPSE = auto()
     ITEM = auto()
@@ -20,23 +18,46 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     if fov_recompute:
         for y in range(game_map.height):
             for x in range(game_map.width):
-                visible = tcod.map_is_in_fov(fov_map, x, y)
+                # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
+                # This function is slow
+                visible = tcod.map_is_in_fov(m=fov_map, x=x, y=y)
 
                 wall = game_map.tiles[x][y].block_sight
 
                 if visible:
                     if wall:
-                        tcod.console_set_char_background(con, x, y, config.colors.get('light_wall'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(
+                            con=con,
+                            x=x, y=y,
+                            col=config.colors.get('light_wall'),
+                            flag=tcod.BKGND_SET
+                        )
                     else:
-                        tcod.console_set_char_background(con, x, y, config.colors.get('light_ground'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(
+                            con=con,
+                            x=x, y=y,
+                            col=config.colors.get('light_ground'),
+                            flag=tcod.BKGND_SET
+                        )
 
-                    game_map.tiles[x][y].explored = True        # It's visible therefore explored
+                    # It's visible therefore explored
+                    game_map.tiles[x][y].explored = True
 
                 elif game_map.tiles[x][y].explored:
                     if wall:
-                        tcod.console_set_char_background(con, x, y, config.colors.get('dark_wall'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(
+                            con=con,
+                            x=x, y=y,
+                            col=config.colors.get('dark_wall'),
+                            flag=tcod.BKGND_SET
+                        )
                     else:
-                        tcod.console_set_char_background(con, x, y, config.colors.get('dark_ground'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(
+                            con=con,
+                            x=x, y=y,
+                            col=config.colors.get('dark_ground'),
+                            flag=tcod.BKGND_SET
+                        )
 
 	# Draw all entities in the list
     sorted_entities = sorted(entities, key=lambda x: x.render_order.value)
@@ -45,7 +66,16 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
         draw_entity(con, entity, fov_map, game_map)
 
     # Display console
-    tcod.console_blit(con, 0, 0, config.scr_width, config.scr_height, 0, 0, 0)
+    # Deprecated since version 8.5: Call the Console.blit method instead.
+    tcod.console_blit(
+        src=con,
+        x=0, y=0,
+        w=config.scr_width,
+        h=config.scr_height,
+        dst=0,
+        xdst=0,
+        ydst=0
+    )
 
     if state in (States.SHOW_INV, States.DROP_INV):
         if state == States.SHOW_INV:
@@ -65,7 +95,7 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     elif state == States.LEVEL_UP:
         lvl_up_menu(
             con,
-            'Level up! Choos a stat to raise:',
+            'Level up! Choose a stat to raise:',
             hero,
             40,
             config.scr_width,
@@ -75,15 +105,27 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     elif state == States.SHOW_STATS:
         char_scr(hero, 30, 10, config.scr_width, config.scr_height)
 
-    tcod.console_set_default_background(panel, tcod.black)
-    tcod.console_clear(panel)
+    # Deprecated since version 8.5: Use Console.default_bg instead.
+    tcod.console_set_default_background(con=panel, col=tcod.black)
+
+    # todo: Deprecated
+    tcod.console_clear(con=panel)
 
     # Print the game messages, one line at a time
     y = 1
     for msg in msg_log.messages:
-        # tcod.console_set_default_foreground(panel, msg.color)
+        # Deprecated since version 8.5: Use Console.default_fg instead.
         tcod.console_set_default_foreground(panel, tcod.white)
-        tcod.console_print_ex(panel, msg_log.x, y, tcod.BKGND_NONE, tcod.LEFT, msg)
+
+        # Deprecated since version 8.5: Use Console.print_ instead.
+        tcod.console_print_ex(
+            con=panel,
+            x=msg_log.x,
+            y=y,
+            flag=tcod.BKGND_NONE,
+            alignment=tcod.LEFT,
+            fmt=msg
+        )
         y += 1
 
     render_bar(
@@ -98,30 +140,35 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     )
 
     # Display level
+    # Deprecated since version 8.5: Use Console.print_ instead.
     tcod.console_print_ex(
-        panel,
-        1, 3,
-        tcod.BKGND_NONE,
-        tcod.LEFT,
-        'Dungeon level: {}'.format(game_map.dungeon_lvl)
+        con=panel,
+        x=1, y=3,
+        flag=tcod.BKGND_NONE,
+        alignment=tcod.LEFT,
+        fmt='Dungeon level: {}'.format(game_map.dungeon_lvl)
     )
 
-    tcod.console_set_default_foreground(panel, tcod.light_gray)
+        # Deprecated since version 8.5: Use Console.default_fg instead.
+    tcod.console_set_default_foreground(con=panel, col=tcod.light_gray)
+
+    # Deprecated since version 8.5: Use Console.print_ instead.
     tcod.console_print_ex(
-        panel,
-        1, 0,
-        tcod.BKGND_NONE,
-        tcod.LEFT,
-        get_names_under_mouse(mouse, entities, fov_map)
+        con=panel,
+        x=1, y=0,
+        flag=tcod.BKGND_NONE,
+        alignment=tcod.LEFT,
+        fmt=get_names_under_mouse(mouse, entities, fov_map)
     )
 
+    # Deprecated since version 8.5: Call the Console.blit method instead.
     tcod.console_blit(
-        panel,
-        0, 0,
-        config.scr_width,
-        config.panel_height,
-        0, 0,
-        config.panel_y
+        src=panel,
+        x=0, y=0,
+        w=config.scr_width,
+        h=config.panel_height,
+        dst=0,
+        xdst=0, ydst=config.panel_y
     )
 
 
@@ -134,57 +181,78 @@ def clear_all(con, entities):
 def draw_entity(con, entity, fov_map, game_map):
     # Draw an entity on the console
     # todo: Break into nicer boolean later...
+
+    # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
     if tcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
-        tcod.console_set_default_foreground(con, entity.color)
-        tcod.console_put_char(con, entity.x, entity.y, entity.char, tcod.BKGND_NONE)
+        # Deprecated since version 8.5: Use Console.default_fg instead.
+        tcod.console_set_default_foreground(con=con, col=entity.color)
+
+        tcod.console_put_char(
+            con=con,
+            x=entity.x, y=entity.y,
+            c=entity.char,
+            flag=tcod.BKGND_NONE
+        )
 
 
 def clear_entity(con, entity):
     # Erase the character that represents this object
-    tcod.console_put_char(con, entity.x, entity.y, ' ', tcod.BKGND_NONE)
+    tcod.console_put_char(
+        con=con,
+        x=entity.x, y=entity.y,
+        c=' ',
+        flag=tcod.BKGND_NONE
+    )
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
     bar_width = int(float(value) / maximum * total_width)
 
-    tcod.console_set_default_background(panel, back_color)
+    # Deprecated since version 8.5: Use Console.default_bg instead.
+    tcod.console_set_default_background(con=panel, col=back_color)
+
+    # Deprecated since version 8.5: Use Console.rect instead.
     tcod.console_rect(
-        panel,
-        x, y,
-        total_width,
-        1,
-        False,
-        tcod.BKGND_SCREEN
+        con=panel,
+        x=x, y=y,
+        w=total_width,
+        h=1,
+        clr=False,
+        flag=tcod.BKGND_SCREEN
     )
 
-    tcod.console_set_default_background(panel, bar_color)
+    # Deprecated since version 8.5: Use Console.default_bg instead.
+    tcod.console_set_default_background(con=panel, col=bar_color)
+
     if bar_width > 0:
+        # Deprecated since version 8.5: Use Console.rect instead.
         tcod.console_rect(
-            panel,
-            x, y,
-            bar_width,
-            1,
-            False,
-            tcod.BKGND_SCREEN
+            con=panel,
+            x=x, y=y,
+            w=bar_width,
+            h=1,
+            clr=False,
+            flag=tcod.BKGND_SCREEN
         )
 
 
-    tcod.console_set_default_foreground(panel, tcod.white)
+    tcod.console_set_default_foreground(con=panel, col=tcod.white)
 
     tcod.console_print_ex(
-        panel,
-        int(x + total_width / 2),
-        y,
-        tcod.BKGND_NONE,
-        tcod.CENTER,
-        '{}: {}/{}'.format(name, value, maximum)
+        con=panel,
+        x=int(x + total_width / 2),
+        y=y,
+        flag=tcod.BKGND_NONE,
+        alignment=tcod.CENTER,
+        fmt='{}: {}/{}'.format(name, value, maximum)
     )
 
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)
 
+    # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
     names = [entity.name for entity in entities
              if entity.x == x and entity.y == y and
-             tcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+             tcod.map_is_in_fov(m=fov_map, x=entity.x, y=entity.y)]
 
     names = ', '.join(names)
 

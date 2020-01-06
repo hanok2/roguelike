@@ -5,34 +5,36 @@ MAX_MENU_ITEMS = 26
 
 
 def menu(con, header, options, width, scr_width, scr_height):
+    """ Display a menu of options. Each option has a letter to the left side."""
     if len(options) > MAX_MENU_ITEMS:
         raise ValueError('Cannot have a menu with more than 26 options.')
 
     # Calculate total height for the header (after auto-wrap) and one line per option
     header_height = tcod.console_get_height_rect(
-        con,
-        0, 0,
-        width,
-        scr_height,
-        header
+        con=con,
+        x=0, y=0,
+        w=width,
+        h=scr_height,
+        fmt=header
     )
 
     height = len(options) + header_height
 
     # Create an off-screen console that represents the menu's window
-    window = tcod.console_new(width, height)
+    window = tcod.console_new(w=width, h=height)
 
     # Print the header, with auto-wrap
-    tcod.console_set_default_foreground(window, tcod.white)
+    tcod.console_set_default_foreground(con=window, col=tcod.white)
 
+    # Print a string constrained to a rectangle with blend and alignment.
     tcod.console_print_rect_ex(
-        window,
-        0, 0,
-        width,
-        height,
-        tcod.BKGND_NONE,
-        tcod.LEFT,
-        header
+        con=window,
+        x=0, y=0,
+        w=width,
+        h=height,
+        flag=tcod.BKGND_NONE,
+        alignment=tcod.LEFT,
+        fmt=header
     )
 
     # Print all the options
@@ -42,11 +44,11 @@ def menu(con, header, options, width, scr_width, scr_height):
         text = '({}) {}'.format(k, v)
 
         tcod.console_print_ex(
-            window,
-            0, y,
-            tcod.BKGND_NONE,
-            tcod.LEFT,
-            text
+            con=window,
+            x=0, y=y,
+            flag=tcod.BKGND_NONE,
+            alignment=tcod.LEFT,
+            fmt=text
         )
         y += 1
 
@@ -55,10 +57,23 @@ def menu(con, header, options, width, scr_width, scr_height):
     # y = int(scr_height / 2 - height / 2)
     y = 5
 
-    tcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+    tcod.console_blit(
+        src=window,
+        x=0, y=0,
+        w=width,
+        h=height,
+        dst=0,
+        xdst=x,
+        ydst=y,
+        ffade=1.0,
+        bfade=0.7
+    )
 
 
 def default_lettering_dict(options):
+    """Create a default set of letters (starting from 'a') for a list of options.
+        Returns a dict with the letters as keys and options as values.
+    """
     letter_index = ord('a')
     option_dict = {}
     for o in options:
@@ -69,6 +84,11 @@ def default_lettering_dict(options):
 
 
 def list_all_inv_items(hero):
+    """ Returns a list of all items the hero currently has in inventory.
+        If the hero has an item equipped, it will display the slot the item is
+        equipped in parentheses.
+    """
+
     options = []
 
     for item in hero.inv.items:
@@ -83,7 +103,8 @@ def list_all_inv_items(hero):
 
 
 def inv_menu(con, header, hero, inv_width, scr_width, scr_height):
-    # Show a menu w/ each item of the inventory as an option
+    """ Show a menu with each item of the inventory as an option """
+
     if len(hero.inv.items) == 0:
         options = ['Inventory is empty.']
     else:
@@ -94,22 +115,35 @@ def inv_menu(con, header, hero, inv_width, scr_width, scr_height):
 
 
 def main_menu(con, bg_img, scr_width, scr_height):
+    """ Displays the main menu for the game."""
     tcod.image_blit_2x(bg_img, 0, 0, 0)
 
-    tcod.console_set_default_foreground(0, tcod.light_yellow)
+    tcod.console_set_default_foreground(con=0, col=tcod.light_yellow)
 
     # Display game title
     title_x = int(scr_width / 2)
     # title_y = int(scr_height / 2) - 4
     title_y = 3
-    tcod.console_print_ex( 0, title_x, title_y, tcod.BKGND_NONE, tcod.CENTER, config.game_title,)
+    tcod.console_print_ex(
+        con=0,
+        x=title_x, y=title_y,
+        flag=tcod.BKGND_NONE,
+        alignment=tcod.CENTER,
+        fmt=config.game_title
+    )
 
     # Display author
     author_x = int(scr_width / 2)
     author_y = int(scr_height - 2)
     # author_y = int(scr_height - 2)
 
-    tcod.console_print_ex(0, author_x, author_y, tcod.BKGND_NONE, tcod.CENTER, 'By {}'.format(config.author))
+    tcod.console_print_ex(
+        con=0,
+        x=author_x, y=author_y,
+        flag=tcod.BKGND_NONE,
+        alignment=tcod.CENTER,
+        fmt='By {}'.format(config.author)
+    )
 
     # Display main menu options
     options = {
@@ -127,6 +161,10 @@ def msg_box(con, header, width, scr_width, scr_height):
 
 
 def lvl_up_menu(con, header, hero, menu_width, scr_width, scr_height):
+    """Displays a menu for the player when they reach a level-up. Gives them
+        choice of different stat boosts to pick from.
+    """
+
     options = {
         'c': 'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
         's': 'Strength (+1 attack, from {})'.format(hero.fighter.power),
@@ -137,10 +175,12 @@ def lvl_up_menu(con, header, hero, menu_width, scr_width, scr_height):
 
 
 def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
-    window = tcod.console_new(char_scr_width, char_scr_height)
+    """ Displays a windows showing the hero's current stats and experience."""
+    window = tcod.console_new(w=char_scr_width, h=char_scr_height)
 
-    tcod.console_set_default_foreground(window, tcod.white)
+    tcod.console_set_default_foreground(con=window, col=tcod.white)
 
+    # todo: Add a loop here
     tcod.console_print_rect_ex(window, 0, 1, char_scr_width, char_scr_height,
         tcod.BKGND_NONE, tcod.LEFT, 'Character Information')
     tcod.console_print_rect_ex( window, 0, 2, char_scr_width, char_scr_height,
@@ -161,12 +201,12 @@ def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
     y = 5
 
     tcod.console_blit(
-        window,
-        0, 0,
-        char_scr_width,
-        char_scr_height,
-        0,
-        x, y,
-        1.0,
-        0.7
+        src=window,
+        x=0, y=0,
+        w=char_scr_width,
+        h=char_scr_height,
+        dst=0,  # Destination
+        xdst=x, ydst=y,
+        ffade=1.0,
+        bfade=0.7
     )

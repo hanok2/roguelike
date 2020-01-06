@@ -13,26 +13,31 @@ from render_functions import clear_all, render_all
 
 def main():
     img_file = 'images/arial10x10.png'
-    tcod.console_set_custom_font(img_file, tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
+    tcod.console_set_custom_font(
+        fontFile=img_file,
+        flags=tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
+    )
 
-    # Creates the screen. (Boolean specifies full screen)
+    # Creates the screen.
     tcod.console_init_root(
-        config.scr_width,
-        config.scr_height,
-        config.window_title,
-        False
+        w=config.scr_width,
+        h=config.scr_height,
+        title=config.window_title,
+        fullscreen=False
     )
 
     # Initialize the console
+    # Deprecated since version 8.5: Create new consoles using tcod.console.Console instead of this function.
     con = tcod.console_new(
-        config.scr_width,
-        config.scr_height
+        w=config.scr_width,
+        h=config.scr_height
     )
 
     # Initialize the panel
+    # Deprecated since version 8.5: Create new consoles using tcod.console.Console instead of this function.
     panel = tcod.console_new(
-        config.scr_width,
-        config.panel_height
+        w=config.scr_width,
+        h=config.panel_height
     )
 
     # Initialize game data
@@ -45,13 +50,18 @@ def main():
     show_main_menu = True
     show_load_err_msg = False
 
-    main_menu_bg_img = tcod.image_load('images/menu_bg.png')
+    main_menu_bg_img = tcod.image_load(filename='images/menu_bg.png')
 
     key = tcod.Key()
     mouse = tcod.Mouse()
 
     while not tcod.console_is_window_closed():
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
+        # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
+        tcod.sys_check_for_event(
+            mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            k=key,
+            m=mouse
+        )
 
         if show_main_menu:
             main_menu(
@@ -70,6 +80,7 @@ def main():
                     config.scr_height
                 )
 
+            # Update the display to represent the root consoles current state.
             tcod.console_flush()
 
             action = handle_main_menu(key)
@@ -100,7 +111,9 @@ def main():
             elif exit_game:
                 break
         else:
-            tcod.console_clear(con)
+            # Reset a console to its default colors and the space character.
+            # Deprecated since version 8.5: Call the Console.clear method instead.
+            tcod.console_clear(con=con)
             play_game(
                 hero,
                 entities,
@@ -127,9 +140,15 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel):
     targeting_item = None
 
     # Game loop
+    # Deprecated since version 9.3: Use the tcod.event module to check for “QUIT” type events.
     while not tcod.console_is_window_closed():
         # Capture new user input
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
+        # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
+        tcod.sys_check_for_event(
+            mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            k=key,
+            m=mouse
+        )
 
         if fov_recompute:
             recompute_fov(
@@ -249,7 +268,9 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel):
                     entities = game_map.next_floor(hero, msg_log)
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
-                    tcod.console_clear(con)
+
+                    # Deprecated since version 8.5: Call the Console.clear method instead.
+                    tcod.console_clear(con=con)
 
                     break
             else:
@@ -297,7 +318,8 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel):
                 return True
 
         if full_scr:
-            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
+            # Toggle fullscreen on/off
+            tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
 
         # Process hero results
         for result in hero_turn_results:
