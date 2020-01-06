@@ -80,8 +80,9 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     # Print the game messages, one line at a time
     y = 1
     for msg in msg_log.messages:
-        tcod.console_set_default_foreground(panel, msg.color)
-        tcod.console_print_ex(panel, msg_log.x, y, tcod.BKGND_NONE, tcod.LEFT, msg.text)
+        # tcod.console_set_default_foreground(panel, msg.color)
+        tcod.console_set_default_foreground(panel, tcod.white)
+        tcod.console_print_ex(panel, msg_log.x, y, tcod.BKGND_NONE, tcod.LEFT, msg)
         y += 1
 
     render_bar(

@@ -6,7 +6,6 @@ from entity import Entity
 from components import Fighter, ApproachingBehavior, Item, EquipmentSlots, Equippable
 from render_functions import RenderOrder
 from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
-from messages import Msg
 from stairs import Stairs
 from random_utils import rnd_choice_from_dict, from_dungeon_lvl
 
@@ -245,7 +244,7 @@ class GameMap(object):
                     item_comp = Item(
                         use_func=cast_fireball,
                         targeting=True,
-                        targeting_msg=Msg('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
+                        targeting_msg='Left-click a target tile for the fireball, or right-click to cancel.',
                         dmg=25,
                         radius=3
                     )
@@ -263,7 +262,7 @@ class GameMap(object):
                     item_comp = Item(
                         use_func=cast_confuse,
                         targeting=True,
-                        targeting_msg=Msg('Left-click an enemy to confuse it, or right-click to cancel.', tcod.light_cyan),
+                        targeting_msg='Left-click an enemy to confuse it, or right-click to cancel.',
                     )
 
                     item = Entity(
@@ -307,8 +306,6 @@ class GameMap(object):
         # Heal the hero
         hero.fighter.heal(hero.fighter.max_hp // 2)
 
-        msg_log.add(Msg(
-            'You take a moment to rest, and recover your strength.', tcod.light_violet)
-        )
+        msg_log.add('You take a moment to rest, and recover your strength.')
 
         return entities

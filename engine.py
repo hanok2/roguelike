@@ -3,7 +3,6 @@ from data_loaders import load_game, save_game
 from death_functions import kill_monster, kill_hero
 from entity import get_blockers_at_loc
 from fov import initialize_fov, recompute_fov
-from messages import Msg
 from states import States
 from initialize_new_game import constants, get_game_data
 from input_handling import handle_keys, handle_mouse, handle_main_menu
@@ -225,7 +224,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
 
                     break
             else:
-                msg_log.add(Msg('There is nothing here to pick up.', tcod.yellow))
+                msg_log.add('There is nothing here to pick up.')
 
         if show_inv:
             prev_state = state
@@ -260,9 +259,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
 
                     break
             else:
-                msg_log.add(Msg(
-                    'There are no stairs here.', tcod.yellow
-                ))
+                msg_log.add('There are no stairs here.')
 
         if lvl_up:
             # todo: Move stat boosts to constants
@@ -325,17 +322,13 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
 
             if cancel_target:
                 state = prev_state
-                msg_log.add(Msg('Targeting cancelled.'))
+                msg_log.add('Targeting cancelled.')
 
             if xp:
                 leveled_up = hero.lvl.add_xp(xp)
 
                 if leveled_up:
-                    msg_log.add(Msg(
-                        'Your battle skills grow stronger! You reached level {}!'.format(
-                            hero.lvl.current_lvl), tcod.yellow
-                        )
-                    )
+                    msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
                     prev_state = state
                     state = States.LEVEL_UP
 
@@ -373,10 +366,10 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
                     dequipped = equip_result.get('dequipped')
 
                     if equipped:
-                        msg_log.add(Msg('You equipped the {}'.format(equipped.name)))
+                        msg_log.add('You equipped the {}'.format(equipped.name))
 
                     if dequipped:
-                        msg_log.add(Msg('You dequipped the {}'.format(dequipped.name)))
+                        msg_log.add('You dequipped the {}'.format(dequipped.name))
 
                 state = States.WORLD_TURN
 

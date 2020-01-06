@@ -1,5 +1,4 @@
 import tcod
-from messages import Msg
 from components import ConfusedBehavior
 
 
@@ -14,13 +13,13 @@ def heal(*args, **kwargs):
     if entity.fighter.hp == entity.fighter.max_hp:
         results.append({
             'consumed': False,
-            'msg': Msg('You are already at full health', tcod.yellow)
+            'msg': 'You are already at full health'
         })
     else:
         entity.fighter.heal(amt)
         results.append({
             'consumed': True,
-            'msg': Msg('Your wounds start to feel better!', tcod.green)
+            'msg': 'Your wounds start to feel better!'
         })
 
     return results
@@ -49,7 +48,7 @@ def cast_lightning(*args, **kwargs):
         results.append({
             'consumed': True,
             'target': target,
-            'msg': Msg('A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg))
+            'msg': 'A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg)
         })
         results.extend(target.fighter.take_dmg(dmg))
 
@@ -57,7 +56,7 @@ def cast_lightning(*args, **kwargs):
         results.append({
             'consumed': False,
             'target': None,
-            'msg': Msg('No enemy is close enough to strike.', tcod.red)
+            'msg': 'No enemy is close enough to strike.'
         })
 
     return results
@@ -76,19 +75,19 @@ def cast_fireball(*args, **kwargs):
     if not tcod.map_is_in_fov(fov_map,target_x, target_y):
         results.append({
             'consumed': False,
-            'msg': Msg('You cannot target a tile outside your field of view.', tcod.yellow)
+            'msg': 'You cannot target a tile outside your field of view.'
         })
         return results
 
     results.append({
         'consumed': True,
-        'msg': Msg('The fireball explodes, burning everything within {} tiles!'.format(radius), tcod.orange)
+        'msg': 'The fireball explodes, burning everything within {} tiles!'.format(radius)
     })
 
     for entity in entities:
         if entity.distance(target_x, target_y) <= radius and entity.fighter:
             results.append({
-                'msg': Msg('The {} gets burned for {} hit points!'.format(entity.name, dmg), tcod.orange)
+                'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)
             })
             results.extend(entity.fighter.take_dmg(dmg))
 
@@ -106,7 +105,7 @@ def cast_confuse(*args, **kwargs):
     if not tcod.map_is_in_fov(fov_map, target_x, target_y):
         results.append({
             'consumed': False,
-            'msg': Msg('You cannot target a tile outside your field of view.', tcod.yellow)
+            'msg': 'You cannot target a tile outside your field of view.'
         })
         return results
 
@@ -119,13 +118,13 @@ def cast_confuse(*args, **kwargs):
 
             results.append({
                 'consumed': True,
-                'msg': Msg('The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name), tcod.light_green)
+                'msg': 'The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
             })
             break
     else:
         results.append({
             'consumed': False,
-            'msg': Msg('There is no targetable enemy at that location.', tcod.yellow)
+            'msg': 'There is no targetable enemy at that location.'
         })
 
     return results

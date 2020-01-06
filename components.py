@@ -1,6 +1,5 @@
 from random import randint
 import tcod
-from messages import Msg
 from equipment_slots import EquipmentSlots
 
 
@@ -63,17 +62,13 @@ class Fighter(object):
         dmg = self.power - target.fighter.defense
 
         if dmg > 0:
-            msg = {'msg': Msg('{} attacks {}!'.format(
-                self.owner.name, target.name), tcod.white)
-                  }
+            msg = {'msg': '{} attacks {}!'.format(self.owner.name, target.name)}
 
             results.append(msg)
             results.extend(target.fighter.take_dmg(dmg))
 
         else:
-            msg = {'msg': Msg('{} attacks {}... But does no damage.'.format(
-                self.owner.name, target.name),
-                                  tcod.white)}
+            msg = {'msg': '{} attacks {}... But does no damage.'.format(self.owner.name, target.name), }
             results.append(msg)
 
         return results
@@ -120,7 +115,7 @@ class ConfusedBehavior(object):
             # Spell has run out
             self.owner.ai = self.prev_ai
             results.append({
-                'msg': Msg('The {} is no longer confused!'.format(self.owner.name), tcod.red)
+                'msg': 'The {} is no longer confused!'.format(self.owner.name)
             })
 
         return results
@@ -174,10 +169,10 @@ class Equippable(object):
 
 
 class Equipment(object):
-    """Since we’re using properties, these values can be accessed like a regular
-    variable, which will come in handy soon enough. If the player has equipment
-    in both the main hand and off hand that increases attack, for instance, then
-    we’ll get the bonus the same either way.
+    """Since we're using properties, these values can be accessed like a regular
+        variable, which will come in handy soon enough. If the player has equipment
+        in both the main hand and off hand that increases attack, for instance, then
+        we'll get the bonus the same either way.
     """
     def __init__(self, main_hand=None, off_hand=None):
         self.main_hand = main_hand
