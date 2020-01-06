@@ -3,8 +3,9 @@ from data_loaders import load_game, save_game
 from death_functions import kill_monster, kill_hero
 from entity import get_blockers_at_loc
 from fov import initialize_fov, recompute_fov
+import game_init
 from states import States
-from initialize_new_game import constants, get_game_data
+import config
 from input_handling import handle_keys, handle_mouse, handle_main_menu
 from menus import main_menu, msg_box
 from render_functions import clear_all, render_all
@@ -16,22 +17,22 @@ def main():
 
     # Creates the screen. (Boolean specifies full screen)
     tcod.console_init_root(
-        constants['scr_width'],
-        constants['scr_height'],
+        config.scr_width,
+        config.scr_height,
         'libtcod tutorial revised',
         False
     )
 
     # Initialize the console
     con = tcod.console_new(
-        constants['scr_width'],
-        constants['scr_height']
+        config.scr_width,
+        config.scr_height
     )
 
     # Initialize the panel
     panel = tcod.console_new(
-        constants['scr_width'],
-        constants['panel_height']
+        config.scr_width,
+        config.panel_height
     )
 
     # Initialize game data
@@ -56,8 +57,8 @@ def main():
             main_menu(
                 con,
                 main_menu_bg_img,
-                constants['scr_width'],
-                constants['scr_height'],
+                config.scr_width,
+                config.scr_height,
             )
 
             if show_load_err_msg:
@@ -65,8 +66,8 @@ def main():
                     con,
                     'No save game to load',
                     50,
-                    constants['scr_width'],
-                    constants['scr_height']
+                    config.scr_width,
+                    config.scr_height
                 )
 
             tcod.console_flush()
@@ -81,7 +82,7 @@ def main():
             if show_load_err_msg and (new_game or load_saved_game or exit_game):
                 show_load_err_msg = False
             elif new_game:
-                hero, entities, game_map, msg_log, state = get_game_data()
+                hero, entities, game_map, msg_log, state = game_init.get_game_data()
                 state = States.HERO_TURN
                 show_main_menu = False
 
@@ -108,12 +109,11 @@ def main():
                 state,
                 con,
                 panel,
-                constants,
             )
             show_main_menu = True
 
 
-def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
+def play_game(hero, entities, game_map, msg_log, state, con, panel):
     fov_recompute = True
 
     # Initialize fov
@@ -136,9 +136,9 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
                 fov_map,
                 hero.x,
                 hero.y,
-                constants['fov_radius'],
-                constants['fov_light_walls'],
-                constants['fov_algorithm']
+                config.fov_radius,
+                config.fov_light_walls,
+                config.fov_algorithm
             )
 
         # Render all entities
@@ -151,13 +151,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
             fov_map,
             fov_recompute,
             msg_log,
-            constants['scr_width'],
-            constants['scr_height'],
-            constants['bar_width'],
-            constants['panel_height'],
-            constants['panel_y'],
             mouse,
-            constants['colors'],
             state
         )
 
@@ -252,7 +246,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
         if take_stairs and state == States.HERO_TURN:
             for entity in entities:
                 if entity.stairs and entity.x == hero.x and entity.y == hero.y:
-                    entities = game_map.next_floor(hero, msg_log, constants)
+                    entities = game_map.next_floor(hero, msg_log, config)
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
                     tcod.console_clear(con)
@@ -262,7 +256,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
                 msg_log.add('There are no stairs here.')
 
         if lvl_up:
-            # todo: Move stat boosts to constants
+            # todo: Move stat boosts to config
             if lvl_up == 'hp':
                 hero.fighter.base_max_hp += 20
                 hero.fighter.hp += 20

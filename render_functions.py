@@ -1,5 +1,6 @@
 from enum import Enum, auto
 import tcod
+import config
 from states import States
 from menus import inv_menu, lvl_up_menu, char_scr
 
@@ -13,7 +14,7 @@ class RenderOrder(Enum):
     ACTOR = auto()
 
 
-def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, scr_width, scr_height, bar_width, panel_height, panel_y, mouse, colors, state):
+def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
     # Draw all the tiles in the game map
 
     if fov_recompute:
@@ -25,17 +26,17 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
 
                 if visible:
                     if wall:
-                        tcod.console_set_char_background(con, x, y, colors.get('light_wall'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(con, x, y, config.colors.get('light_wall'), tcod.BKGND_SET)
                     else:
-                        tcod.console_set_char_background(con, x, y, colors.get('light_ground'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(con, x, y, config.colors.get('light_ground'), tcod.BKGND_SET)
 
                     game_map.tiles[x][y].explored = True        # It's visible therefore explored
 
                 elif game_map.tiles[x][y].explored:
                     if wall:
-                        tcod.console_set_char_background(con, x, y, colors.get('dark_wall'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(con, x, y, config.colors.get('dark_wall'), tcod.BKGND_SET)
                     else:
-                        tcod.console_set_char_background(con, x, y, colors.get('dark_ground'), tcod.BKGND_SET)
+                        tcod.console_set_char_background(con, x, y, config.colors.get('dark_ground'), tcod.BKGND_SET)
 
 	# Draw all entities in the list
     sorted_entities = sorted(entities, key=lambda x: x.render_order.value)
@@ -44,7 +45,7 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
         draw_entity(con, entity, fov_map, game_map)
 
     # Display console
-    tcod.console_blit(con, 0, 0, scr_width, scr_height, 0, 0, 0)
+    tcod.console_blit(con, 0, 0, config.scr_width, config.scr_height, 0, 0, 0)
 
     if state in (States.SHOW_INV, States.DROP_INV):
         if state == States.SHOW_INV:
@@ -57,8 +58,8 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
             inv_title,
             hero,
             50,
-            scr_width,
-            scr_height
+            config.scr_width,
+            config.scr_height
         )
 
     elif state == States.LEVEL_UP:
@@ -67,12 +68,12 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
             'Level up! Choos a stat to raise:',
             hero,
             40,
-            scr_width,
-            scr_height
+            config.scr_width,
+            config.scr_height
         )
 
     elif state == States.SHOW_STATS:
-        char_scr(hero, 30, 10, scr_width, scr_height)
+        char_scr(hero, 30, 10, config.scr_width, config.scr_height)
 
     tcod.console_set_default_background(panel, tcod.black)
     tcod.console_clear(panel)
@@ -88,7 +89,7 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     render_bar(
         panel,
         1, 1,
-        bar_width,
+        config.bar_width,
         'HP',
         hero.fighter.hp,
         hero.fighter.max_hp,
@@ -117,10 +118,10 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
     tcod.console_blit(
         panel,
         0, 0,
-        scr_width,
-        panel_height,
+        config.scr_width,
+        config.panel_height,
         0, 0,
-        panel_y
+        config.panel_y
     )
 
 
