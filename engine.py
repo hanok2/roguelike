@@ -77,6 +77,7 @@ def main():
             new_game = action.get('new_game')
             load_saved_game = action.get('load_game')
             exit_game = action.get('exit')
+            options = action.get('options')
 
             if show_load_err_msg and (new_game or load_saved_game or exit_game):
                 show_load_err_msg = False
@@ -91,6 +92,11 @@ def main():
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_err_msg = True
+
+            elif options:
+                # todo: Fill out options menu
+                print('Options selected - STUB!')
+
             elif exit_game:
                 break
         else:

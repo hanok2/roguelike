@@ -118,7 +118,9 @@ def main_menu(con, bg_img, scr_width, scr_height):
     options = {
         'n': 'New game',
         'c': 'Continue last game',
+        'o': 'Options',
         'q': 'Quit'
+
     }
 
     menu(con, '', options, 24, scr_width, scr_height)

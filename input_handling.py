@@ -118,6 +118,8 @@ def handle_main_menu(key):
         return {'new_game': True}
     elif key_char == 'c':  # For "Continue"
         return {'load_game': True}
+    elif key_char == 'o':
+        return {'options': True}
     elif key_char == 'q':
         return {'exit': True}
 
