@@ -1,6 +1,9 @@
 import tcod
 
-window_title = 'Roguelike Tutorial Revised'
+VERSION = 1.1
+window_title = 'Infinity Dronez'
+game_title = 'Infinity Dronez Version {}'.format(VERSION)
+author = 'hackemslashem'
 
 scr_width = 80
 scr_height = 50

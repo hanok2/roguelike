@@ -19,7 +19,7 @@ def main():
     tcod.console_init_root(
         config.scr_width,
         config.scr_height,
-        'libtcod tutorial revised',
+        config.window_title,
         False
     )
 

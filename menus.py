@@ -1,4 +1,5 @@
 import tcod
+import config
 
 MAX_MENU_ITEMS = 26
 
@@ -37,7 +38,6 @@ def menu(con, header, options, width, scr_width, scr_height):
     # Print all the options
     y = header_height
 
-
     for k, v in options.items():
         text = '({}) {}'.format(k, v)
 
@@ -52,7 +52,8 @@ def menu(con, header, options, width, scr_width, scr_height):
 
     # Blit the contents of "window" to the root console
     x = int(scr_width / 2 - width / 2)
-    y = int(scr_height / 2 - height / 2)
+    # y = int(scr_height / 2 - height / 2)
+    y = 5
 
     tcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
@@ -97,30 +98,25 @@ def main_menu(con, bg_img, scr_width, scr_height):
 
     tcod.console_set_default_foreground(0, tcod.light_yellow)
 
-    tcod.console_print_ex(
-        0,
-        int(scr_width / 2),
-        int(scr_height / 2) - 4,
-        tcod.BKGND_NONE,
-        tcod.CENTER,
-        'STEAMPUNK LEGENDS'
-    )
+    # Display game title
+    title_x = int(scr_width / 2)
+    # title_y = int(scr_height / 2) - 4
+    title_y = 3
+    tcod.console_print_ex( 0, title_x, title_y, tcod.BKGND_NONE, tcod.CENTER, config.game_title,)
 
-    tcod.console_print_ex(
-        0,
-        int(scr_width / 2),
-        int(scr_height - 2),
-        tcod.BKGND_NONE,
-        tcod.CENTER,
-        'By hackemslashem'
-    )
+    # Display author
+    author_x = int(scr_width / 2)
+    author_y = int(scr_height - 2)
+    # author_y = int(scr_height - 2)
 
+    tcod.console_print_ex(0, author_x, author_y, tcod.BKGND_NONE, tcod.CENTER, 'By {}'.format(config.author))
+
+    # Display main menu options
     options = {
         'n': 'New game',
         'c': 'Continue last game',
         'o': 'Options',
         'q': 'Quit'
-
     }
 
     menu(con, '', options, 24, scr_width, scr_height)
