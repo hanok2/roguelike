@@ -36,10 +36,10 @@ def menu(con, header, options, width, scr_width, scr_height):
 
     # Print all the options
     y = header_height
-    letter_index = ord('a')
 
-    for option_text in options:
-        text = '(' + chr(letter_index) + ') ' + option_text
+
+    for k, v in options.items():
+        text = '({}) {}'.format(k, v)
 
         tcod.console_print_ex(
             window,
@@ -49,7 +49,6 @@ def menu(con, header, options, width, scr_width, scr_height):
             text
         )
         y += 1
-        letter_index += 1
 
     # Blit the contents of "window" to the root console
     x = int(scr_width / 2 - width / 2)
@@ -58,23 +57,39 @@ def menu(con, header, options, width, scr_width, scr_height):
     tcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
 
+def default_lettering_dict(options):
+    letter_index = ord('a')
+    option_dict = {}
+    for o in options:
+        new_char = chr(letter_index)
+        option_dict[new_char] = o
+        letter_index += 1
+    return option_dict
+
+
+def list_all_inv_items(hero):
+    options = []
+
+    for item in hero.inv.items:
+        if hero.equipment.main_hand == item:
+            options.append('{} (on main hand)'.format(item.name))
+        elif hero.equipment.off_hand == item:
+            options.append('{} (on off hand)'.format(item.name))
+        else:
+            options.append(item.name)
+
+    return options
+
+
 def inv_menu(con, header, hero, inv_width, scr_width, scr_height):
     # Show a menu w/ each item of the inventory as an option
     if len(hero.inv.items) == 0:
         options = ['Inventory is empty.']
     else:
-        # options = [item.name for item in inv.items]
-        options = []
+        options = list_all_inv_items(hero)
+        options = default_lettering_dict(options)
 
-        for item in hero.inv.items:
-            if hero.equipment.main_hand == item:
-                options.append('{} (on main hand)'.format(item.name))
-            elif hero.equipment.off_hand == item:
-                options.append('{} (on off hand)'.format(item.name))
-            else:
-                options.append(item.name)
-
-    menu(con, header, options, inv_width, scr_width, scr_height)
+        menu(con, header, options, inv_width, scr_width, scr_height)
 
 
 def main_menu(con, bg_img, scr_width, scr_height):
@@ -100,7 +115,11 @@ def main_menu(con, bg_img, scr_width, scr_height):
         'By hackemslashem'
     )
 
-    options = ['Play a new game', 'Continue last game', 'Quit']
+    options = {
+        'n': 'New game',
+        'c': 'Continue last game',
+        'q': 'Quit'
+    }
 
     menu(con, '', options, 24, scr_width, scr_height)
 
@@ -110,11 +129,11 @@ def msg_box(con, header, width, scr_width, scr_height):
 
 
 def lvl_up_menu(con, header, hero, menu_width, scr_width, scr_height):
-    options = [
-        'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
-        'Strength (+1 attack, from {})'.format(hero.fighter.power),
-        'Agility (+1 defense, from {})'.format(hero.fighter.defense)
-    ]
+    options = {
+        'c': 'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
+        's': 'Strength (+1 attack, from {})'.format(hero.fighter.power),
+        'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
+    }
 
     menu(con, header, options, menu_width, scr_width, scr_height)
 

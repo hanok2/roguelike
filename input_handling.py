@@ -114,11 +114,11 @@ def handle_inv_keys(key):
 def handle_main_menu(key):
     key_char = chr(key.c)
 
-    if key_char == 'a':
+    if key_char == 'n':
         return {'new_game': True}
-    elif key_char == 'b':
+    elif key_char == 'c':  # For "Continue"
         return {'load_game': True}
-    elif key_char == 'c' or key.vk == tcod.KEY_ESCAPE:
+    elif key_char == 'q':
         return {'exit': True}
 
     return {}
