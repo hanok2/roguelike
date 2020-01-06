@@ -1,13 +1,14 @@
 from random import randint
 import tcod
-from tile import Tile
-from rect import Rect
-from entity import Entity
+import config
 from components import Fighter, ApproachingBehavior, Item, EquipmentSlots, Equippable
-from render_functions import RenderOrder
+from entity import Entity
 from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
-from stairs import Stairs
+from render_functions import RenderOrder
 from random_utils import rnd_choice_from_dict, from_dungeon_lvl
+from rect import Rect
+from stairs import Stairs
+from tile import Tile
 
 
 class GameMap(object):
@@ -287,18 +288,18 @@ class GameMap(object):
                     )
                 entities.append(item)
 
-    def next_floor(self, hero, msg_log, constants):
+    def next_floor(self, hero, msg_log):
         self.dungeon_lvl += 1
         entities = [hero]
 
         self.tiles = self.initialize_tiles()
 
         self.make_map(
-            constants['max_rooms'],
-            constants['room_min_len'],
-            constants['room_max_len'],
-            constants['map_width'],
-            constants['map_height'],
+            config.max_rooms,
+            config.room_min_len,
+            config.room_max_len,
+            config.map_width,
+            config.map_height,
             hero,
             entities,
         )

@@ -246,7 +246,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel):
         if take_stairs and state == States.HERO_TURN:
             for entity in entities:
                 if entity.stairs and entity.x == hero.x and entity.y == hero.y:
-                    entities = game_map.next_floor(hero, msg_log, config)
+                    entities = game_map.next_floor(hero, msg_log)
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
                     tcod.console_clear(con)
