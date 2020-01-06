@@ -329,7 +329,6 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel, constants):
 
             if xp:
                 leveled_up = hero.lvl.add_xp(xp)
-                msg_log.add(Msg('You gain {} XP points.'.format(xp)))
 
                 if leveled_up:
                     msg_log.add(Msg(

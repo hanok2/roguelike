@@ -18,7 +18,7 @@ def kill_monster(monster):
     monster.fighter = None
     monster.ai = None
 
-    death_msg = '{} is dead!'.format(monster.name.capitalize())
+    death_msg = 'The {} dies!'.format(monster.name.capitalize())
     monster.name = 'remains of ' + monster.name
 
     return Msg(death_msg, tcod.orange)

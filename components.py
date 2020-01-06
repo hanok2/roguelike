@@ -39,8 +39,6 @@ class Fighter(object):
             bonus = 0
         return self.base_defense + bonus
 
-
-
     def take_dmg(self, amt):
         results = []
         self.hp -= amt
@@ -65,15 +63,15 @@ class Fighter(object):
         dmg = self.power - target.fighter.defense
 
         if dmg > 0:
-            msg = {'msg': Msg('{} attacks {} for {} HP.'.format(
-                self.owner.name, target.name, str(dmg)),
-                                  tcod.white)}
+            msg = {'msg': Msg('{} attacks {}!'.format(
+                self.owner.name, target.name), tcod.white)
+                  }
 
             results.append(msg)
             results.extend(target.fighter.take_dmg(dmg))
 
         else:
-            msg = {'msg': Msg('{} attacks {} but does no damage.'.format(
+            msg = {'msg': Msg('{} attacks {}... But does no damage.'.format(
                 self.owner.name, target.name),
                                   tcod.white)}
             results.append(msg)
