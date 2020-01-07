@@ -140,7 +140,7 @@ class Level(object):
 
     @property
     def xp_to_next_lvl(self):
-        # Read-only variable that we can easily access inside the clas and on
+        # Read-only variable that we can easily access inside the class and on
         # the objects we create.
         return self.lvl_up_base + self.current_lvl * self.lvl_up_factor
 

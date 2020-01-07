@@ -213,8 +213,16 @@ class RenderEngine(object):
 
 
     def render_status_bar(self, hero, entities, game_map, fov_map, mouse):
+        # Display dungeon level
+        self.panel.print(
+            x=1, y=1,
+            string='DungeonLvl: {}'.format(game_map.dungeon_lvl),
+            alignment=tcod.LEFT,
+        )
+
+        # Display HP bar
         self.render_bar(
-            1, 1,
+            1, 2,
             config.bar_width,
             'HP',
             hero.fighter.hp,
@@ -223,20 +231,49 @@ class RenderEngine(object):
             tcod.darker_red
         )
 
-        # Display level
-        self.panel.print(
-            x=1, y=3,
-            string='Dungeon level: {}'.format(game_map.dungeon_lvl),
-            alignment=tcod.LEFT,
+        # todo: Display XP bar
+        self.render_bar(
+            1, 4,
+            config.bar_width,
+            'XP',
+            hero.lvl.current_xp,
+            hero.lvl.xp_to_next_lvl,
+            tcod.light_blue,
+            tcod.darker_blue
         )
 
-        self.panel.default_fg = tcod.light_gray
+        # todo: Display level
+        self.panel.print(
+            x=22, y=2,
+            string='Lvl:{}'.format(hero.lvl.current_lvl),
+        )
 
+        # todo: Display power
+        self.panel.print(
+            x=29, y=2,
+            string='Pow:{}'.format(hero.fighter.power),
+        )
+
+        # todo: Display defense
+        self.panel.print(
+            x=36, y=2,
+            string='Def:{}'.format(hero.fighter.defense),
+        )
+
+        # todo: Display turns
+        self.panel.print(
+            x=55, y=2,
+            string='Turn: {}'.format('???'),
+        )
+
+        # Display entity under mouse
         self.panel.print(
             x=1, y=0,
             string=get_names_under_mouse(mouse, entities, fov_map),
             alignment=tcod.LEFT,
         )
+
+        self.panel.default_fg = tcod.light_gray
 
         self.panel.blit(
             dest=self.root,
