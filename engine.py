@@ -283,7 +283,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
             elif state == States.TARGETING:
                 hero_turn_results.append({'cancel_target': True})
             else:
-                save_game(hero, entities, game_map, msg_log, state)
+                save_game(hero, entities, game_map, msg_log, state, turns)
                 return True
 
         if full_scr:
