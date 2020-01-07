@@ -23,9 +23,16 @@ def rnd_choice_from_dict(choice_dict):
 
 
 def from_dungeon_lvl(table, dungeon_lvl):
-    # Returns the weight appropriate for the dungeon lvl.
+    """ Takes a table of [value, level] pairs in a list, and a dungeon level to query.
+        Returns the weight value appropriate for the dungeon lvl.
+        If the exact level is not listed, it finds the lower level and returns that value.
+    """
+    if dungeon_lvl < 0:
+        raise ValueError('dungeon_lvl cannot be less than 0!')
+
     for (value, lvl) in reversed(table):
         if dungeon_lvl >= lvl:
             return value
 
+    # If the level is less than any listed levels, it return 0.
     return 0
