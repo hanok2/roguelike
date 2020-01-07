@@ -82,15 +82,14 @@ def handle_hero_turn_keys(key):
 def handle_hero_dead_keys(key):
     key_char = chr(key.c)
 
-    if key_char == 'i':
-        return {'show_inv': True}
+    # if key_char == 'i':
+        # return {'show_inv': True}
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: Toggle full screen
         return {'full_scr': True}
 
     elif key.vk == tcod.KEY_ESCAPE:
-        # Exit
         return {'exit': True}
 
     return {}
