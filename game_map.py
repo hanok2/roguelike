@@ -30,20 +30,31 @@ class Map(object):
             return True
         return False
 
+    def mk_room(self):
+        # random width and height
+        w = randint(config.room_min_len, config.room_max_len)
+        h = randint(config.room_min_len, config.room_max_len)
+
+        # Random position w/o going out of the map boundaries
+        x = randint(0, self.width - w - 1)
+        y = randint(0, self.height - h - 1)
+
+        # Generate new Rect
+        new_room = Rect(x, y, w, h)
+
+        return new_room
+
     def dig_room(self, rect):
         # Go through the tiles in the rectangle and make them passable.
-
         for x in range(rect.x1 + 1, rect.x2):
             for y in range(rect.y1 + 1, rect.y2):
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 
     def mk_tunnel_simple(self, new_x, new_y):
-        pass
-        # Center coordinates of previous room
-        (old_x, old_y) = self.rooms[-1].center()
+        old_x, old_y = self.get_last_room_center()
 
-        # Flip a coin
+        # Flip a coin to decide vertical first or horizontal first
         if randint(0, 1) == 1:
             # First move horizontally, then vertically.
             self.dig_h_tunnel(old_x, new_x, old_y)
@@ -62,7 +73,11 @@ class Map(object):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-    def make_map(self, map_width, map_height, hero, entities):
+    def get_last_room_center(self):
+        # Center coordinates of previous room
+        return self.rooms[-1].center()
+
+    def make_map(self, hero, entities):
         # Procedurally generate a dungeon map
         num_rooms = 0
 
@@ -70,23 +85,12 @@ class Map(object):
         last_room_centery = None
 
         for r in range(config.max_rooms):
-            # random width and height
-            w = randint(config.room_min_len, config.room_max_len)
-            h = randint(config.room_min_len, config.room_max_len)
+            new_room = self.mk_room()
 
-            # Random position w/o going out of the map boundaries
-            x = randint(0, map_width - w - 1)
-            y = randint(0, map_height- h - 1)
-
-            # Generate new Rect
-            new_room = Rect(x, y, w, h)
-
-            # Double check the other rooms to make sure there are no
-            # intersections.
+            # Double check the other rooms to make sure there are no intersections.
             for other_room in self.rooms:
                 if new_room.intersect(other_room):
                     break
-
             else:
                 # There are no intersections, valid room.
                 self.dig_room(new_room)
@@ -103,8 +107,7 @@ class Map(object):
                     hero.y = new_y
 
                 else:
-                    # For all rooms after the first:
-                    # Connect it to the previous room with a tunnel.
+                    # For all rooms after the first: Connect with a tunnel.
                     self.mk_tunnel_simple(new_x, new_y)
 
                 # Add entities/monsters
@@ -169,12 +172,7 @@ class Map(object):
         self.tiles = self.initialize_tiles()
         self.rooms = []
 
-        self.make_map(
-            config.map_width,
-            config.map_height,
-            hero,
-            entities,
-        )
+        self.make_map(hero, entities)
 
         # Heal the hero
         hero.fighter.heal(hero.fighter.max_hp // 2)

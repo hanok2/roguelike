@@ -50,12 +50,7 @@ def get_game_data():
         config.map_height
     )
 
-    game_map.make_map(
-        config.map_width,
-        config.map_height,
-        hero,
-        entities,
-    )
+    game_map.make_map(hero, entities)
 
     msg_log = MsgLog(
         x=1,
