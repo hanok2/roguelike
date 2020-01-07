@@ -1,6 +1,6 @@
-import config
 import tcod
-from components import Fighter, ApproachingBehavior, Item, EquipmentSlots, Equippable
+import config
+from components import Fighter, ApproachingBehavior
 from entity import Entity
 from random_utils import rnd_choice_from_dict, from_dungeon_lvl
 from render_functions import RenderOrder
@@ -50,5 +50,3 @@ def get_random_monster(x, y, monster_chances):
         raise ValueError('Unknown monster selected: {}'.format(monster_choice))
 
     return monster
-
-

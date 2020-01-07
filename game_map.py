@@ -1,6 +1,6 @@
 from random import randint
 import tcod
-import bestiary
+import monster_factory
 import config
 import item_factory
 from entity import Entity
@@ -137,7 +137,7 @@ class GameMap(object):
 
         # Monster placement
         num_monsters = randint(0, max_monsters_per_room)
-        monster_chances = bestiary.monster_chances(self.dungeon_lvl)
+        monster_chances = monster_factory.monster_chances(self.dungeon_lvl)
 
         for i in range(num_monsters):
             # Choose a random location in the room
@@ -145,7 +145,7 @@ class GameMap(object):
             y = randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                monster = bestiary.get_random_monster(x, y, monster_chances)
+                monster = monster_factory.get_random_monster(x, y, monster_chances)
                 entities.append(monster)
 
         # Item placement

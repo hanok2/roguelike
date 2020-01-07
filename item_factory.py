@@ -5,6 +5,7 @@ from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
 from random_utils import rnd_choice_from_dict, from_dungeon_lvl
 from render_functions import RenderOrder
 
+
 def item_chances(dungeon_lvl):
     return {
         'healing_potion': 35,
