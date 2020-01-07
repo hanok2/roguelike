@@ -12,10 +12,79 @@ class RenderOrder(Enum):
     ACTOR = auto()
 
 
-def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
-    # Draw all the tiles in the game map
+class RenderEngine(object):
+    def __init__(self):
+        # Setup the font first
+        tcod.console_set_custom_font(
+            fontFile=config.tileset_file,
+            flags=tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
+        )
 
-    if fov_recompute:
+        # Creates the screen.
+        # Set up the primary display and return the root console.
+        self.root = tcod.console_init_root(
+            w=config.scr_width,
+            h=config.scr_height,
+            title=config.window_title,
+            fullscreen=False
+        )
+
+        # Initialize the console
+        self.con = tcod.console.Console(width=config.scr_width, height=config.scr_height)
+
+        # Initialize the panel
+        self.panel = tcod.console.Console(width=config.scr_width, height=config.panel_height)
+
+    def render_all(self, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
+        # Draw all the tiles in the game map
+        if fov_recompute:
+            self.render_map_tiles(game_map, fov_map)
+
+        # Draw all entities in the list
+        sorted_entities = sorted(entities, key=lambda x: x.render_order.value)
+
+        for entity in sorted_entities:
+            self.draw_entity(entity, fov_map, game_map)
+
+        # Display console
+        self.con.blit(
+            dest=self.root,
+            dest_x=0,
+            dest_y=0,
+            src_x=0, src_y=0,
+            width=config.scr_width,
+            height=config.scr_height,
+        )
+
+        # Display inventory menu if necessary
+        if state in (States.SHOW_INV, States.DROP_INV):
+            if state == States.SHOW_INV:
+                inv_title = 'Press the key next to an item to use it, or ESC to cancel.\n'
+            else:
+                inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
+
+            inv_menu(self, inv_title, hero, 50)
+
+        elif state == States.LEVEL_UP:
+            lvl_up_menu(
+                self.root,
+                self.con,
+                'Level up! Choose a stat to raise:',
+                hero,
+                40,
+            )
+
+        elif state == States.SHOW_STATS:
+            char_scr(self, hero)
+
+        self.panel.default_bg = tcod.black
+
+        self.panel.clear()
+        self.render_console_messages(msg_log)
+        self.render_status_bar(hero, entities, game_map, fov_map, mouse)
+
+
+    def render_map_tiles(self, game_map, fov_map):
         for y in range(game_map.height):
             for x in range(game_map.width):
                 # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
@@ -29,14 +98,14 @@ def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recomput
                 if visible:
                     if wall:
                         tcod.console_set_char_background(
-                            con=con,
+                            con=self.con,
                             x=x, y=y,
                             col=config.colors.get('light_wall'),
                             flag=tcod.BKGND_SET
                         )
                     else:
                         tcod.console_set_char_background(
-                            con=con,
+                            con=self.con,
                             x=x, y=y,
                             col=config.colors.get('light_ground'),
                             flag=tcod.BKGND_SET
@@ -48,163 +117,122 @@ def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recomput
                 elif game_map.tiles[x][y].explored:
                     if wall:
                         tcod.console_set_char_background(
-                            con=con,
+                            con=self.con,
                             x=x, y=y,
                             col=config.colors.get('dark_wall'),
                             flag=tcod.BKGND_SET
                         )
                     else:
                         tcod.console_set_char_background(
-                            con=con,
+                            con=self.con,
                             x=x, y=y,
                             col=config.colors.get('dark_ground'),
                             flag=tcod.BKGND_SET
                         )
 
-	# Draw all entities in the list
-    sorted_entities = sorted(entities, key=lambda x: x.render_order.value)
+    def clear_all(self, entities):
+        # Clear all entities on the console
+        for entity in entities:
+            self.clear_entity(entity)
 
-    for entity in sorted_entities:
-        draw_entity(con, entity, fov_map, game_map)
+    def draw_entity(self, entity, fov_map, game_map):
+        # Draw an entity on the console
+        # todo: Break into nicer boolean later...
 
-    # Display console
-    con.blit(
-        dest=root,
-        dest_x=0,
-        dest_y=0,
-        src_x=0, src_y=0,
-        width=config.scr_width,
-        height=config.scr_height,
-    )
+        # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
+        if tcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
+            self.con.default_fg = entity.color
 
-    if state in (States.SHOW_INV, States.DROP_INV):
-        if state == States.SHOW_INV:
-            inv_title = 'Press the key next to an item to use it, or ESC to cancel.\n'
-        else:
-            inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
+            tcod.console_put_char(
+                con=self.con,
+                x=entity.x, y=entity.y,
+                c=entity.char,
+                flag=tcod.BKGND_NONE
+            )
 
-        inv_menu(root, con, inv_title, hero, 50)
-
-    elif state == States.LEVEL_UP:
-        lvl_up_menu(
-            root,
-            con,
-            'Level up! Choose a stat to raise:',
-            hero,
-            40,
-        )
-
-    elif state == States.SHOW_STATS:
-        char_scr(root, hero)
-
-    panel.default_bg = tcod.black
-
-    panel.clear()
-
-    # Print the game messages, one line at a time
-    y = 1
-    for msg in msg_log.messages:
-        panel.default_fg = tcod.white
-
-        panel.print(x=msg_log.x, y=y, string=msg, alignment=tcod.LEFT)
-        y += 1
-
-    render_bar(
-        panel,
-        1, 1,
-        config.bar_width,
-        'HP',
-        hero.fighter.hp,
-        hero.fighter.max_hp,
-        tcod.light_red,
-        tcod.darker_red
-    )
-
-    # Display level
-    panel.print(
-        x=1, y=3,
-        string='Dungeon level: {}'.format(game_map.dungeon_lvl),
-        alignment=tcod.LEFT,
-    )
-
-    panel.default_fg = tcod.light_gray
-
-    panel.print(
-        x=1, y=0,
-        string=get_names_under_mouse(mouse, entities, fov_map),
-        alignment=tcod.LEFT,
-    )
-
-    panel.blit(
-        dest=root,
-        dest_x=0, dest_y=config.panel_y,
-        src_x=0, src_y=0,
-        width=config.scr_width,
-        height=config.panel_height,
-    )
-
-
-def clear_all(con, entities):
-    # Clear all entities on the console
-    for entity in entities:
-        clear_entity(con, entity)
-
-
-def draw_entity(con, entity, fov_map, game_map):
-    # Draw an entity on the console
-    # todo: Break into nicer boolean later...
-
-    # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-    if tcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
-        con.default_fg = entity.color
-
+    def clear_entity(self, entity):
+        # Erase the character that represents this object
         tcod.console_put_char(
-            con=con,
+            con=self.con,
             x=entity.x, y=entity.y,
-            c=entity.char,
+            c=' ',
             flag=tcod.BKGND_NONE
         )
 
+    def render_bar(self, x, y, total_width, name, value, maximum, bar_color, back_color):
+        bar_width = int(float(value) / maximum * total_width)
+        self.panel.default_bg = back_color
 
-def clear_entity(con, entity):
-    # Erase the character that represents this object
-    tcod.console_put_char(
-        con=con,
-        x=entity.x, y=entity.y,
-        c=' ',
-        flag=tcod.BKGND_NONE
-    )
-
-def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
-    bar_width = int(float(value) / maximum * total_width)
-    panel.default_bg = back_color
-
-    panel.rect(
-        x=x, y=y,
-        width=total_width,
-        height=1,
-        clear=False,
-        bg_blend=tcod.BKGND_SCREEN
-    )
-
-    panel.default_bg = bar_color
-
-    if bar_width > 0:
-        panel.rect(
+        self.panel.rect(
             x=x, y=y,
-            width=bar_width,
+            width=total_width,
             height=1,
             clear=False,
             bg_blend=tcod.BKGND_SCREEN
         )
 
-    panel.default_fg = tcod.white
+        self.panel.default_bg = bar_color
 
-    panel.print(
-        x=int(x + total_width / 2), y=y,
-        string='{}: {}/{}'.format(name, value, maximum),
-        alignment=tcod.CENTER
-    )
+        if bar_width > 0:
+            self.panel.rect(
+                x=x, y=y,
+                width=bar_width,
+                height=1,
+                clear=False,
+                bg_blend=tcod.BKGND_SCREEN
+            )
+
+        self.panel.default_fg = tcod.white
+
+        self.panel.print(
+            x=int(x + total_width / 2), y=y,
+            string='{}: {}/{}'.format(name, value, maximum),
+            alignment=tcod.CENTER
+        )
+
+    def render_console_messages(self, msg_log):
+        # Print the game messages, one line at a time
+        y = 1
+        for msg in msg_log.messages:
+            self.panel.default_fg = tcod.white
+            self.panel.print(x=msg_log.x, y=y, string=msg, alignment=tcod.LEFT)
+            y += 1
+
+
+    def render_status_bar(self, hero, entities, game_map, fov_map, mouse):
+        self.render_bar(
+            1, 1,
+            config.bar_width,
+            'HP',
+            hero.fighter.hp,
+            hero.fighter.max_hp,
+            tcod.light_red,
+            tcod.darker_red
+        )
+
+        # Display level
+        self.panel.print(
+            x=1, y=3,
+            string='Dungeon level: {}'.format(game_map.dungeon_lvl),
+            alignment=tcod.LEFT,
+        )
+
+        self.panel.default_fg = tcod.light_gray
+
+        self.panel.print(
+            x=1, y=0,
+            string=get_names_under_mouse(mouse, entities, fov_map),
+            alignment=tcod.LEFT,
+        )
+
+        self.panel.blit(
+            dest=self.root,
+            dest_x=0, dest_y=config.panel_y,
+            src_x=0, src_y=0,
+            width=config.scr_width,
+            height=config.panel_height,
+        )
+
 
 def get_names_under_mouse(mouse, entities, fov_map):
     (x, y) = (mouse.cx, mouse.cy)

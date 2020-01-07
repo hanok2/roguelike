@@ -1,6 +1,7 @@
 import tcod
 import config
 import game_init
+import render_functions
 from data_loaders import load_game, save_game
 from death_functions import kill_monster, kill_hero
 from entity import get_blockers_at_loc
@@ -8,36 +9,10 @@ from fov import initialize_fov, recompute_fov
 from states import States
 from input_handling import handle_keys, handle_mouse, handle_main_menu
 from menus import main_menu, msg_box
-from render_functions import clear_all, render_all
 
 
 def main():
-    # Setup the font first
-    tcod.console_set_custom_font(
-        fontFile=config.tileset_file,
-        flags=tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
-    )
-
-    # Creates the screen.
-    # Set up the primary display and return the root console.
-    root = tcod.console_init_root(
-        w=config.scr_width,
-        h=config.scr_height,
-        title=config.window_title,
-        fullscreen=False
-    )
-
-    # Initialize the console
-    con = tcod.console.Console(
-        width=config.scr_width,
-        height=config.scr_height
-    )
-
-    # Initialize the panel
-    panel = tcod.console.Console(
-        width=config.scr_width,
-        height=config.panel_height
-    )
+    render_eng = render_functions.RenderEngine()
 
     # Initialize game data
     hero = None
@@ -64,10 +39,10 @@ def main():
         )
 
         if show_main_menu:
-            main_menu(root, con, main_menu_bg_img)
+            main_menu(render_eng, main_menu_bg_img)
 
             if show_load_err_msg:
-                msg_box(con, 'No save game to load', 50)
+                msg_box(render_eng, 'No save game to load', 50)
 
             # Update the display to represent the root consoles current state.
             tcod.console_flush()
@@ -102,7 +77,7 @@ def main():
         else:
             # Reset a console to its default colors and the space character.
 
-            con.clear()
+            render_eng.con.clear()
 
             play_game(
                 hero,
@@ -110,16 +85,14 @@ def main():
                 game_map,
                 msg_log,
                 state,
-                root,
-                con,
-                panel,
+                render_eng
             )
             show_main_menu = True
 
         # check_for_quit()
 
 
-def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
+def play_game(hero, entities, game_map, msg_log, state, render_eng):
     fov_recompute = True
 
     # Initialize fov
@@ -157,10 +130,7 @@ def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
             )
 
         # Render all entities
-        render_all(
-            root,
-            con,
-            panel,
+        render_eng.render_all(
             entities,
             hero,
             game_map,
@@ -177,7 +147,7 @@ def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
         tcod.console_flush()
 
         # Clear all entities
-        clear_all(con, entities)
+        render_eng.clear_all(entities)
 
         # Get keyboard/mouse input
         action = handle_keys(key, state)
@@ -266,7 +236,7 @@ def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
 
-                    con.clear()
+                    render_eng.con.clear()
 
                     break
             else:

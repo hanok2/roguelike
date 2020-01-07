@@ -5,14 +5,14 @@ MAX_MENU_ITEMS = 26
 
 
 
-def menu(root, con, header, options, width):
+def menu(render_eng, header, options, width):
     """ Display a menu of options. Each option has a letter to the left side."""
     if len(options) > MAX_MENU_ITEMS:
         raise ValueError('Cannot have a menu with more than 26 options.')
 
     # Calculate total height for the header (after auto-wrap) and one line per option
     header_height = tcod.console_get_height_rect(
-        con=con,
+        con=render_eng.con,
         x=0, y=0,
         w=width,
         h=config.scr_height,
@@ -59,7 +59,7 @@ def menu(root, con, header, options, width):
 
     # Blit the contents of "window" to the root console
     window.blit(
-        dest=root,
+        dest=render_eng.root,
         dest_x=x, dest_y=y,
         src_x=0, src_y=0,
         width=width,
@@ -101,7 +101,7 @@ def list_all_inv_items(hero):
     return options
 
 
-def inv_menu(root, con, header, hero, inv_width):
+def inv_menu(render_eng, header, hero, inv_width):
     """ Show a menu with each item of the inventory as an option """
 
     if len(hero.inv.items) == 0:
@@ -110,20 +110,20 @@ def inv_menu(root, con, header, hero, inv_width):
         options = list_all_inv_items(hero)
         options = default_lettering_dict(options)
 
-        menu(root, con, header, options, inv_width)
+        menu(render_eng, header, options, inv_width)
 
 
-def main_menu(root, con, menu_img):
+def main_menu(render_eng, menu_img):
     """ Displays the main menu for the game."""
 
     tcod.image_blit_2x(
         image=menu_img,
-        console=root,
+        console=render_eng.root,
         dx=0,
         dy=0
     )
 
-    root.default_fg=tcod.light_yellow
+    render_eng.root.default_fg=tcod.light_yellow
 
     # Display game title
     title_x = int(config.scr_width / 2)
@@ -131,7 +131,7 @@ def main_menu(root, con, menu_img):
     # title_y = int(config.scr_height / 2) - 4
     title_y = 3
 
-    root.print(
+    render_eng.root.print(
         x=title_x, y=title_y,
         string=config.game_title,
         alignment=tcod.CENTER
@@ -142,7 +142,7 @@ def main_menu(root, con, menu_img):
     author_y = int(config.scr_height - 2)
     # author_y = int(config.scr_height - 2)
 
-    root.print(
+    render_eng.root.print(
         x=author_x, y=author_y,
         string='By {}'.format(config.author),
         alignment=tcod.CENTER,
@@ -156,14 +156,14 @@ def main_menu(root, con, menu_img):
         'q': 'Quit'
     }
 
-    menu(root, con, '', options, 24)
+    menu(render_eng, '', options, 24)
 
 
-def msg_box(con, header, width):
-    menu(con, header, [], width, config.scr_width, config.scr_height)
+def msg_box(render_eng, header, width):
+    menu(render_eng.con, header, [], width, config.scr_width, config.scr_height)
 
 
-def lvl_up_menu(root, con, header, hero, menu_width):
+def lvl_up_menu(render_eng, header, hero, menu_width):
     """Displays a menu for the player when they reach a level-up. Gives them
         choice of different stat boosts to pick from.
     """
@@ -173,10 +173,10 @@ def lvl_up_menu(root, con, header, hero, menu_width):
         'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
     }
 
-    menu(root, con, header, options, menu_width, config.scr_width, config.scr_height)
+    menu(render_eng, header, options, menu_width, config.scr_width, config.scr_height)
 
 
-def char_scr(root, hero):
+def char_scr(render_eng, hero):
     """ Displays a windows showing the hero's current stats and experience."""
     window = tcod.console.Console(
         width=config.char_scr_width,
@@ -210,7 +210,7 @@ def char_scr(root, hero):
     y = 5
 
     window.blit(
-        dest=root,
+        dest=render_eng.root,
         dest_x=x, dest_y=y,
         src_x=0, src_y=0,
         width=config.char_scr_width,
