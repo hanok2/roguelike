@@ -54,7 +54,7 @@ class RenderEngine(object):
         self.con.blit(
             dest=self.root,
             dest_x=0,
-            dest_y=0,
+            dest_y=config.msg_height,
             src_x=0, src_y=0,
             width=config.scr_width,
             height=config.scr_height,
@@ -83,6 +83,9 @@ class RenderEngine(object):
 
         self.panel.default_bg = tcod.black
         self.panel.clear()
+
+        self.msg_panel.default_bg = tcod.black
+        self.msg_panel.clear()
 
         self.render_status_bar(hero, entities, game_map, fov_map, mouse)
         self.render_console_messages(msg_log)

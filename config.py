@@ -25,7 +25,8 @@ char_scr_height = 10
 
 # Map info
 map_width = 80
-map_height = 43
+# map_height = 43
+map_height = scr_height - panel_height - msg_height
 
 # Room generation
 room_max_len = 10
