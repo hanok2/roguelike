@@ -47,7 +47,7 @@ class Map(object):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-    def make_map(self, max_rooms, room_min_len, room_max_len, map_width, map_height, hero, entities):
+    def make_map(self, map_width, map_height, hero, entities):
         # Procedurally generate a dungeon map
         rooms = []
         num_rooms = 0
@@ -55,10 +55,10 @@ class Map(object):
         center_of_last_room_x = None
         center_of_last_room_y = None
 
-        for r in range(max_rooms):
+        for r in range(config.max_rooms):
             # random width and height
-            w = randint(room_min_len, room_max_len)
-            h = randint(room_min_len, room_max_len)
+            w = randint(config.room_min_len, config.room_max_len)
+            h = randint(config.room_min_len, config.room_max_len)
 
             # Random position w/o going out of the map boundaries
             x = randint(0, map_width - w - 1)
@@ -168,9 +168,6 @@ class Map(object):
         self.tiles = self.initialize_tiles()
 
         self.make_map(
-            config.max_rooms,
-            config.room_min_len,
-            config.room_max_len,
             config.map_width,
             config.map_height,
             hero,

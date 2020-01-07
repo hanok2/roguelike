@@ -51,9 +51,6 @@ def get_game_data():
     )
 
     game_map.make_map(
-        config.max_rooms,
-        config.room_min_len,
-        config.room_max_len,
         config.map_width,
         config.map_height,
         hero,
