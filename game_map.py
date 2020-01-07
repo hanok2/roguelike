@@ -30,23 +30,34 @@ class Map(object):
             return True
         return False
 
-    def create_room(self, rect):
-        # go through the tiles in the rectangle and make them passable.
+    def dig_room(self, rect):
+        # Go through the tiles in the rectangle and make them passable.
 
         for x in range(rect.x1 + 1, rect.x2):
             for y in range(rect.y1 + 1, rect.y2):
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 
-    def create_simple_tunnel(self):
+    def mk_tunnel_simple(self, new_x, new_y):
         pass
+        # Center coordinates of previous room
+        (old_x, old_y) = self.rooms[-1].center()
 
-    def create_h_tunnel(self, x1, x2, y):
+        # Flip a coin
+        if randint(0, 1) == 1:
+            # First move horizontally, then vertically.
+            self.dig_h_tunnel(old_x, new_x, old_y)
+            self.dig_v_tunnel(old_y, new_y, new_x)
+        else:
+            self.dig_v_tunnel(old_y, new_y, old_x)
+            self.dig_h_tunnel(old_x, new_x, new_y)
+
+    def dig_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-    def create_v_tunnel(self, y1, y2, x):
+    def dig_v_tunnel(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
@@ -55,8 +66,8 @@ class Map(object):
         # Procedurally generate a dungeon map
         num_rooms = 0
 
-        center_of_last_room_x = None
-        center_of_last_room_y = None
+        last_room_centerx = None
+        last_room_centery = None
 
         for r in range(config.max_rooms):
             # random width and height
@@ -78,13 +89,13 @@ class Map(object):
 
             else:
                 # There are no intersections, valid room.
-                self.create_room(new_room)
+                self.dig_room(new_room)
 
                 # Get center coordinates
                 (new_x, new_y) = new_room.center()
 
-                center_of_last_room_x = new_x
-                center_of_last_room_y = new_y
+                last_room_centerx = new_x
+                last_room_centery = new_y
 
                 if num_rooms == 0:
                     # If this is the first room, place the hero there.
@@ -94,18 +105,7 @@ class Map(object):
                 else:
                     # For all rooms after the first:
                     # Connect it to the previous room with a tunnel.
-
-                    # Center coordinates of previous room
-                    (prev_x, prev_y) = self.rooms[num_rooms - 1].center()
-
-                    # Flip a coin
-                    if randint(0, 1) == 1:
-                        # First move horizontally, then vertically.
-                        self.create_h_tunnel(prev_x, new_x, prev_y)
-                        self.create_v_tunnel(prev_y, new_y, new_x)
-                    else:
-                        self.create_v_tunnel(prev_y, new_y, prev_x)
-                        self.create_h_tunnel(prev_x, new_x, new_y)
+                    self.mk_tunnel_simple(new_x, new_y)
 
                 # Add entities/monsters
                 self.place_entities(new_room, entities)
@@ -114,7 +114,7 @@ class Map(object):
                 num_rooms += 1
 
         # Add the Stairs
-        down_stairs = self.place_stairs_down(center_of_last_room_x, center_of_last_room_y)
+        down_stairs = self.place_stairs_down(last_room_centerx, last_room_centery)
         entities.append(down_stairs)
 
     def place_entities(self, room, entities):
@@ -178,7 +178,6 @@ class Map(object):
 
         # Heal the hero
         hero.fighter.heal(hero.fighter.max_hp // 2)
-
         msg_log.add('You take a moment to rest, and recover your strength.')
 
         return entities
