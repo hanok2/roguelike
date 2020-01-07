@@ -2,6 +2,9 @@ from random import randint
 
 
 def rnd_choice_index(chances):
+    """Takes a list of integers that represent weights and takes a random pick.
+        Returns the index of the weight that was picked.
+    """
     # Generate a random # up to the sum of all chance weights
     rnd_chance = randint(1, sum(chances))
 

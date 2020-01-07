@@ -1,9 +1,24 @@
 import pytest
 from . import random_utils
 
-# def rnd_choice_index(chances):
+CHOICE_DICT = {'a': 1, 'b': 2, 'c': 3}
 
-# def rnd_choice_from_dict(choice_dict):
+
+def test_rnd_choice_index_make_sure_result_is_in_bounds():
+    chances = CHOICE_DICT.values()
+    result = random_utils.rnd_choice_index(chances)
+    assert result >= 0 and result < len(CHOICE_DICT)
+
+
+def test_rnd_choice_index_empty_list_raises_ValueError():
+    chances = []
+    with pytest.raises(ValueError):
+        random_utils.rnd_choice_index(chances)
+
+
+def test_rnd_choice_from_dict():
+    result = random_utils.rnd_choice_from_dict(CHOICE_DICT)
+    assert result in CHOICE_DICT.keys()
 
 
 # Table for testing from_dungeon_lvl
