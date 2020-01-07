@@ -8,6 +8,7 @@ from render_functions import RenderOrder
 
 def monster_chances(dungeon_lvl):
     return {
+        'spider': 80,
         'orc': 80,
         # 'troll': 20,
         'troll': from_dungeon_lvl(config.troll_chances, dungeon_lvl)
@@ -16,11 +17,22 @@ def monster_chances(dungeon_lvl):
 def get_random_monster(x, y, monster_chances):
     monster_choice = rnd_choice_from_dict(monster_chances)
 
-    if monster_choice == 'orc':
-        # ORC
-        fighter_comp = Fighter(hp=20, defense=0, power=4, xp=35)
+    if monster_choice == 'spider':
+        fighter_comp = Fighter(hp=1, defense=0, power=1, xp=5)
         ai_comp = ApproachingBehavior()
-
+        monster = Entity(
+            x, y,
+            's',
+            tcod.desaturated_green,
+            'Spider',
+            blocks=True,
+            render_order=RenderOrder.ACTOR,
+            fighter=fighter_comp,
+            ai=ai_comp
+        )
+    elif monster_choice == 'orc':
+        fighter_comp = Fighter(hp=5, defense=0, power=2, xp=35)
+        ai_comp = ApproachingBehavior()
         monster = Entity(
             x, y,
             'o',
@@ -31,10 +43,8 @@ def get_random_monster(x, y, monster_chances):
             fighter=fighter_comp,
             ai=ai_comp
         )
-
     elif monster_choice == 'troll':
-        # TROLL
-        fighter_comp = Fighter(hp=30, defense=2, power=8, xp=100)
+        fighter_comp = Fighter(hp=10, defense=2, power=4, xp=100)
         ai_comp = ApproachingBehavior()
         monster = Entity(
             x, y,
