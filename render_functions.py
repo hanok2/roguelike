@@ -166,7 +166,7 @@ class RenderEngine(object):
 
         # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
         entity_in_fov = tcod.map_is_in_fov(fov_map, entity.x, entity.y)
-        stair_entity = (entity.stairs and game_map.tiles[entity.x][entity.y].explored)
+        stair_entity = ((entity.stair_down or entity.stair_up) and game_map.tiles[entity.x][entity.y].explored)
 
         if entity_in_fov or stair_entity:
             self.con.default_fg = entity.color

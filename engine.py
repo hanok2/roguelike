@@ -163,7 +163,8 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         show_inv = action.get('show_inv')
         drop_inv = action.get('drop_inv')
         inv_index = action.get('inv_index')
-        take_stairs = action.get('take_stairs')
+        stair_down = action.get('stair_down')
+        stair_up = action.get('stair_up')
         lvl_up = action.get('lvl_up')
         show_char_scr = action.get('show_char_scr')
         gameexit = action.get('exit')
@@ -234,10 +235,11 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 hero_turn_results.extend(hero.inv.drop(item))
 
         # todo: Fix to accomodate Dungeon object
-        if take_stairs and state == States.HERO_TURN:
+        if stair_down and state == States.HERO_TURN:
             for entity in current_map.entities:
 
-                if entity.stairs and entity.x == hero.x and entity.y == hero.y:
+                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                if entity.down_stair and hero_at_stairs:
                     dungeon.generate_next_level()
                     if dungeon.move_downstairs():
                         current_map = dungeon.current_map()
@@ -253,6 +255,9 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                     break
             else:
                 msg_log.add('There are no stairs here.')
+
+        if stair_up and state == States.HERO_TURN:
+            print('You pressed <!')
 
         if lvl_up:
             # todo: Move stat boosts to config

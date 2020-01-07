@@ -3,11 +3,11 @@ import tcod
 import config
 import item_factory
 import monster_factory
+import stairs
 from entity import Entity
 from random_utils import from_dungeon_lvl
 from render_functions import RenderOrder
 from rect import Rect
-from stairs import Stairs
 from tile import Tile
 
 
@@ -162,13 +162,15 @@ class Map(object):
                 if num_rooms > 0:
                     # For all rooms after the first: Connect with a tunnel.
                     self.mk_tunnel_simple(new_x, new_y)
+                else:
+                    # Add the up-stair
+                    self.place_stairs_up(new_x, new_y)
 
                 self.rooms.append(new_room)
                 num_rooms += 1
 
         # Add the Stairs
-        down_stairs = self.place_stairs_down(last_room_centerx, last_room_centery)
-        self.entities.append(down_stairs)
+        self.place_stairs_down(last_room_centerx, last_room_centery)
 
     def populate(self):
         for room in self.rooms:
@@ -209,13 +211,25 @@ class Map(object):
                 self.entities.append(item)
 
     def place_stairs_down(self, x, y):
-        stairs_comp = Stairs(self.dungeon_lvl + 1)
+        stairs_comp = stairs.Stairs(floor=self.dungeon_lvl + 1)
 
-        return Entity(
+        self.entities.append(Entity(
             x, y,
             '>',
             tcod.white,
-            'Stairs',
+            'Stairs Down',
             render_order=RenderOrder.STAIRS,
-            stairs=stairs_comp
-        )
+            stair_down=stairs_comp
+        ))
+
+    def place_stairs_up(self, x, y):
+        stairs_comp = stairs.Stairs(floor=self.dungeon_lvl - 1)
+
+        self.entities.append(Entity(
+            x, y,
+            '<',
+            tcod.white,
+            'Stairs Up',
+            render_order=RenderOrder.STAIRS,
+            stair_down=stairs_comp
+        ))

@@ -30,6 +30,13 @@ def handle_keys(key, state):
 def handle_hero_turn_keys(key):
     key_char = chr(key.c)
 
+    # Stairs
+    # key.shift is a boolean telling you whether Shift is down
+    if key.shift and key_char == '.':
+        return {'stair_down': True}
+    elif key.shift and key_char == ',':
+        return {'stair_up': True}
+
     # Actions
     if key_char == 'g' or key_char == ',':
         return {'pickup': True}
@@ -37,17 +44,9 @@ def handle_hero_turn_keys(key):
         return {'show_inv': True}
     elif key_char == 'd':
         return {'drop_inv': True}
-
-    # Trouble shoot > input later
-    # key.shift is a boolean telling you whether Shift is down
-    elif key.shift and key_char == '.':
-    # elif key.vk == tcod.KEY_ENTER:
-        return {'take_stairs': True}
-
     elif key_char == '\\':
         return {'show_char_scr': True}
-
-    if key_char == '.':
+    elif key_char == '.':
         return {'wait': True}
 
     # Movement
