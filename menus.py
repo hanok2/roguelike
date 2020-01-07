@@ -4,7 +4,8 @@ import config
 MAX_MENU_ITEMS = 26
 
 
-def menu(root, con, header, options, width, scr_width, scr_height):
+
+def menu(root, con, header, options, width):
     """ Display a menu of options. Each option has a letter to the left side."""
     if len(options) > MAX_MENU_ITEMS:
         raise ValueError('Cannot have a menu with more than 26 options.')
@@ -14,7 +15,7 @@ def menu(root, con, header, options, width, scr_width, scr_height):
         con=con,
         x=0, y=0,
         w=width,
-        h=scr_height,
+        h=config.scr_height,
         fmt=header
     )
 
@@ -52,8 +53,8 @@ def menu(root, con, header, options, width, scr_width, scr_height):
         )
         y += 1
 
-    x = int(scr_width / 2 - width / 2)
-    # y = int(scr_height / 2 - height / 2)
+    x = int(config.scr_width / 2 - width / 2)
+    # y = int(config.scr_height / 2 - height / 2)
     y = 5
 
     # Blit the contents of "window" to the root console
@@ -100,7 +101,7 @@ def list_all_inv_items(hero):
     return options
 
 
-def inv_menu(root, con, header, hero, inv_width, scr_width, scr_height):
+def inv_menu(root, con, header, hero, inv_width):
     """ Show a menu with each item of the inventory as an option """
 
     if len(hero.inv.items) == 0:
@@ -109,13 +110,14 @@ def inv_menu(root, con, header, hero, inv_width, scr_width, scr_height):
         options = list_all_inv_items(hero)
         options = default_lettering_dict(options)
 
-        menu(root, con, header, options, inv_width, scr_width, scr_height)
+        menu(root, con, header, options, inv_width)
 
 
-def main_menu(root, con, bg_img, scr_width, scr_height):
+def main_menu(root, con, menu_img):
     """ Displays the main menu for the game."""
+
     tcod.image_blit_2x(
-        image=bg_img,
+        image=menu_img,
         console=root,
         dx=0,
         dy=0
@@ -124,9 +126,9 @@ def main_menu(root, con, bg_img, scr_width, scr_height):
     root.default_fg=tcod.light_yellow
 
     # Display game title
-    title_x = int(scr_width / 2)
+    title_x = int(config.scr_width / 2)
 
-    # title_y = int(scr_height / 2) - 4
+    # title_y = int(config.scr_height / 2) - 4
     title_y = 3
 
     root.print(
@@ -136,9 +138,9 @@ def main_menu(root, con, bg_img, scr_width, scr_height):
     )
 
     # Display author
-    author_x = int(scr_width / 2)
-    author_y = int(scr_height - 2)
-    # author_y = int(scr_height - 2)
+    author_x = int(config.scr_width / 2)
+    author_y = int(config.scr_height - 2)
+    # author_y = int(config.scr_height - 2)
 
     root.print(
         x=author_x, y=author_y,
@@ -154,59 +156,65 @@ def main_menu(root, con, bg_img, scr_width, scr_height):
         'q': 'Quit'
     }
 
-    menu(root, con, '', options, 24, scr_width, scr_height)
+    menu(root, con, '', options, 24)
 
 
-def msg_box(con, header, width, scr_width, scr_height):
-    menu(con, header, [], width, scr_width, scr_height)
+def msg_box(con, header, width):
+    menu(con, header, [], width, config.scr_width, config.scr_height)
 
 
-def lvl_up_menu(root, con, header, hero, menu_width, scr_width, scr_height):
+def lvl_up_menu(root, con, header, hero, menu_width):
     """Displays a menu for the player when they reach a level-up. Gives them
         choice of different stat boosts to pick from.
     """
-
     options = {
         'c': 'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
         's': 'Strength (+1 attack, from {})'.format(hero.fighter.power),
         'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
     }
 
-    menu(root, con, header, options, menu_width, scr_width, scr_height)
+    menu(root, con, header, options, menu_width, config.scr_width, config.scr_height)
 
 
-def char_scr(root, hero, char_scr_width, char_scr_height, scr_width, scr_height):
+def char_scr(root, hero):
     """ Displays a windows showing the hero's current stats and experience."""
-    window = tcod.console_new(w=char_scr_width, h=char_scr_height)
+    window = tcod.console.Console(
+        width=config.char_scr_width,
+        height=config.char_scr_height
+    )
 
-    tcod.console_set_default_foreground(con=window, col=tcod.white)
+    window.default_fg = tcod.white
 
     # todo: Add a loop here
-    tcod.console_print_rect_ex(window, 0, 1, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Character Information')
-    tcod.console_print_rect_ex( window, 0, 2, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Level: {0}'.format(hero.lvl.current_lvl))
-    tcod.console_print_rect_ex(window, 0, 3, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Experience: {0}'.format(hero.lvl.current_xp))
-    tcod.console_print_rect_ex(window, 0, 4, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Experience to Level: {0}'.format(hero.lvl.xp_to_next_lvl))
-    tcod.console_print_rect_ex(window, 0, 6, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Maximum HP: {0}'.format(hero.fighter.max_hp))
-    tcod.console_print_rect_ex(window, 0, 7, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Attack: {0}'.format(hero.fighter.power))
-    tcod.console_print_rect_ex(window, 0, 8, char_scr_width, char_scr_height,
-        tcod.BKGND_NONE, tcod.LEFT, 'Defense: {0}'.format(hero.fighter.defense))
+    info = [
+        'Character Information',
+        'Level: {}'.format(hero.lvl.current_lvl),
+        'Experience: {}'.format(hero.lvl.current_xp),
+        'Experience to Level: {}'.format(hero.lvl.xp_to_next_lvl),
+        'Maximum HP: {}'.format(hero.fighter.max_hp),
+        'Attack: {}'.format(hero.fighter.power),
+        'Defense: {}'.format(hero.fighter.defense),
+    ]
 
-    x = scr_width // 2 - char_scr_width // 2
-    # y = scr_height // 2 - char_scr_height // 2
+    for i, row in enumerate(info):
+        window.print_box(
+            x=0, y=i+1,
+            width=config.char_scr_width,
+            height=config.char_scr_height,
+            string=row,
+            alignment=tcod.LEFT,
+        )
+
+    x = config.scr_width // 2 - config.char_scr_width // 2
+    # y = config.scr_height // 2 - config.char_scr_height // 2
     y = 5
 
     window.blit(
         dest=root,
         dest_x=x, dest_y=y,
         src_x=0, src_y=0,
-        width=char_scr_width,
-        height=char_scr_height,
+        width=config.char_scr_width,
+        height=config.char_scr_height,
         fg_alpha=1.0,
         bg_alpha=0.7
     )

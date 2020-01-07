@@ -1,22 +1,20 @@
 import tcod
+import config
+import game_init
 from data_loaders import load_game, save_game
 from death_functions import kill_monster, kill_hero
 from entity import get_blockers_at_loc
 from fov import initialize_fov, recompute_fov
-import game_init
 from states import States
-import config
 from input_handling import handle_keys, handle_mouse, handle_main_menu
 from menus import main_menu, msg_box
 from render_functions import clear_all, render_all
 
 
 def main():
-    img_file = 'images/arial10x10.png'
-
     # Setup the font first
     tcod.console_set_custom_font(
-        fontFile=img_file,
+        fontFile=config.tileset_file,
         flags=tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
     )
 
@@ -51,7 +49,7 @@ def main():
     show_main_menu = True
     show_load_err_msg = False
 
-    main_menu_bg_img = tcod.image_load(filename='images/menu_bg.png')
+    main_menu_bg_img = tcod.image_load(filename=config.menu_img)
 
     key = tcod.Key()
     mouse = tcod.Mouse()
@@ -66,22 +64,10 @@ def main():
         )
 
         if show_main_menu:
-            main_menu(
-                root,
-                con,
-                main_menu_bg_img,
-                config.scr_width,
-                config.scr_height,
-            )
+            main_menu(root, con, main_menu_bg_img)
 
             if show_load_err_msg:
-                msg_box(
-                    con,
-                    'No save game to load',
-                    50,
-                    config.scr_width,
-                    config.scr_height
-                )
+                msg_box(con, 'No save game to load', 50)
 
             # Update the display to represent the root consoles current state.
             tcod.console_flush()

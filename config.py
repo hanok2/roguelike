@@ -5,6 +5,9 @@ window_title = 'Infinity Dronez'
 game_title = 'Infinity Dronez Version {}'.format(VERSION)
 author = 'hackemslashem'
 
+tileset_file = 'images/arial10x10.png'
+menu_img = 'images/menu_bg.png'
+
 scr_width = 80
 scr_height = 50
 
@@ -16,6 +19,9 @@ panel_y = scr_height - panel_height
 msg_x = bar_width + 2
 msg_width = scr_width - bar_width - 2
 msg_height = panel_height - 1
+
+char_scr_width = 30
+char_scr_height = 10
 
 # Map info
 map_width = 80

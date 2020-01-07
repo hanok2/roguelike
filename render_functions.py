@@ -83,15 +83,7 @@ def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recomput
         else:
             inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
 
-        inv_menu(
-            root,
-            con,
-            inv_title,
-            hero,
-            50,
-            config.scr_width,
-            config.scr_height
-        )
+        inv_menu(root, con, inv_title, hero, 50)
 
     elif state == States.LEVEL_UP:
         lvl_up_menu(
@@ -100,12 +92,10 @@ def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recomput
             'Level up! Choose a stat to raise:',
             hero,
             40,
-            config.scr_width,
-            config.scr_height
         )
 
     elif state == States.SHOW_STATS:
-        char_scr(root, hero, 30, 10, config.scr_width, config.scr_height)
+        char_scr(root, hero)
 
     panel.default_bg = tcod.black
 
@@ -143,7 +133,6 @@ def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recomput
         x=1, y=0,
         string=get_names_under_mouse(mouse, entities, fov_map),
         alignment=tcod.LEFT,
-
     )
 
     panel.blit(
