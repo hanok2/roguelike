@@ -3,7 +3,7 @@ import config
 from entity import Entity
 from components import Fighter, Level, Equipment, Equippable
 from equipment_slots import EquipmentSlots
-from game_map import Map
+from maps import Map
 from inventory import Inventory
 from messages import MsgLog
 from render_functions import RenderOrder
