@@ -2,11 +2,10 @@ from random import randint
 import tcod
 import bestiary
 import config
-from components import Item, EquipmentSlots, Equippable
+import item_factory
 from entity import Entity
-from item_functions import heal, cast_confuse, cast_lightning, cast_fireball
+from random_utils import from_dungeon_lvl
 from render_functions import RenderOrder
-from random_utils import rnd_choice_from_dict, from_dungeon_lvl
 from rect import Rect
 from stairs import Stairs
 from tile import Tile
@@ -43,16 +42,13 @@ class GameMap(object):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-
     def create_v_tunnel(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-
     def make_map(self, max_rooms, room_min_len, room_max_len, map_width, map_height, hero, entities):
-        # procedurally generate a dungeon map
-
+        # Procedurally generate a dungeon map
         rooms = []
         num_rooms = 0
 
@@ -139,21 +135,8 @@ class GameMap(object):
             config.max_items_weights, self.dungeon_lvl
         )
 
-        # Get a random # of monsters
+        # Monster placement
         num_monsters = randint(0, max_monsters_per_room)
-        num_items = randint(0, max_items_per_room)
-
-        item_chances = {
-            'healing_potion': 35,
-            'lightning_scroll': from_dungeon_lvl([[25, 4]], self.dungeon_lvl),
-            'fireball_scroll': from_dungeon_lvl([[25, 6]], self.dungeon_lvl),
-            'confusion_scroll': from_dungeon_lvl([[10, 2]], self.dungeon_lvl),
-            'sword': 35,
-            'shield': 35,
-            # 'sword': from_dungeon_lvl([[5, 4]], self.dungeon_lvl),
-            # 'shield': from_dungeon_lvl([[15, 8]], self.dungeon_lvl),
-        }
-
         monster_chances = bestiary.monster_chances(self.dungeon_lvl)
 
         for i in range(num_monsters):
@@ -166,90 +149,16 @@ class GameMap(object):
                 entities.append(monster)
 
         # Item placement
+        num_items = randint(0, max_items_per_room)
+        item_chances = item_factory.item_chances(self.dungeon_lvl)
+
         for i in range(num_items):
             # Choose a random location in the room
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-
-                item_choice = rnd_choice_from_dict(item_chances)
-
-                if item_choice == 'healing_potion':
-                    item_comp = Item(use_func=heal, amt=40)
-                    item = Entity(
-                        x, y,
-                        '!',
-                        tcod.violet,
-                        "Healing potion",
-                        render_order=RenderOrder.ITEM,
-                        item=item_comp,
-                    )
-
-                elif item_choice == 'sword':
-                    equippable_comp = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
-                    item = Entity(
-                        x, y,
-                        '(',
-                        tcod.sky,
-                        'Sword',
-                        equippable=equippable_comp
-                    )
-                elif item_choice == 'shield':
-                    equippable_comp = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=2)
-                    item = Entity(
-                        x, y,
-                        '[',
-                        tcod.darker_orange,
-                        'Shield',
-                        equippable=equippable_comp
-                    )
-
-                elif item_choice == 'fireball_scroll':
-                    item_comp = Item(
-                        use_func=cast_fireball,
-                        targeting=True,
-                        targeting_msg='Left-click a target tile for the fireball, or right-click to cancel.',
-                        dmg=25,
-                        radius=3
-                    )
-
-                    item = Entity(
-                        x, y,
-                        '?',
-                        tcod.yellow,
-                        "Fireball Scroll",
-                        render_order=RenderOrder.ITEM,
-                        item=item_comp,
-                    )
-
-                elif item_choice == 'confusion_scroll':
-                    item_comp = Item(
-                        use_func=cast_confuse,
-                        targeting=True,
-                        targeting_msg='Left-click an enemy to confuse it, or right-click to cancel.',
-                    )
-
-                    item = Entity(
-                        x, y,
-                        '?',
-                        tcod.yellow,
-                        "Confuse Scroll",
-                        render_order=RenderOrder.ITEM,
-                        item=item_comp,
-                    )
-
-                else:
-                    # Scroll of lightning bolt
-                    item_comp = Item(use_func=cast_lightning, dmg=40, max_range=5)
-                    item = Entity(
-                        x, y,
-                        '?',
-                        tcod.yellow,
-                        "Lightning Scroll",
-                        render_order=RenderOrder.ITEM,
-                        item=item_comp,
-                    )
+                item = item_factory.get_rnd_item(x, y, item_chances)
                 entities.append(item)
 
     def next_floor(self, hero, msg_log):
