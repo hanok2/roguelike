@@ -13,6 +13,8 @@ from render_functions import clear_all, render_all
 
 def main():
     img_file = 'images/arial10x10.png'
+
+    # Setup the font first
     tcod.console_set_custom_font(
         fontFile=img_file,
         flags=tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD
@@ -28,17 +30,15 @@ def main():
     )
 
     # Initialize the console
-    # Deprecated since version 8.5: Create new consoles using tcod.console.Console instead of this function.
-    con = tcod.console_new(
-        w=config.scr_width,
-        h=config.scr_height
+    con = tcod.console.Console(
+        width=config.scr_width,
+        height=config.scr_height
     )
 
     # Initialize the panel
-    # Deprecated since version 8.5: Create new consoles using tcod.console.Console instead of this function.
-    panel = tcod.console_new(
-        w=config.scr_width,
-        h=config.panel_height
+    panel = tcod.console.Console(
+        width=config.scr_width,
+        height=config.panel_height
     )
 
     # Initialize game data
@@ -56,8 +56,7 @@ def main():
     key = tcod.Key()
     mouse = tcod.Mouse()
 
-    # Deprecated since version 9.3: Use the tcod.event module to check for “QUIT” type events.
-    while not tcod.console_is_window_closed():
+    while True:
 
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
@@ -116,8 +115,9 @@ def main():
                 break
         else:
             # Reset a console to its default colors and the space character.
-            # Deprecated since version 8.5: Call the Console.clear method instead.
-            tcod.console_clear(con=con)
+
+            con.clear()
+
             play_game(
                 hero,
                 entities,
@@ -129,6 +129,8 @@ def main():
                 panel,
             )
             show_main_menu = True
+
+        # check_for_quit()
 
 
 def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
@@ -145,8 +147,11 @@ def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
     targeting_item = None
 
     # Game loop
+
     # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
-    while not tcod.console_is_window_closed():
+    # while not tcod.console_is_window_closed():
+
+    while True:
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
@@ -275,8 +280,7 @@ def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
                     fov_map = initialize_fov(game_map)
                     fov_recompute = True
 
-                    # Deprecated since version 8.5: Call the Console.clear method instead.
-                    tcod.console_clear(con=con)
+                    con.clear()
 
                     break
             else:
@@ -429,6 +433,17 @@ def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
 
             else:
                 state = States.HERO_TURN
+
+        # check_for_quit()
+
+
+def check_for_quit():
+    # Check for quitting
+
+    # AttributeError: module 'tcod' has no attribute 'event'
+    for event in tcod.event.get():
+        if event.type == "QUIT":
+            raise SystemExit()
 
 
 if __name__ == "__main__":

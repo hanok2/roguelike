@@ -57,17 +57,14 @@ def menu(root, con, header, options, width, scr_width, scr_height):
     y = 5
 
     # Blit the contents of "window" to the root console
-    # Deprecated since version 8.5: Call the Console.blit method instead.
-    tcod.console_blit(
-        src=window,
-        x=0, y=0,
-        w=width,
-        h=height,
-        dst=0,
-        xdst=x,
-        ydst=y,
-        ffade=1.0,
-        bfade=0.7
+    window.blit(
+        dest=root,
+        dest_x=x, dest_y=y,
+        src_x=0, src_y=0,
+        width=width,
+        height=height,
+        fg_alpha=1.0,
+        bg_alpha=0.7,
     )
 
 
@@ -124,8 +121,7 @@ def main_menu(root, con, bg_img, scr_width, scr_height):
         dy=0
     )
 
-     # Deprecated since version 8.5: Use Console.default_fg instead.
-    tcod.console_set_default_foreground(con=0, col=tcod.light_yellow)
+    root.default_fg=tcod.light_yellow
 
     # Display game title
     title_x = int(scr_width / 2)
@@ -133,13 +129,10 @@ def main_menu(root, con, bg_img, scr_width, scr_height):
     # title_y = int(scr_height / 2) - 4
     title_y = 3
 
-    # Deprecated since version 8.5: Use Console.print_ instead.
-    tcod.console_print_ex(
-        con=0,
+    root.print(
         x=title_x, y=title_y,
-        flag=tcod.BKGND_NONE,
-        alignment=tcod.CENTER,
-        fmt=config.game_title
+        string=config.game_title,
+        alignment=tcod.CENTER
     )
 
     # Display author
@@ -147,12 +140,10 @@ def main_menu(root, con, bg_img, scr_width, scr_height):
     author_y = int(scr_height - 2)
     # author_y = int(scr_height - 2)
 
-    tcod.console_print_ex(
-        con=0,
+    root.print(
         x=author_x, y=author_y,
-        flag=tcod.BKGND_NONE,
+        string='By {}'.format(config.author),
         alignment=tcod.CENTER,
-        fmt='By {}'.format(config.author)
     )
 
     # Display main menu options
@@ -184,7 +175,7 @@ def lvl_up_menu(root, con, header, hero, menu_width, scr_width, scr_height):
     menu(root, con, header, options, menu_width, scr_width, scr_height)
 
 
-def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
+def char_scr(root, hero, char_scr_width, char_scr_height, scr_width, scr_height):
     """ Displays a windows showing the hero's current stats and experience."""
     window = tcod.console_new(w=char_scr_width, h=char_scr_height)
 
@@ -210,14 +201,12 @@ def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
     # y = scr_height // 2 - char_scr_height // 2
     y = 5
 
-    # Deprecated since version 8.5: Call the Console.blit method instead.
-    tcod.console_blit(
-        src=window,
-        x=0, y=0,
-        w=char_scr_width,
-        h=char_scr_height,
-        dst=0,  # Destination
-        xdst=x, ydst=y,
-        ffade=1.0,
-        bfade=0.7
+    window.blit(
+        dest=root,
+        dest_x=x, dest_y=y,
+        src_x=0, src_y=0,
+        width=char_scr_width,
+        height=char_scr_height,
+        fg_alpha=1.0,
+        bg_alpha=0.7
     )
