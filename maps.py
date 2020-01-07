@@ -11,6 +11,18 @@ from stairs import Stairs
 from tile import Tile
 
 
+class Dungeon(object):
+    def __init__(self):
+        self.levels = []
+        self.current_lvl = 1
+        self.hero = None
+
+        # Generate full set of levels or create on-the-fly?
+
+    def move_hero(self, lvl):
+        pass
+
+
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=1):
         self.width = width
