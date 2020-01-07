@@ -39,13 +39,15 @@ class RenderEngine(object):
         self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
 
 
-    def render_all(self, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state, turns):
+    def render_all(self, dungeon, fov_map, fov_recompute, msg_log, mouse, state, turns):
+        game_map = dungeon.current_map()
+
         # Draw all the tiles in the game map
         if fov_recompute:
             self.render_map_tiles(game_map, fov_map)
 
         # Draw all entities in the list
-        sorted_entities = sorted(entities, key=lambda x: x.render_order.value)
+        sorted_entities = sorted(game_map.entities, key=lambda x: x.render_order.value)
 
         for entity in sorted_entities:
             self.draw_entity(entity, fov_map, game_map)
@@ -67,19 +69,19 @@ class RenderEngine(object):
             else:
                 inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
 
-            inv_menu(self, inv_title, hero, 50)
+            inv_menu(self, inv_title, dungeon.hero, 50)
 
         elif state == States.LEVEL_UP:
             lvl_up_menu(
                 self.root,
                 self.con,
                 'Level up! Choose a stat to raise:',
-                hero,
+                dungeon.hero,
                 40,
             )
 
         elif state == States.SHOW_STATS:
-            char_scr(self, hero)
+            char_scr(self, dungeon.hero)
 
         self.panel.default_bg = tcod.black
         self.panel.clear()
@@ -87,7 +89,7 @@ class RenderEngine(object):
         self.msg_panel.default_bg = tcod.black
         self.msg_panel.clear()
 
-        self.render_status_bar(hero, entities, game_map, fov_map, mouse, turns)
+        self.render_status_bar(dungeon, fov_map, mouse, turns)
         self.render_console_messages(msg_log)
 
 
@@ -151,6 +153,15 @@ class RenderEngine(object):
         for entity in entities:
             self.clear_entity(entity)
 
+    def clear_entity(self, entity):
+        # Erase the character that represents this object
+        tcod.console_put_char(
+            con=self.con,
+            x=entity.x, y=entity.y,
+            c=' ',
+            flag=tcod.BKGND_NONE
+        )
+
     def draw_entity(self, entity, fov_map, game_map):
         # Draw an entity on the console
         # todo: Break into nicer boolean later...
@@ -165,15 +176,6 @@ class RenderEngine(object):
                 c=entity.char,
                 flag=tcod.BKGND_NONE
             )
-
-    def clear_entity(self, entity):
-        # Erase the character that represents this object
-        tcod.console_put_char(
-            con=self.con,
-            x=entity.x, y=entity.y,
-            c=' ',
-            flag=tcod.BKGND_NONE
-        )
 
     def render_bar(self, x, y, total_width, name, value, maximum, bar_color, back_color):
         bar_width = int(float(value) / maximum * total_width)
@@ -224,11 +226,14 @@ class RenderEngine(object):
         )
 
 
-    def render_status_bar(self, hero, entities, game_map, fov_map, mouse, turns):
+    def render_status_bar(self, dungeon, fov_map, mouse, turns):
+        hero = dungeon.hero
+        game_map = dungeon.current_map()
+
         # Display dungeon level
         self.panel.print(
             x=1, y=1,
-            string='DungeonLvl: {}'.format(game_map.dungeon_lvl),
+            string='DungeonLvl: {}'.format(dungeon.current_lvl),
             alignment=tcod.LEFT,
         )
 
@@ -281,7 +286,7 @@ class RenderEngine(object):
         # Display entity under mouse
         self.panel.print(
             x=1, y=0,
-            string=get_names_under_mouse(mouse, entities, fov_map),
+            string=get_names_under_mouse(mouse, game_map.entities, fov_map),
             alignment=tcod.LEFT,
         )
 

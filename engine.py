@@ -15,9 +15,10 @@ def main():
     render_eng = render_functions.RenderEngine()
 
     # Initialize game data
-    hero = None
-    entities = []
-    game_map = None
+    # hero = None
+    # entities = []
+    dungeon = None
+    # current_map = None
     msg_log = None
     state = None
     turns = 0
@@ -58,13 +59,13 @@ def main():
             if show_load_err_msg and (new_game or load_saved_game or exit_game):
                 show_load_err_msg = False
             elif new_game:
-                hero, entities, game_map, msg_log, state, turns = game_init.get_game_data()
+                dungeon, msg_log, state, turns = game_init.get_game_data()
                 state = States.HERO_TURN
                 show_main_menu = False
 
             elif load_saved_game:
                 try:
-                    hero, entities, game_map, msg_log, state, turns = load_game()
+                    dungeon, msg_log, state, turns = load_game()
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_err_msg = True
@@ -81,9 +82,7 @@ def main():
             render_eng.con.clear()
 
             play_game(
-                hero,
-                entities,
-                game_map,
+                dungeon,
                 msg_log,
                 state,
                 turns,
@@ -94,11 +93,15 @@ def main():
         # check_for_quit()
 
 
-def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
+def play_game(dungeon, msg_log, state, turns, render_eng):
+    hero = dungeon.hero
+    current_map = dungeon.current_map()
+
     fov_recompute = True
 
     # Initialize fov
-    fov_map = initialize_fov(game_map)
+    fov_map = initialize_fov(current_map)
+
     key = tcod.Key()
     mouse = tcod.Mouse()
 
@@ -133,9 +136,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
 
         # Render all entities
         render_eng.render_all(
-            entities,
-            hero,
-            game_map,
+            dungeon,
             fov_map,
             fov_recompute,
             msg_log,
@@ -150,7 +151,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
         tcod.console_flush()
 
         # Clear all entities
-        render_eng.clear_all(entities)
+        render_eng.clear_all(current_map.entities)
 
         # Get keyboard/mouse input
         action = handle_keys(key, state)
@@ -178,8 +179,8 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
             dest_x = hero.x + dx
             dest_y = hero.y + dy
 
-            if not game_map.is_blocked(dest_x, dest_y):
-                target = get_blockers_at_loc(entities, dest_x, dest_y)
+            if not current_map.is_blocked(dest_x, dest_y):
+                target = get_blockers_at_loc(current_map.entities, dest_x, dest_y)
 
                 if target:
                     attack_results = hero.fighter.attack(target)
@@ -198,7 +199,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
             state = States.WORLD_TURN
 
         elif pickup and state == States.HERO_TURN:
-            for entity in entities:
+            for entity in current_map.entities:
                 item_pos_at_our_pos = entity.x == hero.x and entity.y == hero.y
 
                 if entity.item and item_pos_at_our_pos:
@@ -225,18 +226,22 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
                 # hero_turn_results.extend(hero.inv.use(item))
                 hero_turn_results.extend(
                     hero.inv.use(
-                        item, entities=entities, fov_map=fov_map
+                        item, entities=current_map.entities, fov_map=fov_map
                     )
                 )
 
             elif state == States.DROP_INV:
                 hero_turn_results.extend(hero.inv.drop(item))
 
+        # todo: Fix to accomodate Dungeon object
         if take_stairs and state == States.HERO_TURN:
-            for entity in entities:
+            for entity in current_map.entities:
                 if entity.stairs and entity.x == hero.x and entity.y == hero.y:
-                    entities = game_map.next_floor(hero, msg_log)
-                    fov_map = initialize_fov(game_map)
+                    dungeon.generate_next_level()
+                    current_map = dungeon.current_map()
+
+                    # entities = dungeon.next_floor(hero, msg_log)
+                    fov_map = initialize_fov(current_map)
                     fov_recompute = True
 
                     render_eng.con.clear()
@@ -267,7 +272,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
 
                 item_use_results = hero.inv.use(
                     targeting_item,
-                    entities=entities,
+                    entities=current_map.entities,
                     fov_map=fov_map,
                     target_x=target_x,
                     target_y=target_y
@@ -283,7 +288,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
             elif state == States.TARGETING:
                 hero_turn_results.append({'cancel_target': True})
             else:
-                save_game(hero, entities, game_map, msg_log, state, turns)
+                save_game(dungeon, msg_log, state, turns)
                 return True
 
         if full_scr:
@@ -326,7 +331,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
                 msg_log.add(msg)
 
             if item_added:
-                entities.remove(item_added)
+                current_map.entities.remove(item_added)
                 state = States.WORLD_TURN
 
             if item_consumed:
@@ -340,7 +345,7 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
                 msg_log.add(targeting_item.item.targeting_msg)
 
             if item_dropped:
-                entities.append(item_dropped)
+                current_map.entities.append(item_dropped)
                 state = States.WORLD_TURN
 
             if equip:
@@ -363,14 +368,14 @@ def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
             # This *may* go elsewhere, but we'll try it here first.
             turns += 1
 
-            for entity in entities:
+            for entity in current_map.entities:
 
                 if entity.ai:
                     turn_results = entity.ai.take_turn(
                         hero,
                         fov_map,
-                        game_map,
-                        entities
+                        current_map,
+                        current_map.entities
                     )
 
                     for result in turn_results:

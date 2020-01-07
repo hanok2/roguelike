@@ -12,25 +12,57 @@ from tile import Tile
 
 
 class Dungeon(object):
-    def __init__(self):
+    def __init__(self, hero):
+        self.hero = hero
         self.levels = []
-        self.current_lvl = 1
-        self.hero = None
+        self.current_lvl = 0
+
+        # Generate the first level on initialization
+        self.generate_next_level()
+        self.place_hero()
+
+    def current_map(self):
+        return self.levels[self.current_lvl - 1]
+
+    def place_hero(self):
+        # If this is the first room, place the hero there.
+        if len(self.levels) == 1:
+            x, y = self.levels[0].rooms[0].center()
+
+            self.hero.x = x
+            self.hero.y = y
+
+            self.levels[0].entities.append(self.hero)
+
+
+    # Take destination_level, direction(up/down)
+    # def move_upstairs()
+    # def move_downstairs()
+
+    def generate_next_level(self):
+        # Generate next dungeon level
+        level_depth = len(self.levels) + 1
+        new_map = Map(config.map_width, config.map_height, level_depth)
+        new_map.make_map()
+
+        self.levels.append(new_map)
 
         # Generate full set of levels or create on-the-fly?
+        # First level - place the player in the first room
+        # Subsequent levels - the player will appear at the stairs.
 
-    def move_hero(self, lvl):
-        pass
-
+        self.current_lvl += 1
 
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+        self.entities = []
         self.rooms = []
-
         self.dungeon_lvl = dungeon_lvl
+
+    # def find_hero():
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -89,7 +121,7 @@ class Map(object):
         # Center coordinates of previous room
         return self.rooms[-1].center()
 
-    def make_map(self, hero, entities):
+    def make_map(self):
         # Procedurally generate a dungeon map
         num_rooms = 0
 
@@ -113,26 +145,21 @@ class Map(object):
                 last_room_centerx = new_x
                 last_room_centery = new_y
 
-                if num_rooms == 0:
-                    # If this is the first room, place the hero there.
-                    hero.x = new_x
-                    hero.y = new_y
-
-                else:
+                if num_rooms > 0:
                     # For all rooms after the first: Connect with a tunnel.
                     self.mk_tunnel_simple(new_x, new_y)
 
                 # Add entities/monsters
-                self.place_entities(new_room, entities)
+                self.place_entities(new_room)
 
                 self.rooms.append(new_room)
                 num_rooms += 1
 
         # Add the Stairs
         down_stairs = self.place_stairs_down(last_room_centerx, last_room_centery)
-        entities.append(down_stairs)
+        self.entities.append(down_stairs)
 
-    def place_entities(self, room, entities):
+    def place_entities(self, room):
         max_monsters_per_room = from_dungeon_lvl(
             config.max_monsters_weights, self.dungeon_lvl
         )
@@ -149,9 +176,9 @@ class Map(object):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
 
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
                 monster = monster_factory.get_random_monster(x, y, monster_chances)
-                entities.append(monster)
+                self.entities.append(monster)
 
         # Item placement
         num_items = randint(0, max_items_per_room)
@@ -162,9 +189,9 @@ class Map(object):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
 
-            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+            if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
                 item = item_factory.get_rnd_item(x, y, item_chances)
-                entities.append(item)
+                self.entities.append(item)
 
     def place_stairs_down(self, x, y):
         stairs_comp = Stairs(self.dungeon_lvl + 1)
@@ -176,18 +203,3 @@ class Map(object):
             render_order=RenderOrder.STAIRS,
             stairs=stairs_comp
         )
-
-    def next_floor(self, hero, msg_log):
-        self.dungeon_lvl += 1
-        entities = [hero]
-
-        self.tiles = self.initialize_tiles()
-        self.rooms = []
-
-        self.make_map(hero, entities)
-
-        # Heal the hero
-        hero.fighter.heal(hero.fighter.max_hp // 2)
-        msg_log.add('You take a moment to rest, and recover your strength.')
-
-        return entities

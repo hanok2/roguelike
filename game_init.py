@@ -1,9 +1,9 @@
 import tcod
 import config
+import maps
 from entity import Entity
 from components import Fighter, Level, Equipment, Equippable
 from equipment_slots import EquipmentSlots
-from maps import Map
 from inventory import Inventory
 from messages import MsgLog
 from render_functions import RenderOrder
@@ -44,13 +44,8 @@ def get_game_data():
     hero.inv.add_item(dagger)
     hero.equipment.toggle_equip(dagger)
 
-    # Initialize the game map
-    game_map = Map(
-        config.map_width,
-        config.map_height
-    )
-
-    game_map.make_map(hero, entities)
+    # Initialize the Dungeon
+    dungeon = maps.Dungeon(hero)
 
     msg_log = MsgLog(
         x=1,
@@ -61,4 +56,4 @@ def get_game_data():
     state = States.HERO_TURN
     turn = 0
 
-    return hero, entities, game_map, msg_log, state, turn
+    return dungeon, msg_log, state, turn
