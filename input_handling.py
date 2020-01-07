@@ -40,9 +40,8 @@ def handle_hero_turn_keys(key):
 
     # Trouble shoot > input later
     # key.shift is a boolean telling you whether Shift is down
-    # elif key.shift and key_char == '.':
-
-    elif key.vk == tcod.KEY_ENTER:
+    elif key.shift and key_char == '.':
+    # elif key.vk == tcod.KEY_ENTER:
         return {'take_stairs': True}
 
     elif key_char == '\\':
