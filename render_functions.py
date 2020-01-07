@@ -102,39 +102,48 @@ class RenderEngine(object):
 
                 wall = game_map.tiles[x][y].block_sight
 
+                # Tiles within field-of-vision
                 if visible:
                     if wall:
-                        tcod.console_set_char_background(
+                        tcod.console_put_char_ex(
                             con=self.con,
                             x=x, y=y,
-                            col=config.colors.get('light_wall'),
-                            flag=tcod.BKGND_SET
+                            c='#',
+                            fore=tcod.white,
+                            back=tcod.black,
+                            # back=config.colors.get('light_ground'),
                         )
                     else:
-                        tcod.console_set_char_background(
+                        tcod.console_put_char_ex(
                             con=self.con,
                             x=x, y=y,
-                            col=config.colors.get('light_ground'),
-                            flag=tcod.BKGND_SET
+                            c='.',
+                            fore=tcod.black,
+                            # back=config.colors.get('light_ground'),
+                            back=tcod.light_gray
                         )
 
                     # It's visible therefore explored
                     game_map.tiles[x][y].explored = True
 
+                # Tiles outside field-of-vision
                 elif game_map.tiles[x][y].explored:
                     if wall:
-                        tcod.console_set_char_background(
+                        tcod.console_put_char_ex(
                             con=self.con,
                             x=x, y=y,
-                            col=config.colors.get('dark_wall'),
-                            flag=tcod.BKGND_SET
+                            c='#',
+                            fore=tcod.white,
+                            back=tcod.black,
                         )
+
                     else:
-                        tcod.console_set_char_background(
+                        tcod.console_put_char_ex(
                             con=self.con,
                             x=x, y=y,
-                            col=config.colors.get('dark_ground'),
-                            flag=tcod.BKGND_SET
+                            c='.',
+                            fore=tcod.white,
+                            back=tcod.darkest_gray,
                         )
 
     def clear_all(self, entities):
