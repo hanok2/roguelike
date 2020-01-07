@@ -12,7 +12,7 @@ class RenderOrder(Enum):
     ACTOR = auto()
 
 
-def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
+def render_all(root, con, panel, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
     # Draw all the tiles in the game map
 
     if fov_recompute:
@@ -21,6 +21,8 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
                 # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
                 # This function is slow
                 visible = tcod.map_is_in_fov(m=fov_map, x=x, y=y)
+
+                # visible = fov_map.fov
 
                 wall = game_map.tiles[x][y].block_sight
 
@@ -67,14 +69,23 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
 
     # Display console
     # Deprecated since version 8.5: Call the Console.blit method instead.
-    tcod.console_blit(
-        src=con,
-        x=0, y=0,
-        w=config.scr_width,
-        h=config.scr_height,
-        dst=0,
-        xdst=0,
-        ydst=0
+    # tcod.console_blit(
+        # src=con,
+        # x=0, y=0,
+        # w=config.scr_width,
+        # h=config.scr_height,
+        # dst=0,
+        # xdst=0,
+        # ydst=0
+    # )
+
+    con.blit(
+        dest=root,
+        dest_x=0,
+        dest_y=0,
+        src_x=0, src_y=0,
+        width=config.scr_width,
+        height=config.scr_height,
     )
 
     if state in (States.SHOW_INV, States.DROP_INV):
@@ -84,6 +95,7 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
             inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
 
         inv_menu(
+            root,
             con,
             inv_title,
             hero,
@@ -94,6 +106,7 @@ def render_all(con, panel, entities, hero, game_map, fov_map, fov_recompute, msg
 
     elif state == States.LEVEL_UP:
         lvl_up_menu(
+            root,
             con,
             'Level up! Choose a stat to raise:',
             hero,

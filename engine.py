@@ -19,7 +19,8 @@ def main():
     )
 
     # Creates the screen.
-    tcod.console_init_root(
+    # Set up the primary display and return the root console.
+    root = tcod.console_init_root(
         w=config.scr_width,
         h=config.scr_height,
         title=config.window_title,
@@ -55,7 +56,9 @@ def main():
     key = tcod.Key()
     mouse = tcod.Mouse()
 
+    # Deprecated since version 9.3: Use the tcod.event module to check for “QUIT” type events.
     while not tcod.console_is_window_closed():
+
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
             mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
@@ -65,6 +68,7 @@ def main():
 
         if show_main_menu:
             main_menu(
+                root,
                 con,
                 main_menu_bg_img,
                 config.scr_width,
@@ -120,13 +124,14 @@ def main():
                 game_map,
                 msg_log,
                 state,
+                root,
                 con,
                 panel,
             )
             show_main_menu = True
 
 
-def play_game(hero, entities, game_map, msg_log, state, con, panel):
+def play_game(hero, entities, game_map, msg_log, state, root, con, panel):
     fov_recompute = True
 
     # Initialize fov
@@ -140,7 +145,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel):
     targeting_item = None
 
     # Game loop
-    # Deprecated since version 9.3: Use the tcod.event module to check for “QUIT” type events.
+    # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
     while not tcod.console_is_window_closed():
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
@@ -162,6 +167,7 @@ def play_game(hero, entities, game_map, msg_log, state, con, panel):
 
         # Render all entities
         render_all(
+            root,
             con,
             panel,
             entities,

@@ -4,7 +4,7 @@ import config
 MAX_MENU_ITEMS = 26
 
 
-def menu(con, header, options, width, scr_width, scr_height):
+def menu(root, con, header, options, width, scr_width, scr_height):
     """ Display a menu of options. Each option has a letter to the left side."""
     if len(options) > MAX_MENU_ITEMS:
         raise ValueError('Cannot have a menu with more than 26 options.')
@@ -52,11 +52,12 @@ def menu(con, header, options, width, scr_width, scr_height):
         )
         y += 1
 
-    # Blit the contents of "window" to the root console
     x = int(scr_width / 2 - width / 2)
     # y = int(scr_height / 2 - height / 2)
     y = 5
 
+    # Blit the contents of "window" to the root console
+    # Deprecated since version 8.5: Call the Console.blit method instead.
     tcod.console_blit(
         src=window,
         x=0, y=0,
@@ -102,7 +103,7 @@ def list_all_inv_items(hero):
     return options
 
 
-def inv_menu(con, header, hero, inv_width, scr_width, scr_height):
+def inv_menu(root, con, header, hero, inv_width, scr_width, scr_height):
     """ Show a menu with each item of the inventory as an option """
 
     if len(hero.inv.items) == 0:
@@ -111,19 +112,28 @@ def inv_menu(con, header, hero, inv_width, scr_width, scr_height):
         options = list_all_inv_items(hero)
         options = default_lettering_dict(options)
 
-        menu(con, header, options, inv_width, scr_width, scr_height)
+        menu(root, con, header, options, inv_width, scr_width, scr_height)
 
 
-def main_menu(con, bg_img, scr_width, scr_height):
+def main_menu(root, con, bg_img, scr_width, scr_height):
     """ Displays the main menu for the game."""
-    tcod.image_blit_2x(bg_img, 0, 0, 0)
+    tcod.image_blit_2x(
+        image=bg_img,
+        console=root,
+        dx=0,
+        dy=0
+    )
 
+     # Deprecated since version 8.5: Use Console.default_fg instead.
     tcod.console_set_default_foreground(con=0, col=tcod.light_yellow)
 
     # Display game title
     title_x = int(scr_width / 2)
+
     # title_y = int(scr_height / 2) - 4
     title_y = 3
+
+    # Deprecated since version 8.5: Use Console.print_ instead.
     tcod.console_print_ex(
         con=0,
         x=title_x, y=title_y,
@@ -153,14 +163,14 @@ def main_menu(con, bg_img, scr_width, scr_height):
         'q': 'Quit'
     }
 
-    menu(con, '', options, 24, scr_width, scr_height)
+    menu(root, con, '', options, 24, scr_width, scr_height)
 
 
 def msg_box(con, header, width, scr_width, scr_height):
     menu(con, header, [], width, scr_width, scr_height)
 
 
-def lvl_up_menu(con, header, hero, menu_width, scr_width, scr_height):
+def lvl_up_menu(root, con, header, hero, menu_width, scr_width, scr_height):
     """Displays a menu for the player when they reach a level-up. Gives them
         choice of different stat boosts to pick from.
     """
@@ -171,7 +181,7 @@ def lvl_up_menu(con, header, hero, menu_width, scr_width, scr_height):
         'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
     }
 
-    menu(con, header, options, menu_width, scr_width, scr_height)
+    menu(root, con, header, options, menu_width, scr_width, scr_height)
 
 
 def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
@@ -200,6 +210,7 @@ def char_scr(hero, char_scr_width, char_scr_height, scr_width, scr_height):
     # y = scr_height // 2 - char_scr_height // 2
     y = 5
 
+    # Deprecated since version 8.5: Call the Console.blit method instead.
     tcod.console_blit(
         src=window,
         x=0, y=0,
