@@ -3,7 +3,7 @@ import config
 from entity import Entity
 from components import Fighter, Level, Equipment, Equippable
 from equipment_slots import EquipmentSlots
-from game_map import GameMap
+from game_map import Map
 from inventory import Inventory
 from messages import MsgLog
 from render_functions import RenderOrder
@@ -45,7 +45,7 @@ def get_game_data():
     hero.equipment.toggle_equip(dagger)
 
     # Initialize the game map
-    game_map = GameMap(
+    game_map = Map(
         config.map_width,
         config.map_height
     )

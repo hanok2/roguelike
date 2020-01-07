@@ -1,8 +1,8 @@
 from random import randint
 import tcod
-import monster_factory
 import config
 import item_factory
+import monster_factory
 from entity import Entity
 from random_utils import from_dungeon_lvl
 from render_functions import RenderOrder
@@ -11,7 +11,7 @@ from stairs import Stairs
 from tile import Tile
 
 
-class GameMap(object):
+class Map(object):
     def __init__(self, width, height, dungeon_lvl=1):
         self.width = width
         self.height = height
