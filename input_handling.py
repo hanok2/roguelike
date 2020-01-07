@@ -152,11 +152,11 @@ def handle_lvl_up_menu(key):
         key_char = chr(key.c)
 
 
-        if key_char == 'a':
+        if key_char == 'c':                 # Constitution
             return {'lvl_up': 'hp'}
-        elif key_char == 'b':
+        elif key_char == 's':               # Strength
             return {'lvl_up': 'str'}
-        elif key_char == 'c':
+        elif key_char == 'd':               # Defense
             return {'lvl_up': 'def'}
 
     return {}
