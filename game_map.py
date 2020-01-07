@@ -16,6 +16,7 @@ class Map(object):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+        self.rooms = []
 
         self.dungeon_lvl = dungeon_lvl
 
@@ -37,6 +38,9 @@ class Map(object):
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 
+    def create_simple_tunnel(self):
+        pass
+
     def create_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.tiles[x][y].blocked = False
@@ -49,7 +53,6 @@ class Map(object):
 
     def make_map(self, map_width, map_height, hero, entities):
         # Procedurally generate a dungeon map
-        rooms = []
         num_rooms = 0
 
         center_of_last_room_x = None
@@ -69,7 +72,7 @@ class Map(object):
 
             # Double check the other rooms to make sure there are no
             # intersections.
-            for other_room in rooms:
+            for other_room in self.rooms:
                 if new_room.intersect(other_room):
                     break
 
@@ -93,7 +96,7 @@ class Map(object):
                     # Connect it to the previous room with a tunnel.
 
                     # Center coordinates of previous room
-                    (prev_x, prev_y) = rooms[num_rooms - 1].center()
+                    (prev_x, prev_y) = self.rooms[num_rooms - 1].center()
 
                     # Flip a coin
                     if randint(0, 1) == 1:
@@ -104,27 +107,14 @@ class Map(object):
                         self.create_v_tunnel(prev_y, new_y, prev_x)
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
-
                 # Add entities/monsters
-                self.place_entities(
-                    new_room,
-                    entities,
-                )
+                self.place_entities(new_room, entities)
 
-                rooms.append(new_room)
+                self.rooms.append(new_room)
                 num_rooms += 1
 
         # Add the Stairs
-        stairs_comp = Stairs(self.dungeon_lvl + 1)
-        down_stairs = Entity(
-            center_of_last_room_x,
-            center_of_last_room_y,
-            '>',
-            tcod.white,
-            'Stairs',
-            render_order=RenderOrder.STAIRS,
-            stairs=stairs_comp
-        )
+        down_stairs = self.place_stairs_down(center_of_last_room_x, center_of_last_room_y)
         entities.append(down_stairs)
 
     def place_entities(self, room, entities):
@@ -161,11 +151,23 @@ class Map(object):
                 item = item_factory.get_rnd_item(x, y, item_chances)
                 entities.append(item)
 
+    def place_stairs_down(self, x, y):
+        stairs_comp = Stairs(self.dungeon_lvl + 1)
+        return Entity(
+            x, y,
+            '>',
+            tcod.white,
+            'Stairs',
+            render_order=RenderOrder.STAIRS,
+            stairs=stairs_comp
+        )
+
     def next_floor(self, hero, msg_log):
         self.dungeon_lvl += 1
         entities = [hero]
 
         self.tiles = self.initialize_tiles()
+        self.rooms = []
 
         self.make_map(
             config.map_width,
