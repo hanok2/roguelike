@@ -31,8 +31,6 @@ def get_game_data():
         equipment=equipment_comp,
     )
 
-    entities = [hero]
-
     equippable_comp = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
     dagger = Entity(
         0, 0,

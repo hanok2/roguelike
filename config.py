@@ -24,14 +24,14 @@ char_scr_width = 30
 char_scr_height = 10
 
 # Map info
-map_width = 80
+map_width = 60
 # map_height = 43
 map_height = scr_height - panel_height - msg_height
 
 # Room generation
-room_max_len = 10
+room_max_len = 15
 room_min_len = 4
-max_rooms = 30
+max_rooms = 10
 # max_items_per_room = 3
 max_items_weights = [[1, 1], [2, 4]]
 

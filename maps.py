@@ -19,39 +19,43 @@ class Dungeon(object):
 
         # Generate the first level on initialization
         self.generate_next_level()
-        self.place_hero()
+        self.place_hero(self.current_lvl)
+        self.current_map().populate()
 
     def current_map(self):
-        return self.levels[self.current_lvl - 1]
+        return self.levels[self.current_lvl]
 
-    def place_hero(self):
-        # If this is the first room, place the hero there.
-        if len(self.levels) == 1:
-            x, y = self.levels[0].rooms[0].center()
+    def place_hero(self, level):
+        x, y = self.levels[level].rooms[0].center()
+        # Change the heros x/y coordinates
+        self.hero.x = x
+        self.hero.y = y
 
-            self.hero.x = x
-            self.hero.y = y
-
-            self.levels[0].entities.append(self.hero)
-
-
-    # Take destination_level, direction(up/down)
-    # def move_upstairs()
-    # def move_downstairs()
+        # Add the hero to the Map's list of entities
+        self.levels[level].entities.append(self.hero)
 
     def generate_next_level(self):
         # Generate next dungeon level
+        # place up stair in the first room
         level_depth = len(self.levels) + 1
         new_map = Map(config.map_width, config.map_height, level_depth)
         new_map.make_map()
-
         self.levels.append(new_map)
 
-        # Generate full set of levels or create on-the-fly?
-        # First level - place the player in the first room
-        # Subsequent levels - the player will appear at the stairs.
+    def move_downstairs(self):
+        # Remove the hero from the current level
+        if self.current_map().rm_hero(self.hero):
+            self.current_lvl += 1
 
-        self.current_lvl += 1
+            # todo: Find where the up-stair is on the next level
+            # Place the hero on the next level
+            self.place_hero(self.current_lvl)
+
+            return True
+        return False
+
+    # def move_upstairs():
+
 
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=1):
@@ -62,7 +66,17 @@ class Map(object):
         self.rooms = []
         self.dungeon_lvl = dungeon_lvl
 
-    # def find_hero():
+    def rm_hero(self, hero):
+        if hero in self.entities:
+            self.entities.remove(hero)
+            return True
+        return False
+
+    def find_down_stair(self):
+        for e in self.entities:
+            if e.name == 'Stairs':
+                return e
+        return None
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -149,15 +163,16 @@ class Map(object):
                     # For all rooms after the first: Connect with a tunnel.
                     self.mk_tunnel_simple(new_x, new_y)
 
-                # Add entities/monsters
-                self.place_entities(new_room)
-
                 self.rooms.append(new_room)
                 num_rooms += 1
 
         # Add the Stairs
         down_stairs = self.place_stairs_down(last_room_centerx, last_room_centery)
         self.entities.append(down_stairs)
+
+    def populate(self):
+        for room in self.rooms:
+            self.place_entities(room)
 
     def place_entities(self, room):
         max_monsters_per_room = from_dungeon_lvl(
@@ -195,6 +210,7 @@ class Map(object):
 
     def place_stairs_down(self, x, y):
         stairs_comp = Stairs(self.dungeon_lvl + 1)
+
         return Entity(
             x, y,
             '>',

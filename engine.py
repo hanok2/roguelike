@@ -236,16 +236,20 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         # todo: Fix to accomodate Dungeon object
         if take_stairs and state == States.HERO_TURN:
             for entity in current_map.entities:
+
                 if entity.stairs and entity.x == hero.x and entity.y == hero.y:
                     dungeon.generate_next_level()
-                    current_map = dungeon.current_map()
+                    if dungeon.move_downstairs():
+                        current_map = dungeon.current_map()
+                        current_map.populate()
+                        hero = dungeon.hero
+                    else:
+                        raise ValueError("Something weird happened with going downstairs!")
 
-                    # entities = dungeon.next_floor(hero, msg_log)
                     fov_map = initialize_fov(current_map)
                     fov_recompute = True
 
                     render_eng.con.clear()
-
                     break
             else:
                 msg_log.add('There are no stairs here.')

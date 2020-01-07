@@ -21,7 +21,6 @@ def initialize_fov(game_map):
     return fov_map
 
 def recompute_fov(fov_map, x, y, radius, light_walls=True, algorithm=0):
-
     # Deprecated since version 4.5: Use tcod.map.Map.compute_fov instead.
     tcod.map_compute_fov(
         m=fov_map,

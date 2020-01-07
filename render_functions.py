@@ -38,7 +38,6 @@ class RenderEngine(object):
         # Initialize message panel
         self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
 
-
     def render_all(self, dungeon, fov_map, fov_recompute, msg_log, mouse, state, turns):
         game_map = dungeon.current_map()
 
@@ -164,10 +163,12 @@ class RenderEngine(object):
 
     def draw_entity(self, entity, fov_map, game_map):
         # Draw an entity on the console
-        # todo: Break into nicer boolean later...
 
         # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-        if tcod.map_is_in_fov(fov_map, entity.x, entity.y) or (entity.stairs and game_map.tiles[entity.x][entity.y].explored):
+        entity_in_fov = tcod.map_is_in_fov(fov_map, entity.x, entity.y)
+        stair_entity = (entity.stairs and game_map.tiles[entity.x][entity.y].explored)
+
+        if entity_in_fov or stair_entity:
             self.con.default_fg = entity.color
 
             tcod.console_put_char(
@@ -233,7 +234,7 @@ class RenderEngine(object):
         # Display dungeon level
         self.panel.print(
             x=1, y=1,
-            string='DungeonLvl: {}'.format(dungeon.current_lvl),
+            string='DungeonLvl: {}'.format(game_map.dungeon_lvl),
             alignment=tcod.LEFT,
         )
 
