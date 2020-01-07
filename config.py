@@ -17,7 +17,7 @@ panel_height = 7
 panel_y = scr_height - panel_height
 
 msg_x = bar_width + 2
-msg_width = scr_width - bar_width - 2
+# msg_width = scr_width - bar_width - 2  # Same as scr_width
 msg_height = panel_height - 1
 
 char_scr_width = 30

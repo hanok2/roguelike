@@ -32,8 +32,12 @@ class RenderEngine(object):
         # Initialize the console
         self.con = tcod.console.Console(width=config.scr_width, height=config.scr_height)
 
-        # Initialize the panel
+        # Initialize the status panel
         self.panel = tcod.console.Console(width=config.scr_width, height=config.panel_height)
+
+        # Initialize message panel
+        self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
+
 
     def render_all(self, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
         # Draw all the tiles in the game map
@@ -78,10 +82,10 @@ class RenderEngine(object):
             char_scr(self, hero)
 
         self.panel.default_bg = tcod.black
-
         self.panel.clear()
-        self.render_console_messages(msg_log)
+
         self.render_status_bar(hero, entities, game_map, fov_map, mouse)
+        self.render_console_messages(msg_log)
 
 
     def render_map_tiles(self, game_map, fov_map):
@@ -194,9 +198,18 @@ class RenderEngine(object):
         # Print the game messages, one line at a time
         y = 1
         for msg in msg_log.messages:
-            self.panel.default_fg = tcod.white
-            self.panel.print(x=msg_log.x, y=y, string=msg, alignment=tcod.LEFT)
+            self.msg_panel.default_fg = tcod.white
+            self.msg_panel.print(x=msg_log.x, y=y, string=msg, alignment=tcod.LEFT)
             y += 1
+
+        self.msg_panel.blit(
+            dest=self.root,
+            # dest_x=0, dest_y=config.panel_y,
+            dest_x=0, dest_y=0,
+            src_x=0, src_y=0,
+            width=config.scr_width,
+            height=config.msg_height,
+        )
 
 
     def render_status_bar(self, hero, entities, game_map, fov_map, mouse):

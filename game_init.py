@@ -9,6 +9,7 @@ from messages import MsgLog
 from render_functions import RenderOrder
 from states import States
 
+
 def get_game_data():
     # Player components
     fighter_comp = Fighter(hp=100, defense=1, power=2)
@@ -60,9 +61,9 @@ def get_game_data():
     )
 
     msg_log = MsgLog(
-        config.msg_x,
-        config.msg_width,
-        config.msg_height
+        x=1,
+        width=config.scr_width,
+        height=config.msg_height
     )
 
     state = States.HERO_TURN
