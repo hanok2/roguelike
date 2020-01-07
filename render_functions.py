@@ -39,7 +39,7 @@ class RenderEngine(object):
         self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
 
 
-    def render_all(self, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state):
+    def render_all(self, entities, hero, game_map, fov_map, fov_recompute, msg_log, mouse, state, turns):
         # Draw all the tiles in the game map
         if fov_recompute:
             self.render_map_tiles(game_map, fov_map)
@@ -87,7 +87,7 @@ class RenderEngine(object):
         self.msg_panel.default_bg = tcod.black
         self.msg_panel.clear()
 
-        self.render_status_bar(hero, entities, game_map, fov_map, mouse)
+        self.render_status_bar(hero, entities, game_map, fov_map, mouse, turns)
         self.render_console_messages(msg_log)
 
 
@@ -215,7 +215,7 @@ class RenderEngine(object):
         )
 
 
-    def render_status_bar(self, hero, entities, game_map, fov_map, mouse):
+    def render_status_bar(self, hero, entities, game_map, fov_map, mouse, turns):
         # Display dungeon level
         self.panel.print(
             x=1, y=1,
@@ -266,7 +266,7 @@ class RenderEngine(object):
         # todo: Display turns
         self.panel.print(
             x=55, y=2,
-            string='Turn: {}'.format('???'),
+            string='Turn: {}'.format(turns),
         )
 
         # Display entity under mouse

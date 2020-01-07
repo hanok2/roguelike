@@ -67,5 +67,6 @@ def get_game_data():
     )
 
     state = States.HERO_TURN
+    turn = 0
 
-    return hero, entities, game_map, msg_log, state
+    return hero, entities, game_map, msg_log, state, turn

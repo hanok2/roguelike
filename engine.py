@@ -20,6 +20,7 @@ def main():
     game_map = None
     msg_log = None
     state = None
+    turns = 0
 
     show_main_menu = True
     show_load_err_msg = False
@@ -57,13 +58,13 @@ def main():
             if show_load_err_msg and (new_game or load_saved_game or exit_game):
                 show_load_err_msg = False
             elif new_game:
-                hero, entities, game_map, msg_log, state = game_init.get_game_data()
+                hero, entities, game_map, msg_log, state, turns = game_init.get_game_data()
                 state = States.HERO_TURN
                 show_main_menu = False
 
             elif load_saved_game:
                 try:
-                    hero, entities, game_map, msg_log, state = load_game()
+                    hero, entities, game_map, msg_log, state, turns = load_game()
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_err_msg = True
@@ -85,6 +86,7 @@ def main():
                 game_map,
                 msg_log,
                 state,
+                turns,
                 render_eng
             )
             show_main_menu = True
@@ -92,7 +94,7 @@ def main():
         # check_for_quit()
 
 
-def play_game(hero, entities, game_map, msg_log, state, render_eng):
+def play_game(hero, entities, game_map, msg_log, state, turns, render_eng):
     fov_recompute = True
 
     # Initialize fov
@@ -138,7 +140,8 @@ def play_game(hero, entities, game_map, msg_log, state, render_eng):
             fov_recompute,
             msg_log,
             mouse,
-            state
+            state,
+            turns
         )
 
         fov_recompute = False       # Mandatory
@@ -356,6 +359,10 @@ def play_game(hero, entities, game_map, msg_log, state, render_eng):
                 state = States.WORLD_TURN
 
         if state == States.WORLD_TURN:
+            # Increment turn counter
+            # This *may* go elsewhere, but we'll try it here first.
+            turns += 1
+
             for entity in entities:
 
                 if entity.ai:
