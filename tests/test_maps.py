@@ -15,8 +15,9 @@ from ..src import config
 """Tests for class Map(object):"""
 
 def test_map_init():
-    result = maps.Map(width=50, height=50)
-    assert len(result.tiles) == 250
+    map_len = 50
+    result = maps.Map(width=map_len, height=map_len)
+    assert len(result.tiles) == map_len
     assert result.entities == []
     assert result.rooms == []
     assert result.dungeon_lvl == config.DEFAULT_DUNGEON_LVL
