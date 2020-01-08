@@ -110,9 +110,12 @@ class Map(object):
         return Rect(x, y, w, h)
 
     def dig_room(self, rect):
+        WALL_OFFSET = 1
         # Go through the tiles in the rectangle and make them passable.
-        for x in range(rect.x1 + 1, rect.x2):
-            for y in range(rect.y1 + 1, rect.y2):
+        for x in range(rect.x1 + WALL_OFFSET, rect.x2 - WALL_OFFSET):
+
+            for y in range(rect.y1 + WALL_OFFSET, rect.y2 - WALL_OFFSET):
+
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 

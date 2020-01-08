@@ -1,6 +1,7 @@
 import pytest
 from ..src import maps
 from ..src import config
+from ..src import rect
 
 DEFAULT_LENGTH = 50
 INVALID_LENGTH = 2
@@ -85,7 +86,40 @@ def test_map_mk_room_y2_in_map():
     assert r.y2 < DEFAULT_LENGTH
 
 
-# def test_map_dig_room():
+def test_map_dig_room_4x4():
+    m = maps.Map(width=10, height=10)
+    r = rect.Rect(0, 0, 4, 4)
+    m.dig_room(r)
+
+    assert m.tiles[0][0].blocked is True  # Wall
+    assert m.tiles[1][1].blocked is False  # Floor
+    assert m.tiles[2][2].blocked is False  # Floor
+    assert m.tiles[3][3].blocked is True  # Wall
+
+
+def test_map_dig_room_room_4x3():
+    m = maps.Map(width=10, height=10)
+    r = rect.Rect(0, 0, 4, 3)
+    m.dig_room(r)
+
+    assert m.tiles[0][0].blocked is True  # Wall
+    assert m.tiles[1][1].blocked is False  # Floor
+    assert m.tiles[2][1].blocked is False  # Floor
+    assert m.tiles[2][3].blocked is True # Wall
+
+
+def test_map_dig_room_5x5():
+    m = maps.Map(width=10, height=10)
+    r = rect.Rect(0, 0, 5, 5)
+    m.dig_room(r)
+
+    assert m.tiles[0][0].blocked is True  # Wall
+    assert m.tiles[1][1].blocked is False  # Floor
+    assert m.tiles[2][2].blocked is False  # Floor
+    assert m.tiles[3][3].blocked is False  # Floor
+    assert m.tiles[4][4].blocked is True  # Wall
+
+
 # def test_map_mk_tunnel_simple():
 # def test_map_dig_h_tunnel():
 # def test_map_dig_v_tunnel():
