@@ -60,7 +60,31 @@ def test_map_is_blocked_not_wall_returns_False():
     assert result is False
 
 
-# def test_map_mk_room():
+def test_map_mk_room_x1_in_map():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    r = m.mk_room()
+    assert r.x1 >= 0
+    assert r.x1 < DEFAULT_LENGTH
+
+def test_map_mk_room_x2_in_map():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    r = m.mk_room()
+    assert r.x2 >= 0
+    assert r.x2 < DEFAULT_LENGTH
+
+def test_map_mk_room_y1_in_map():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    r = m.mk_room()
+    assert r.y1 >= 0
+    assert r.y1 < DEFAULT_LENGTH
+
+def test_map_mk_room_y2_in_map():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    r = m.mk_room()
+    assert r.y2 >= 0
+    assert r.y2 < DEFAULT_LENGTH
+
+
 # def test_map_dig_room():
 # def test_map_mk_tunnel_simple():
 # def test_map_dig_h_tunnel():

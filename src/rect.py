@@ -16,8 +16,8 @@ class Rect(object):
             raise ValueError('w and h must be a minimum of {}!'.format(MIN_WALL_LEN))
 
         self.x1 = x
-        self.y1 = y
         self.x2 = x + w
+        self.y1 = y
         self.y2 = y + h
 
     def center(self):

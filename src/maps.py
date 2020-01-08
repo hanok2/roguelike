@@ -107,9 +107,7 @@ class Map(object):
         y = randint(0, self.height - h - 1)
 
         # Generate new Rect
-        new_room = Rect(x, y, w, h)
-
-        return new_room
+        return Rect(x, y, w, h)
 
     def dig_room(self, rect):
         # Go through the tiles in the rectangle and make them passable.
