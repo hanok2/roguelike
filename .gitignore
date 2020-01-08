@@ -5,3 +5,5 @@ savegame.dat
 todo.txt
 Steampunk stuff
 
+*.pyc
+
