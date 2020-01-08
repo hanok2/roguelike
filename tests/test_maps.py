@@ -234,7 +234,17 @@ def test_map_is_occupied__occupied_return_True():
     assert m.is_occupied(x, y) is True
 
 
-# def test_map_get_random_non_wall_loc():
+def test_map_get_random_non_wall_loc__default_map_returns_None():
+    m = maps.Map(width=10, height=10)
+    # There should be no non-Wall tiles in a default map
+    assert m.get_random_non_wall_loc() is None
+
+def test_map_get_random_non_wall_loc__returns_non_wall():
+    m = maps.Map(width=10, height=10)
+    m.tiles[0][0].blocked = False
+    result = m.get_random_non_wall_loc()
+    assert result == (0, 0)
+
 # def test_map_get_random_room_loc():
 
 def test_map_place_entities_no_entities_appear_in_Wall():

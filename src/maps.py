@@ -1,4 +1,4 @@
-from random import randint
+import random
 import tcod
 from . import config
 from . import item_factory
@@ -100,12 +100,12 @@ class Map(object):
 
     def mk_room(self):
         # random width and height
-        w = randint(config.room_min_len, config.room_max_len)
-        h = randint(config.room_min_len, config.room_max_len)
+        w = random.randint(config.room_min_len, config.room_max_len)
+        h = random.randint(config.room_min_len, config.room_max_len)
 
         # Random position w/o going out of the map boundaries
-        x = randint(0, self.width - w - 1)
-        y = randint(0, self.height - h - 1)
+        x = random.randint(0, self.width - w - 1)
+        y = random.randint(0, self.height - h - 1)
 
         # Generate new Rect
         return Rect(x, y, w, h)
@@ -173,7 +173,7 @@ class Map(object):
                     last_room = self.rooms[-1]
 
                     # Flip a coin to decide vertical first or horizontal first
-                    horz_first = bool(randint(0, 1))
+                    horz_first = bool(random.randint(0, 1))
                     self.mk_tunnel_simple(last_room, new_room, horz_first)
 
                 else:
@@ -196,7 +196,17 @@ class Map(object):
 
     def get_random_non_wall_loc(self):
         """Find a random spot on the map that is not a Wall."""
-        pass
+        # Find all of the non-wall tiles
+        valid_tiles = []
+        for x in range(self.width):
+            for y in range(self.height):
+                if not self.tiles[x][y].blocked:
+                    valid_tiles.append((x, y))
+
+        # Return a random valid tile
+        if valid_tiles:
+            return random.choice(valid_tiles)
+        return None
 
     def get_random_room_loc(self, room):
         """Find a random spot in a room."""
@@ -208,16 +218,16 @@ class Map(object):
         max_items_per_room = 20
 
         # Monster placement
-        num_monsters = randint(0, max_monsters_per_room)
+        num_monsters = random.randint(0, max_monsters_per_room)
         monster_chances = monster_factory.monster_chances(self.dungeon_lvl)
 
         NW_OFFSET = 1
         SE_OFFSET = 2
 
         for i in range(num_monsters):
-            # Choose a random location in the room
-            x = randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
-            y = randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
+            # Choose a random location in the map
+            x = random.randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
+            y = random.randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
 
             if not self.is_occupied(x, y):
             # if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
@@ -225,13 +235,13 @@ class Map(object):
                 self.entities.append(monster)
 
         # Item placement
-        num_items = randint(0, max_items_per_room)
+        num_items = random.randint(0, max_items_per_room)
         item_chances = item_factory.item_chances(self.dungeon_lvl)
 
         for i in range(num_items):
             # Choose a random location in the room
-            x = randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
-            y = randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
+            x = random.randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
+            y = random.randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
 
             # if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
             if not self.is_occupied(x, y):
