@@ -47,7 +47,19 @@ def test_map_initialize_tiles():
     assert all(t for t in result)
 
 
-# def test_map_is_blocked():
+def test_map_is_blocked_wall_returns_true():
+    m = maps.Map(width=3, height=3)
+    result = m.is_blocked(0, 0)
+    assert result is True
+
+def test_map_is_blocked_not_wall_returns_False():
+    x, y = 1, 1  # Dig out
+    m = maps.Map(width=3, height=3)
+    m.tiles[x][y].blocked = False
+    result = m.is_blocked(x, y)
+    assert result is False
+
+
 # def test_map_mk_room():
 # def test_map_dig_room():
 # def test_map_mk_tunnel_simple():
