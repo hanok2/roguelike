@@ -148,7 +148,18 @@ def test_map_dig_room_5x5():
     assert m.tiles[4][4].blocked is True  # Wall
 
 
-# def test_map_mk_tunnel_simple():
+def test_map_mk_tunnel_simple():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    r1 = rect.Rect(0, 0, 4, 4)
+    r2 = rect.Rect(25, 25, 4, 4)
+    m.mk_tunnel_simple(r1, r2)
+
+    x1, y1 = r1.center()
+    x2, y2 = r2.center()
+    # Just test that the tunnels started
+    assert m.tiles[x1][y1].blocked is False # Floor
+    assert m.tiles[x2][y2].blocked is False # Floor
+
 
 def test_map_dig_h_tunnel():
     m = maps.Map(width=10, height=10)
