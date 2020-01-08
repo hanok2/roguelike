@@ -64,6 +64,12 @@ class Dungeon(object):
 
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=config.DEFAULT_DUNGEON_LVL):
+        # Error checking
+        if width < config.min_map_length or height < config.min_map_length:
+            raise ValueError("The minimum map width/height is {}".format(config.min_map_length))
+        elif dungeon_lvl <= 0:
+            raise ValueError("The minimum map dungeon_lvl is 1")
+
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()

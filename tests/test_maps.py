@@ -1,6 +1,9 @@
+import pytest
 from ..src import maps
 from ..src import config
 
+DEFAULT_LENGTH = 50
+INVALID_LENGTH = 2
 
 """Tests for class Dungeon(object):"""
 
@@ -14,14 +17,25 @@ from ..src import config
 
 """Tests for class Map(object):"""
 
+
 def test_map_init():
-    map_len = 50
-    result = maps.Map(width=map_len, height=map_len)
-    assert len(result.tiles) == map_len
+    result = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    assert len(result.tiles) == DEFAULT_LENGTH
     assert result.entities == []
     assert result.rooms == []
     assert result.dungeon_lvl == config.DEFAULT_DUNGEON_LVL
 
+def test_map_init_invalid_width_raises_exception():
+    with pytest.raises(ValueError):
+        maps.Map(width=INVALID_LENGTH, height=DEFAULT_LENGTH)
+
+def test_map_init_invalid_height_raises_exception():
+    with pytest.raises(ValueError):
+        maps.Map(width=DEFAULT_LENGTH, height=INVALID_LENGTH)
+
+def test_map_init_invalid_dungeon_lvl_raises_exception():
+    with pytest.raises(ValueError):
+        maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH, dungeon_lvl=0)
 
 # width can't be < 3
 # height can't be < 3

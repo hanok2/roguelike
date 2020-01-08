@@ -25,6 +25,7 @@ char_scr_height = 10
 
 # Map info
 DEFAULT_DUNGEON_LVL = 1
+min_map_length = 3
 map_width = 60
 # map_height = 43
 map_height = scr_height - panel_height - msg_height
