@@ -1,14 +1,14 @@
 from random import randint
 import tcod
-from src import config
-from src import item_factory
-from src import monster_factory
-from src import stairs
-from src.entity import Entity
-from src.random_utils import from_dungeon_lvl
-from src.render_functions import RenderOrder
-from src.rect import Rect
-from src.tile import Tile
+from . import config
+from . import item_factory
+from . import monster_factory
+from . import stairs
+from .entity import Entity
+from .random_utils import from_dungeon_lvl
+from .render_functions import RenderOrder
+from .rect import Rect
+from .tile import Tile
 
 
 class Dungeon(object):

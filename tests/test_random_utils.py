@@ -1,5 +1,5 @@
 import pytest
-from . import random_utils
+from ..src import random_utils
 
 CHOICE_DICT = {'a': 1, 'b': 2, 'c': 3}
 

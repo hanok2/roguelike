@@ -1,7 +1,7 @@
 """ Tests for rect.py """
 
 import pytest
-from . import rect
+from ..src import rect
 
 def test_Rect_init():
     r = rect.Rect(0, 0, 3, 3)

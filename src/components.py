@@ -1,6 +1,6 @@
 from random import randint
 import tcod
-from src.equipment_slots import EquipmentSlots
+from .equipment_slots import EquipmentSlots
 
 
 class Fighter(object):

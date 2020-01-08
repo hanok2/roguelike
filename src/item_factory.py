@@ -1,9 +1,9 @@
 import tcod
-from src.components import Item, EquipmentSlots, Equippable
-from src.entity import Entity
-from src.item_functions import heal, cast_confuse, cast_lightning, cast_fireball
-from src.random_utils import rnd_choice_from_dict, from_dungeon_lvl
-from src.render_functions import RenderOrder
+from .components import Item, EquipmentSlots, Equippable
+from .entity import Entity
+from .item_functions import heal, cast_confuse, cast_lightning, cast_fireball
+from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
+from .render_functions import RenderOrder
 
 
 def item_chances(dungeon_lvl):

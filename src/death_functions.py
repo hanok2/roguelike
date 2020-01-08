@@ -1,6 +1,6 @@
 import tcod
-from src.states import States
-from src.render_functions import RenderOrder
+from .states import States
+from .render_functions import RenderOrder
 
 
 def kill_hero(hero):

@@ -1,9 +1,9 @@
 import tcod
-from src import config
-from src.components import Fighter, ApproachingBehavior
-from src.entity import Entity
-from src.random_utils import rnd_choice_from_dict, from_dungeon_lvl
-from src.render_functions import RenderOrder
+from . import config
+from .components import Fighter, ApproachingBehavior
+from .entity import Entity
+from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
+from .render_functions import RenderOrder
 
 
 def monster_chances(dungeon_lvl):

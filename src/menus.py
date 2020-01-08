@@ -1,5 +1,5 @@
 import tcod
-from src import config
+from . import config
 
 MAX_MENU_ITEMS = 26
 

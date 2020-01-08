@@ -1,8 +1,8 @@
 from enum import Enum, auto
 import tcod
-from src import config
-from src.states import States
-from src.menus import inv_menu, lvl_up_menu, char_scr
+from . import config
+from .states import States
+from .menus import inv_menu, lvl_up_menu, char_scr
 
 
 class RenderOrder(Enum):

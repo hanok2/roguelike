@@ -1,5 +1,5 @@
 import tcod
-from src.components import ConfusedBehavior
+from .components import ConfusedBehavior
 
 
 def heal(*args, **kwargs):

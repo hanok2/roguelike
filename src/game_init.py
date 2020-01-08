@@ -1,13 +1,13 @@
 import tcod
-from src import config
-from src import maps
-from src.entity import Entity
-from src.components import Fighter, Level, Equipment, Equippable
-from src.equipment_slots import EquipmentSlots
-from src.inventory import Inventory
-from src.messages import MsgLog
-from src.render_functions import RenderOrder
-from src.states import States
+from . import config
+from . import maps
+from .entity import Entity
+from .components import Fighter, Level, Equipment, Equippable
+from .equipment_slots import EquipmentSlots
+from .inventory import Inventory
+from .messages import MsgLog
+from .render_functions import RenderOrder
+from .states import States
 
 
 def get_game_data():

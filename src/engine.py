@@ -1,14 +1,14 @@
 import tcod
-from src import config
-from src import game_init
-from src import render_functions
-from src.data_loaders import load_game, save_game
-from src.death_functions import kill_monster, kill_hero
-from src.entity import get_blockers_at_loc
-from src.fov import initialize_fov, recompute_fov
-from src.states import States
-from src.input_handling import handle_keys, handle_mouse, handle_main_menu
-from src.menus import main_menu, msg_box
+from . import config
+from . import game_init
+from . import render_functions
+from .data_loaders import load_game, save_game
+from .death_functions import kill_monster, kill_hero
+from .entity import get_blockers_at_loc
+from .fov import initialize_fov, recompute_fov
+from .states import States
+from .input_handling import handle_keys, handle_mouse, handle_main_menu
+from .menus import main_menu, msg_box
 
 
 def main():

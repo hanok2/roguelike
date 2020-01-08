@@ -1,5 +1,5 @@
 import tcod
-from src.states import States
+from .states import States
 
 # TCOD - EVENT CONSTANTS:
 # https://github.com/libtcod/python-tcod/blob/master/tcod/event_constants.py

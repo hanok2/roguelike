@@ -1,7 +1,7 @@
 import math
 import tcod
-from src.render_functions import RenderOrder
-from src.components import Item
+from .render_functions import RenderOrder
+from .components import Item
 
 
 class Entity(object):
