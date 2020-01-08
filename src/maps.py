@@ -90,9 +90,7 @@ class Map(object):
         return None
 
     def initialize_tiles(self):
-        tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
-
-        return tiles
+        return [[Tile(True) for y in range(self.height)] for x in range(self.width)]
 
     def is_blocked(self, x, y):
         if self.tiles[x][y].blocked:

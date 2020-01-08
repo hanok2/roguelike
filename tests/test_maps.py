@@ -37,14 +37,16 @@ def test_map_init_invalid_dungeon_lvl_raises_exception():
     with pytest.raises(ValueError):
         maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH, dungeon_lvl=0)
 
-# width can't be < 3
-# height can't be < 3
-# dungeon_lvl can't be less than 0
-
-
 # def test_map_rm_hero():
 # def test_map_find_down_stair():
-# def test_map_initialize_tiles():
+
+def test_map_initialize_tiles():
+    # Test that all initialized tiles are True (aka: Wall)
+    m = maps.Map(width=3, height=3)
+    result = m.initialize_tiles()
+    assert all(t for t in result)
+
+
 # def test_map_is_blocked():
 # def test_map_mk_room():
 # def test_map_dig_room():
