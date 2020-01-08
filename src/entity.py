@@ -7,7 +7,7 @@ from .components import Item
 class Entity(object):
     """ A generic object to represent players, enemies, items, etc."""
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None, human=False):
         self.x = x
         self.y = y
         self.char = char
@@ -24,6 +24,7 @@ class Entity(object):
         self.lvl = lvl
         self.equipment = equipment
         self.equippable = equippable
+        self.human = human      # or player, hero, controlled?
 
         if self.fighter:
             self.fighter.owner = self

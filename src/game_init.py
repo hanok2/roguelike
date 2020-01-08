@@ -29,6 +29,8 @@ def get_game_data():
         inv=inv_comp,
         lvl=lvl_comp,
         equipment=equipment_comp,
+        human=True
+
     )
 
     equippable_comp = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
