@@ -58,3 +58,15 @@ def test_Rect_intersect_both_rects_intersect_returns_True():
     r2 = rect.Rect(1, 1, 3, 3)
     assert r1.intersect(r2)
     assert r2.intersect(r1)
+
+
+def test_Rect_within__valid_returns_True():
+    r1 = rect.Rect(0, 0, 3, 3)
+    x, y = 0, 0
+    assert r1.within(x, y)
+
+
+def test_Rect_within__invalid_returns_False():
+    r1 = rect.Rect(0, 0, 3, 3)
+    x, y = 3, 3
+    assert r1.within(x, y) is False

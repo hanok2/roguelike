@@ -33,5 +33,11 @@ class Rect(object):
                 self.y1 <= other.y2 and
                 self.y2 >= other.y1)
 
+    def within(self, x, y):
+        """Tests if a x, y coordinate is in the Rect bounds."""
+        if x >= self.x1 and x < self.x2 and y >= self.y1 and y < self.y2:
+            return True
+        return False
+
     # def get_rnd_area_loc(occupied)
     # def get_rnd_wall_loc()
