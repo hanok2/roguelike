@@ -191,7 +191,8 @@ class Map(object):
             self.place_entities(room)
 
     def is_occupied(self, x, y):
-        return not any([entity for entity in self.entities if entity.x == x and entity.y == y])
+        """Returns True if an entity is occupying the tile."""
+        return any([entity for entity in self.entities if entity.x == x and entity.y == y])
 
     def get_random_non_wall_loc(self):
         """Find a random spot on the map that is not a Wall."""
@@ -218,7 +219,8 @@ class Map(object):
             x = randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
             y = randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
 
-            if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
+            if not self.is_occupied(x, y):
+            # if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
                 monster = monster_factory.get_random_monster(x, y, monster_chances)
                 self.entities.append(monster)
 
@@ -231,7 +233,8 @@ class Map(object):
             x = randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
             y = randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
 
-            if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
+            # if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
+            if not self.is_occupied(x, y):
                 item = item_factory.get_rnd_item(x, y, item_chances)
                 self.entities.append(item)
 

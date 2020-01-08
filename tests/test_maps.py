@@ -219,7 +219,21 @@ def test_map_dig_v_tunnel_reversed_parameters():
 # def test_map_make_map():
 # def test_map_populate():
 
-# def test_map_is_occupied():
+def test_map_is_occupied__not_occupied_returns_False():
+    # Test if there are any entities at the coordinates
+    m = maps.Map(width=10, height=10)
+    result = m.is_occupied(0, 0)
+    assert result is False
+
+def test_map_is_occupied__occupied_return_True():
+    # Test if there are any entities at the coordinates
+    m = maps.Map(width=10, height=10)
+    x, y = 0, 0
+    hero = entity.Entity(x, y, '@', None, 'Player', human=True)
+    m.entities.append(hero)
+    assert m.is_occupied(x, y) is True
+
+
 # def test_map_get_random_non_wall_loc():
 # def test_map_get_random_room_loc():
 
