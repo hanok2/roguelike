@@ -41,7 +41,7 @@ class Dungeon(object):
 
     def move_downstairs(self):
         # Remove the hero from the current level
-        if self.current_map().rm_hero(self.hero):
+        if self.current_map().rm_hero():
             self.current_lvl += 1
 
             # Place the hero on the next level
@@ -51,7 +51,7 @@ class Dungeon(object):
         return False
 
     def move_upstairs(self):
-        if self.current_map().rm_hero(self.hero):
+        if self.current_map().rm_hero():
             self.current_lvl -= 1
 
             # todo: Find where the up-stair is on the next level
@@ -142,10 +142,6 @@ class Map(object):
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
-
-    def get_last_room_center(self):
-        # Center coordinates of previous room
-        return self.rooms[-1].center()
 
     def make_map(self):
         # Procedurally generate a dungeon map
