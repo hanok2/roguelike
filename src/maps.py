@@ -120,16 +120,16 @@ class Map(object):
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 
-    def mk_tunnel_simple(self, room1, room2):
+    def mk_tunnel_simple(self, room1, room2, horz_first=True):
         x1, y1 = room1.center()
         x2, y2 = room2.center()
 
-        # Flip a coin to decide vertical first or horizontal first
-        if randint(0, 1) == 1:
+        if horz_first:
             # First move horizontally, then vertically.
             self.dig_h_tunnel(x1, x2, y1)
             self.dig_v_tunnel(y1, y2, x2)
         else:
+            # First move vertically, then horizontally
             self.dig_v_tunnel(y1, y2, x1)
             self.dig_h_tunnel(x1, x2, y2)
 
@@ -176,7 +176,10 @@ class Map(object):
                     # self.mk_tunnel_simple(new_x, new_y)
                     last_room = self.rooms[-1]
 
-                    self.mk_tunnel_simple(last_room, new_room)
+                    # Flip a coin to decide vertical first or horizontal first
+                    horz_first = bool(randint(0, 1))
+                    self.mk_tunnel_simple(last_room, new_room, horz_first)
+
                 else:
                     # Add the up-stair
                     self.place_stairs_up(new_x, new_y)

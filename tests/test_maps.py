@@ -148,17 +148,40 @@ def test_map_dig_room_5x5():
     assert m.tiles[4][4].blocked is True  # Wall
 
 
-def test_map_mk_tunnel_simple():
+def test_map_mk_tunnel_simple_horz_first():
     m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r1 = rect.Rect(0, 0, 4, 4)
-    r2 = rect.Rect(25, 25, 4, 4)
+    r2 = rect.Rect(8, 8, 4, 4)
     m.mk_tunnel_simple(r1, r2)
 
-    x1, y1 = r1.center()
-    x2, y2 = r2.center()
-    # Just test that the tunnels started
-    assert m.tiles[x1][y1].blocked is False # Floor
-    assert m.tiles[x2][y2].blocked is False # Floor
+    cx1, cy1 = r1.center()
+    cx2, cy2 = r2.center()
+
+    # Test the horizontal tunnel
+    for x in range(cx1, cx2 + 1):
+        assert m.tiles[x][cy1].blocked is False # Floor
+
+    # Test the vertical tunnel
+    for y in range(cy1, cy2 + 1):
+        assert m.tiles[cx2][y].blocked is False # Floor
+
+
+def test_map_mk_tunnel_simple_vert_first():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    r1 = rect.Rect(0, 0, 4, 4)
+    r2 = rect.Rect(8, 8, 4, 4)
+    m.mk_tunnel_simple(r1, r2, horz_first=False)
+
+    cx1, cy1 = r1.center()
+    cx2, cy2 = r2.center()
+
+    # Test the vertical tunnel
+    for y in range(cy1, cy2 + 1):
+        assert m.tiles[cx1][y].blocked is False # Floor
+
+    # Test the horizontal tunnel
+    for x in range(cx1, cx2 + 1):
+        assert m.tiles[x][cy2].blocked is False # Floor
 
 
 def test_map_dig_h_tunnel():
