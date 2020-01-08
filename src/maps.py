@@ -86,7 +86,7 @@ class Map(object):
 
     def find_down_stair(self):
         for e in self.entities:
-            if e.name == 'Stairs':
+            if e.stair_down:
                 return e
         return None
 

@@ -55,7 +55,19 @@ def test_map_rm_hero_if_present_returns_True():
     assert hero not in m.entities
 
 
-# def test_map_find_down_stair():
+def test_map_find_down_stair():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    m.make_map()
+    # Find where the stairs are
+    stair = [e for e in m.entities if e.stair_down].pop()
+    result = m.find_down_stair()
+    assert result == stair
+
+def test_map_find_down_stair_DNE_return_None():
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    result = m.find_down_stair()
+    assert result is None
+
 
 def test_map_initialize_tiles():
     # Test that all initialized tiles are True (aka: Wall)
