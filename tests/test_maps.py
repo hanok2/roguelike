@@ -215,7 +215,6 @@ def test_map_dig_v_tunnel_reversed_parameters():
     assert m.tiles[0][8].blocked is False
     assert m.tiles[0][9].blocked is True
 
-# def test_map_get_last_room_center():
 # def test_map_make_map():
 # def test_map_populate():
 
@@ -271,12 +270,32 @@ def test_map_get_random_room_loc__map_middle():
     assert result_y >= min_y and result_y <= max_y
 
 
-def test_map_place_entities_no_entities_appear_in_Wall():
+def test_map_place_monsters__all_wall_tiles():
+    m = maps.Map(width=50, height=50)
+    m.place_monsters()
+
+    # Check that no entities are on Wall tiles
+    for e in m.entities:
+        assert m.tiles[e.x][e.y].blocked is False
+
+
+def test_map_place_monsters_no_entities_appear_in_Wall():
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    m.place_monsters()
+
+    # Check that no entities are on Wall tiles
+    for e in m.entities:
+        assert m.tiles[e.x][e.y].blocked is False
+
+
+def test_map_place_items_no_entities_appear_in_Wall():
     m = maps.Map(width=50, height=50)
     r = rect.Rect(0, 0, 5, 5)
     m.dig_room(r)
-    m.place_entities(r)
+    m.place_items(r)
 
+    # Check that no entities are on Wall tiles
     for e in m.entities:
         assert m.tiles[e.x][e.y].blocked is False
 

@@ -187,8 +187,10 @@ class Map(object):
         self.place_stairs_down(last_room_centerx, last_room_centery)
 
     def populate(self):
+        self.place_monsters()
         for room in self.rooms:
-            self.place_entities(room)
+            self.place_items(room)
+
 
     def is_occupied(self, x, y):
         """Returns True if an entity is occupying the tile."""
@@ -214,25 +216,33 @@ class Map(object):
         y = random.randint(room.y1 + config.NW_OFFSET, room.y2 - config.SE_OFFSET)
         return x, y
 
+    def place_monsters(self):
+        """Generates monsters for the map. For each monster, we pick a random
+            non-wall and non-occupied spot on the map and places a random monster there.
+        """
+        # todo: Create a table for monster generation that increases difficulty
+        # max_monsters_per_map = from_dungeon_lvl(config.max_monsters_weights, self.dungeon_lvl)
 
-    def place_entities(self, room):
-        max_monsters_per_room = from_dungeon_lvl(config.max_monsters_weights, self.dungeon_lvl)
-        # max_items_per_room = from_dungeon_lvl(config.max_items_weights, self.dungeon_lvl)
-        max_items_per_room = 20
-
-        # Monster placement
-        num_monsters = random.randint(0, max_monsters_per_room)
         monster_chances = monster_factory.monster_chances(self.dungeon_lvl)
 
+        # Make sure there are value tiles
+        if not self.get_random_non_wall_loc():
+            return None
 
-        for i in range(num_monsters):
-            x, y = self.get_random_room_loc(room)
+        for _ in range(config.max_monsters_per_map):
+            x, y = self.get_random_non_wall_loc()
 
             if not self.is_occupied(x, y):
                 monster = monster_factory.get_random_monster(x, y, monster_chances)
                 self.entities.append(monster)
 
-        # Item placement
+    def place_items(self, room):
+        """Places a random set of items in a room. Items can be placed on top of
+            other items to create a pile or even where other monsters are.
+        """
+        # max_items_per_room = from_dungeon_lvl(config.max_items_weights, self.dungeon_lvl)
+        max_items_per_room = 5
+
         num_items = random.randint(0, max_items_per_room)
         item_chances = item_factory.item_chances(self.dungeon_lvl)
 

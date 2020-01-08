@@ -36,11 +36,11 @@ room_min_len = 4
 NW_OFFSET = 1
 SE_OFFSET = 2
 max_rooms = 10
-# max_items_per_room = 3
 max_items_weights = [[1, 1], [2, 4]]
 
 # Monster data
 # max_monsters_per_room = 3
+max_monsters_per_map = 20
 max_monsters_weights = [[2, 1], [3, 4], [5, 6]]
 troll_chances = [[15, 3], [30, 5], [60, 7]]
 
