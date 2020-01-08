@@ -19,7 +19,7 @@ def heal(*args, **kwargs):
         entity.fighter.heal(amt)
         results.append({
             'consumed': True,
-            'msg': 'Your wounds start to feel better!'
+            'msg': 'You drink the healing potion and start to feel better!'
         })
 
     return results
