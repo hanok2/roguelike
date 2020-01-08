@@ -215,8 +215,50 @@ def test_map_dig_v_tunnel_reversed_parameters():
     assert m.tiles[0][8].blocked is False
     assert m.tiles[0][9].blocked is True
 
-# def test_map_make_map():
+def test_map_make_map__has_at_least_2_rooms():
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    assert len(m.rooms) >= 2
+
+
+def test_map_make_map__has_up_stair():
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    assert any(True for e in m.entities if e.stair_up)
+
+
+def test_map_make_map__has_down_stair():
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    assert any(True for e in m.entities if e.stair_down)
+
+
+def test_map_make_map__up_and_down_stairs_in_diff_rooms():
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    stair_up = [e for e in m.entities if e.stair_up].pop()
+    stair_down = [e for e in m.entities if e.stair_down].pop()
+
+    stair_up_room = None
+    for room in m.rooms:
+        if room.within(stair_up.x, stair_up.y):
+            stair_up_room = room
+            break
+    # The coordinates of stair_down should not be within the same room as
+    # stair_up
+    assert not stair_up_room.within(stair_down.x, stair_down.y)
+
+
+# def test_map_make_map__all_rooms_interconnected():
+    # Need a pathfinding algorithm??
+
+
 # def test_map_populate():
+    # This is probably not important to test until much later
+    # Test that it calls place_monsters and place_items?
+    # Test for minimum amount of monsters/items?
+    # Test for at least 1 monster?
+    # Test for at least 1 item?
 
 def test_map_is_occupied__not_occupied_returns_False():
     # Test if there are any entities at the coordinates

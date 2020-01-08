@@ -145,12 +145,7 @@ class Map(object):
 
     def make_map(self):
         # Procedurally generate a dungeon map
-        num_rooms = 0
-
-        last_room_centerx = None
-        last_room_centery = None
-
-        for r in range(config.max_rooms):
+        for _ in range(config.max_rooms):
             new_room = self.mk_room()
 
             # Double check the other rooms to make sure there are no intersections.
@@ -167,30 +162,29 @@ class Map(object):
                 last_room_centerx = new_x
                 last_room_centery = new_y
 
-                if num_rooms > 0:
+                if self.rooms:
                     # For all rooms after the first: Connect with a tunnel.
-                    # self.mk_tunnel_simple(new_x, new_y)
                     last_room = self.rooms[-1]
 
                     # Flip a coin to decide vertical first or horizontal first
                     horz_first = bool(random.randint(0, 1))
                     self.mk_tunnel_simple(last_room, new_room, horz_first)
-
                 else:
-                    # Add the up-stair
+                    # Place stairs up in the first room
                     self.place_stairs_up(new_x, new_y)
 
                 self.rooms.append(new_room)
-                num_rooms += 1
 
         # Add the Stairs
         self.place_stairs_down(last_room_centerx, last_room_centery)
 
     def populate(self):
+        """Populates the map with monsters and items.
+            Possibly adds other entities: stairs/features/etc.
+        """
         self.place_monsters()
         for room in self.rooms:
             self.place_items(room)
-
 
     def is_occupied(self, x, y):
         """Returns True if an entity is occupying the tile."""
