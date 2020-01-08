@@ -121,8 +121,38 @@ def test_map_dig_room_5x5():
 
 
 # def test_map_mk_tunnel_simple():
-# def test_map_dig_h_tunnel():
-# def test_map_dig_v_tunnel():
+
+def test_map_dig_h_tunnel():
+    m = maps.Map(width=10, height=10)
+    m.dig_h_tunnel(x1=0, x2=8, y=0)
+    assert m.tiles[0][0].blocked is False
+    assert m.tiles[8][0].blocked is False
+    assert m.tiles[9][0].blocked is True
+
+
+def test_map_dig_h_tunnel_reversed_parameters():
+    m = maps.Map(width=10, height=10)
+    m.dig_h_tunnel(x1=8, x2=0, y=0)
+    assert m.tiles[0][0].blocked is False
+    assert m.tiles[8][0].blocked is False
+    assert m.tiles[9][0].blocked is True
+
+
+def test_map_dig_v_tunnel():
+    m = maps.Map(width=10, height=10)
+    m.dig_v_tunnel(y1=0, y2=8, x=0)
+    assert m.tiles[0][0].blocked is False
+    assert m.tiles[0][8].blocked is False
+    assert m.tiles[0][9].blocked is True
+
+
+def test_map_dig_v_tunnel_reversed_parameters():
+    m = maps.Map(width=10, height=10)
+    m.dig_v_tunnel(y1=8, y2=0, x=0)
+    assert m.tiles[0][0].blocked is False
+    assert m.tiles[0][8].blocked is False
+    assert m.tiles[0][9].blocked is True
+
 # def test_map_get_last_room_center():
 # def test_map_make_map():
 # def test_map_populate():
