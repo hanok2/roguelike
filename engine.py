@@ -257,8 +257,15 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         if stair_up and state == States.HERO_TURN:
             for entity in current_map.entities:
                 hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+
                 if entity.stair_up and hero_at_stairs:
-                    if dungeon.move_upstairs():
+
+                    if dungeon.current_lvl == 0:
+                        msg_log.add('You go up the stairs and leave the dungeon forever...')
+                        state = States.HERO_DEAD
+                        gameexit = True
+
+                    elif dungeon.move_upstairs():
                         current_map = dungeon.current_map()
 
                         fov_map = initialize_fov(current_map)
