@@ -280,5 +280,40 @@ def test_map_place_entities_no_entities_appear_in_Wall():
     for e in m.entities:
         assert m.tiles[e.x][e.y].blocked is False
 
-# def test_map_place_stairs_down():
-# def test_map_place_stairs_up():
+
+def test_map_place_stairs_down_on_floor__valid_pos():
+    m = maps.Map(width=50, height=50)
+    r = rect.Rect(0, 0, 5, 5)
+    m.dig_room(r)
+    x, y = r.center()
+    result = m.place_stairs_down(x, y)
+
+    assert result.x == x
+    assert result.y == y
+    assert result in m.entities
+
+
+def test_map_place_stairs_down_on_wall_raises_exception():
+    m = maps.Map(width=50, height=50)
+    x, y = 0, 0
+    with pytest.raises(ValueError):
+        m.place_stairs_down(x, y)
+
+
+def test_map_place_stairs_up__valid_pos():
+    m = maps.Map(width=50, height=50)
+    r = rect.Rect(0, 0, 5, 5)
+    m.dig_room(r)
+    x, y = r.center()
+    result = m.place_stairs_up(x, y)
+
+    assert result.x == x
+    assert result.y == y
+    assert result in m.entities
+
+
+def test_map_place_stairs_up_on_wall_raises_exception():
+    m = maps.Map(width=50, height=50)
+    x, y = 0, 0
+    with pytest.raises(ValueError):
+        m.place_stairs_up(x, y)

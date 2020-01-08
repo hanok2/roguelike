@@ -244,25 +244,33 @@ class Map(object):
                 self.entities.append(item)
 
     def place_stairs_down(self, x, y):
-        stairs_comp = stairs.Stairs(floor=self.dungeon_lvl + 1)
+        if self.tiles[x][y].blocked:
+            raise ValueError('Stairs cannot go on Wall tile!')
 
-        self.entities.append(Entity(
+        stairs_comp = stairs.Stairs(floor=self.dungeon_lvl + 1)
+        stair_up = Entity(
             x, y,
             '>',
             tcod.white,
             'Stairs Down',
             render_order=RenderOrder.STAIRS,
             stair_down=stairs_comp
-        ))
+        )
+        self.entities.append(stair_up)
+        return stair_up
 
     def place_stairs_up(self, x, y):
-        stairs_comp = stairs.Stairs(floor=self.dungeon_lvl - 1)
+        if self.tiles[x][y].blocked:
+            raise ValueError('Stairs cannot go on Wall tile!')
 
-        self.entities.append(Entity(
+        stairs_comp = stairs.Stairs(floor=self.dungeon_lvl - 1)
+        stair_up = Entity(
             x, y,
             '<',
             tcod.white,
             'Stairs Up',
             render_order=RenderOrder.STAIRS,
             stair_up=stairs_comp
-        ))
+        )
+        self.entities.append(stair_up)
+        return stair_up
