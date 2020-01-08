@@ -144,7 +144,8 @@ class RenderEngine(object):
                             x=x, y=y,
                             c='.',
                             fore=tcod.white,
-                            back=tcod.darkest_gray,
+                            # back=tcod.darkest_gray,
+                            back=tcod.black,
                         )
 
     def clear_all(self, entities):
