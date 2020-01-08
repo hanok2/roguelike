@@ -1,4 +1,5 @@
 import pytest
+from ..src import entity
 from ..src import maps
 from ..src import config
 from ..src import rect
@@ -38,7 +39,22 @@ def test_map_init_invalid_dungeon_lvl_raises_exception():
     with pytest.raises(ValueError):
         maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH, dungeon_lvl=0)
 
-# def test_map_rm_hero():
+def test_map_rm_hero_if_absent_returns_False():
+    m = maps.Map(width=3, height=3)
+    result = m.rm_hero()
+    # Should be False because the map is not initialized with the hero in it.
+    assert result is False
+
+def test_map_rm_hero_if_present_returns_True():
+    m = maps.Map(width=3, height=3)
+    hero = entity.Entity(0, 0, '@', None, 'Player', human=True)
+    m.entities.append(hero)
+    result = m.rm_hero()
+    assert result is True
+    # Also check there is no hero in the entities
+    assert hero not in m.entities
+
+
 # def test_map_find_down_stair():
 
 def test_map_initialize_tiles():

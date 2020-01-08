@@ -77,10 +77,11 @@ class Map(object):
         self.rooms = []
         self.dungeon_lvl = dungeon_lvl
 
-    def rm_hero(self, hero):
-        if hero in self.entities:
-            self.entities.remove(hero)
-            return True
+    def rm_hero(self):
+        for e in self.entities:
+            if e.human:
+                self.entities.remove(e)
+                return True
         return False
 
     def find_down_stair(self):
