@@ -21,11 +21,11 @@ INVALID_LENGTH = 2
 
 
 def test_map_init():
-    result = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
-    assert len(result.tiles) == DEFAULT_LENGTH
-    assert result.entities == []
-    assert result.rooms == []
-    assert result.dungeon_lvl == config.DEFAULT_DUNGEON_LVL
+    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    assert len(m.tiles) == DEFAULT_LENGTH
+    assert m.entities == []
+    assert m.rooms == []
+    assert m.dungeon_lvl == config.DEFAULT_DUNGEON_LVL
 
 def test_map_init_invalid_width_raises_exception():
     with pytest.raises(ValueError):
@@ -218,6 +218,19 @@ def test_map_dig_v_tunnel_reversed_parameters():
 # def test_map_get_last_room_center():
 # def test_map_make_map():
 # def test_map_populate():
-# def test_map_place_entities():
+
+# def test_map_is_occupied():
+# def test_map_get_random_non_wall_loc():
+# def test_map_get_random_room_loc():
+
+def test_map_place_entities_no_entities_appear_in_Wall():
+    m = maps.Map(width=50, height=50)
+    r = rect.Rect(0, 0, 5, 5)
+    m.dig_room(r)
+    m.place_entities(r)
+
+    for e in m.entities:
+        assert m.tiles[e.x][e.y].blocked is False
+
 # def test_map_place_stairs_down():
 # def test_map_place_stairs_up():

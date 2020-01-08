@@ -190,22 +190,33 @@ class Map(object):
         for room in self.rooms:
             self.place_entities(room)
 
+    def is_occupied(self, x, y):
+        return not any([entity for entity in self.entities if entity.x == x and entity.y == y])
+
+    def get_random_non_wall_loc(self):
+        """Find a random spot on the map that is not a Wall."""
+        pass
+
+    def get_random_room_loc(self, room):
+        """Find a random spot in a room."""
+        pass
+
     def place_entities(self, room):
-        max_monsters_per_room = from_dungeon_lvl(
-            config.max_monsters_weights, self.dungeon_lvl
-        )
-        max_items_per_room = from_dungeon_lvl(
-            config.max_items_weights, self.dungeon_lvl
-        )
+        max_monsters_per_room = from_dungeon_lvl(config.max_monsters_weights, self.dungeon_lvl)
+        # max_items_per_room = from_dungeon_lvl(config.max_items_weights, self.dungeon_lvl)
+        max_items_per_room = 20
 
         # Monster placement
         num_monsters = randint(0, max_monsters_per_room)
         monster_chances = monster_factory.monster_chances(self.dungeon_lvl)
 
+        NW_OFFSET = 1
+        SE_OFFSET = 2
+
         for i in range(num_monsters):
             # Choose a random location in the room
-            x = randint(room.x1 + 1, room.x2 - 1)
-            y = randint(room.y1 + 1, room.y2 - 1)
+            x = randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
+            y = randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
 
             if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
                 monster = monster_factory.get_random_monster(x, y, monster_chances)
@@ -217,8 +228,8 @@ class Map(object):
 
         for i in range(num_items):
             # Choose a random location in the room
-            x = randint(room.x1 + 1, room.x2 - 1)
-            y = randint(room.y1 + 1, room.y2 - 1)
+            x = randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
+            y = randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
 
             if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
                 item = item_factory.get_rnd_item(x, y, item_chances)

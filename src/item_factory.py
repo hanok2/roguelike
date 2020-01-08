@@ -9,9 +9,12 @@ from .render_functions import RenderOrder
 def item_chances(dungeon_lvl):
     return {
         'healing_potion': 35,
-        'lightning_scroll': from_dungeon_lvl([[25, 4]], dungeon_lvl),
-        'fireball_scroll': from_dungeon_lvl([[25, 6]], dungeon_lvl),
-        'confusion_scroll': from_dungeon_lvl([[10, 2]], dungeon_lvl),
+        # 'lightning_scroll': from_dungeon_lvl([[25, 4]], dungeon_lvl),
+        # 'fireball_scroll': from_dungeon_lvl([[25, 6]], dungeon_lvl),
+        # 'confusion_scroll': from_dungeon_lvl([[10, 2]], dungeon_lvl),
+        'lightning_scroll': 35,
+        'fireball_scroll': 35,
+        'confusion_scroll': 35,
         'sword': 35,
         'shield': 35,
         # 'sword': from_dungeon_lvl([[5, 4]], dungeon_lvl),
