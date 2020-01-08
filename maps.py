@@ -27,11 +27,8 @@ class Dungeon(object):
 
     def place_hero(self, level):
         x, y = self.levels[level].rooms[0].center()
-        # Change the heros x/y coordinates
         self.hero.x = x
         self.hero.y = y
-
-        # Add the hero to the Map's list of entities
         self.levels[level].entities.append(self.hero)
 
     def generate_next_level(self):
@@ -47,15 +44,23 @@ class Dungeon(object):
         if self.current_map().rm_hero(self.hero):
             self.current_lvl += 1
 
-            # todo: Find where the up-stair is on the next level
             # Place the hero on the next level
             self.place_hero(self.current_lvl)
 
             return True
         return False
 
-    # def move_upstairs():
+    def move_upstairs(self):
+        if self.current_map().rm_hero(self.hero):
+            self.current_lvl -= 1
 
+            # todo: Find where the up-stair is on the next level
+            x, y = self.levels[self.current_lvl].rooms[-1].center()
+            self.hero.x = x
+            self.hero.y = y
+            self.levels[self.current_lvl].entities.append(self.hero)
+            return True
+        return False
 
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=1):
@@ -231,5 +236,5 @@ class Map(object):
             tcod.white,
             'Stairs Up',
             render_order=RenderOrder.STAIRS,
-            stair_down=stairs_comp
+            stair_up=stairs_comp
         ))

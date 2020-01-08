@@ -234,30 +234,42 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             elif state == States.DROP_INV:
                 hero_turn_results.extend(hero.inv.drop(item))
 
-        # todo: Fix to accomodate Dungeon object
         if stair_down and state == States.HERO_TURN:
             for entity in current_map.entities:
-
                 hero_at_stairs = entity.x == hero.x and entity.y == hero.y
-                if entity.down_stair and hero_at_stairs:
+                if entity.stair_down and hero_at_stairs:
                     dungeon.generate_next_level()
                     if dungeon.move_downstairs():
                         current_map = dungeon.current_map()
                         current_map.populate()
-                        hero = dungeon.hero
+                        # hero = dungeon.hero
+
+                        fov_map = initialize_fov(current_map)
+                        fov_recompute = True
+                        render_eng.con.clear()
+                        break
                     else:
                         raise ValueError("Something weird happened with going downstairs!")
 
-                    fov_map = initialize_fov(current_map)
-                    fov_recompute = True
-
-                    render_eng.con.clear()
-                    break
             else:
                 msg_log.add('There are no stairs here.')
 
         if stair_up and state == States.HERO_TURN:
-            print('You pressed <!')
+            for entity in current_map.entities:
+                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                if entity.stair_up and hero_at_stairs:
+                    if dungeon.move_upstairs():
+                        current_map = dungeon.current_map()
+
+                        fov_map = initialize_fov(current_map)
+                        fov_recompute = True
+                        render_eng.con.clear()
+                        break
+                    else:
+                        raise ValueError("Something weird happened with going upstairs!")
+
+            else:
+                msg_log.add('There are no stairs here.')
 
         if lvl_up:
             # todo: Move stat boosts to config
