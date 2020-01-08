@@ -33,6 +33,8 @@ map_height = scr_height - panel_height - msg_height
 # Room generation
 room_max_len = 15
 room_min_len = 4
+NW_OFFSET = 1
+SE_OFFSET = 2
 max_rooms = 10
 # max_items_per_room = 3
 max_items_weights = [[1, 1], [2, 4]]

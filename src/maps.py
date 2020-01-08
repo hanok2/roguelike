@@ -210,7 +210,10 @@ class Map(object):
 
     def get_random_room_loc(self, room):
         """Find a random spot in a room."""
-        pass
+        x = random.randint(room.x1 + config.NW_OFFSET, room.x2 - config.SE_OFFSET)
+        y = random.randint(room.y1 + config.NW_OFFSET, room.y2 - config.SE_OFFSET)
+        return x, y
+
 
     def place_entities(self, room):
         max_monsters_per_room = from_dungeon_lvl(config.max_monsters_weights, self.dungeon_lvl)
@@ -221,16 +224,11 @@ class Map(object):
         num_monsters = random.randint(0, max_monsters_per_room)
         monster_chances = monster_factory.monster_chances(self.dungeon_lvl)
 
-        NW_OFFSET = 1
-        SE_OFFSET = 2
 
         for i in range(num_monsters):
-            # Choose a random location in the map
-            x = random.randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
-            y = random.randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
+            x, y = self.get_random_room_loc(room)
 
             if not self.is_occupied(x, y):
-            # if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
                 monster = monster_factory.get_random_monster(x, y, monster_chances)
                 self.entities.append(monster)
 
@@ -239,11 +237,8 @@ class Map(object):
         item_chances = item_factory.item_chances(self.dungeon_lvl)
 
         for i in range(num_items):
-            # Choose a random location in the room
-            x = random.randint(room.x1 + NW_OFFSET, room.x2 - SE_OFFSET)
-            y = random.randint(room.y1 + NW_OFFSET, room.y2 - SE_OFFSET)
+            x, y = self.get_random_room_loc(room)
 
-            # if not any([entity for entity in self.entities if entity.x == x and entity.y == y]):
             if not self.is_occupied(x, y):
                 item = item_factory.get_rnd_item(x, y, item_chances)
                 self.entities.append(item)

@@ -245,7 +245,31 @@ def test_map_get_random_non_wall_loc__returns_non_wall():
     result = m.get_random_non_wall_loc()
     assert result == (0, 0)
 
-# def test_map_get_random_room_loc():
+def test_map_get_random_room_loc__map_corner():
+    m = maps.Map(width=50, height=50)
+    r = rect.Rect(x=0, y=0, w=5, h=5)
+    result_x, result_y = m.get_random_room_loc(r)
+    min_x = r.x1 + config.NW_OFFSET
+    max_x = r.x2 - config.SE_OFFSET
+    min_y = r.y1 + config.NW_OFFSET
+    max_y = r.y2 - config.SE_OFFSET
+
+    assert result_x >= min_x and result_x <= max_x
+    assert result_y >= min_y and result_y <= max_y
+
+
+def test_map_get_random_room_loc__map_middle():
+    m = maps.Map(width=50, height=50)
+    r = rect.Rect(x=10, y=10, w=15, h=5)
+    result_x, result_y = m.get_random_room_loc(r)
+    min_x = r.x1 + config.NW_OFFSET
+    max_x = r.x2 - config.SE_OFFSET
+    min_y = r.y1 + config.NW_OFFSET
+    max_y = r.y2 - config.SE_OFFSET
+
+    assert result_x >= min_x and result_x <= max_x
+    assert result_y >= min_y and result_y <= max_y
+
 
 def test_map_place_entities_no_entities_appear_in_Wall():
     m = maps.Map(width=50, height=50)
