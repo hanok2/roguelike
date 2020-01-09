@@ -46,27 +46,71 @@ def handle_hero_turn_keys(key):
         return {'drop_inv': True}
     elif key_char == '\\':
         return {'show_char_scr': True}
+
+    # Wait
     elif key_char == '.':
         return {'wait': True}
+    elif key.vk == tcod.KEY_KP5:
+        return {'wait': True}
 
-    # Movement
-    # Note: Add support for number pad movement
-    if key.vk == tcod.KEY_UP or key_char == 'k':
+    # Move Up
+    if key_char == 'k':
         return {'move': (0, -1)}
-    elif key.vk == tcod.KEY_DOWN or key_char == 'j':
+    elif key.vk == tcod.KEY_UP:
+        return {'move': (0, -1)}
+    elif key.vk == tcod.KEY_KP8:
+        return {'move': (0, -1)}
+
+    # Move Down
+    elif key_char == 'j':
         return {'move': (0, 1)}
-    elif key.vk == tcod.KEY_LEFT or key_char == 'h':
+    elif key.vk == tcod.KEY_DOWN:
+        return {'move': (0, 1)}
+    elif key.vk == tcod.KEY_KP2:
+        return {'move': (0, 1)}
+
+    # Move Left
+    elif key_char == 'h':
         return {'move': (-1, 0)}
-    elif key.vk == tcod.KEY_RIGHT or key_char == 'l':
+    elif key.vk == tcod.KEY_LEFT:
+        return {'move': (-1, 0)}
+    elif key.vk == tcod.KEY_KP4:
+        return {'move': (-1, 0)}
+
+    # Move Right
+    elif key_char == 'l':
         return {'move': (1, 0)}
+    elif key.vk == tcod.KEY_RIGHT:
+        return {'move': (1, 0)}
+    elif key.vk == tcod.KEY_KP6:
+        return {'move': (1, 0)}
+
+    # Move NW
     elif key_char == 'y':
         return {'move': (-1, -1)}
+    elif key.vk == tcod.KEY_KP7:
+        return {'move': (-1, -1)}
+
+    # Move NE
     elif key_char == 'u':
         return {'move': (1, -1)}
+    elif key.vk == tcod.KEY_KP9:
+        return {'move': (1, -1)}
+
+    # Move SW
     elif key_char == 'b':
         return {'move': (-1, 1)}
+    elif key.vk == tcod.KEY_KP1:
+        return {'move': (-1, 1)}
+
+    # Move SE
     elif key_char == 'n':
         return {'move': (1, 1)}
+    elif key.vk == tcod.KEY_KP3:
+        return {'move': (1, 1)}
+
+    # Note: Add support for number pad movement
+
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: Toggle full screen
