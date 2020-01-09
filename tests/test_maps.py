@@ -92,23 +92,11 @@ def test_hero_at_stairs__starting_upstair_returns_True(basic_hero):
     assert d.hero_at_stairs('<')
 
 
-def test_move_downstairs__next_lvl_DNE_we_create_it(basic_hero):
-    d = maps.Dungeon(basic_hero)
-    # Move the hero to the down stair
-    down_stair = d.current_map().find_stair('>')
-    d.hero.x, d.hero.y = down_stair.x, down_stair.y
-    d.generate_next_level()
-
-    d.move_downstairs()
-    assert len(d.levels) == 2
-
-
 def test_move_downstairs__not_on_down_stair_returns_False(basic_hero):
     d = maps.Dungeon(basic_hero)
     d.generate_next_level()
 
     result = d.move_downstairs()
-
     assert result is False
 
 
