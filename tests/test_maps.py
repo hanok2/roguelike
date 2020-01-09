@@ -92,6 +92,44 @@ def test_generate_next_level__maps_are_numbered_correctly():
 
 # def move_hero(self, dest_lvl, dest_x, dest_y):
 
+# Wait on this test - might want to remove some calls from Dungeon init
+# def test_move_hero__hero_not_placed_yet(basic_hero):
+    # d = maps.Dungeon(basic_hero)
+
+
+# Test moving to wall: Return false
+def test_move_hero__to_wall_returns_False(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    m = maps.Map(10, 10, 2)
+    d.levels.append(m)
+    assert d.move_hero(dest_lvl=1, dest_x=0, dest_y=0) is False
+
+
+# Test moving to an occupied spot: Return false
+
+def test_move_hero__to_occupied_spot_returns_False(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    rnd_monster = [e for e in d.current_map().entities if e.ai].pop()
+    dest_x = rnd_monster.x
+    dest_y = rnd_monster.y
+
+    assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y) is False
+
+
+# Test moving to a valid spot on same floor: Return true
+
+def test_move_hero__valid_spot_same_floor_returns_True(basic_hero):
+    d = maps.Dungeon(basic_hero)
+
+# Test moving to a valid spot on same floor: Hero's X/Y updates
+# Test moving to a valid spot on same floor: Dungeon level remains same
+# Test moving to a valid spot on different floor: Return true
+# Test moving to a valid spot on different floor: Hero's X/Y updates
+# Test moving to a valid spot on different floor: Dungeon current level changes
+# Valid spot: Hero doesn't exist at previous spot
+# Valid spot: Hero exists at new spot
+
+
 
 """Tests for class Map(object):"""
 
@@ -347,6 +385,17 @@ def test_map_is_occupied__occupied_return_True(basic_hero):
     x, y = 0, 0
     m.entities.append(basic_hero)
     assert m.is_occupied(x, y) is True
+
+
+def test_get_random_open_spot__all_wall_returns_None():
+    m = maps.Map(width=10, height=10)
+    assert m.get_random_open_spot() is None
+
+
+def test_get_random_open_spot__single_spot():
+    m = maps.Map(width=10, height=10)
+    m.tiles[0][0].blocked = False
+    assert m.get_random_open_spot() == (0, 0)
 
 
 def test_map_get_random_non_wall_loc__default_map_returns_None():

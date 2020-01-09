@@ -72,8 +72,31 @@ class Dungeon(object):
             If the destination is a wall or unoccupied, we won't be able to move
             the hero and will return False.
             If the move succeeds, returns True.
+
+            For future: Might be good to track the Hero's current level.
         """
-        pass
+        # Check the destination:
+        # Is it a wall?
+        src_map = self.levels[dest_lvl]
+        if src_map.tiles[dest_x][dest_y].blocked:
+            return False
+
+        # Is there a blocking monster there?
+        blockers = [e for e in src_map.entities if e.blocks]
+        for e in blockers:
+            if e.x == dest_x and e.y == dest_y:
+                return False
+
+        # Search for the hero
+        # If not found - that is ok.
+
+        # If found, keep current location
+            # Remove the hero
+
+        # Place the hero at the destination
+        # Update hero x/y
+        # Update current_lvl
+
 
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=config.DEFAULT_DUNGEON_LVL):
@@ -202,6 +225,18 @@ class Map(object):
     def is_occupied(self, x, y):
         """Returns True if an entity is occupying the tile."""
         return any([entity for entity in self.entities if entity.x == x and entity.y == y])
+
+    def get_random_open_spot(self):
+        """Find a random non-wall, non-blocked spot on the map.
+            If we find a valid tile, return the (x, y) tuple for that tile.
+            Else, return None
+        """
+        while True:
+            tile = self.get_random_non_wall_loc()
+            if not tile:
+                return None
+            elif not self.is_occupied(*tile):
+                return tile
 
     def get_random_non_wall_loc(self):
         """Find a random spot on the map that is not a Wall."""
