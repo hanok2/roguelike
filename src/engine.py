@@ -236,46 +236,48 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         if stair_down and state == States.HERO_TURN:
             for entity in current_map.entities:
-                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
-                if entity.stair_down and hero_at_stairs:
-                    dungeon.generate_next_level()
+                if entity.stair_down:
+                    hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                    if hero_at_stairs:
+                        dungeon.generate_next_level()
 
-                    if dungeon.move_downstairs():
-                        current_map = dungeon.current_map()
-                        current_map.populate()
-                        msg_log.add('You carefully descend the stairs down.')
+                        if dungeon.move_downstairs():
+                            current_map = dungeon.current_map()
+                            current_map.populate()
+                            msg_log.add('You carefully descend the stairs down.')
 
-                        fov_map = initialize_fov(current_map)
-                        fov_recompute = True
-                        render_eng.con.clear()
-                        break
-                    else:
-                        raise ValueError("Something weird happened with going downstairs!")
+                            fov_map = initialize_fov(current_map)
+                            fov_recompute = True
+                            render_eng.con.clear()
+                            break
+                        else:
+                            raise ValueError("Something weird happened with going downstairs!")
 
             else:
                 msg_log.add('There are no stairs here.')
 
         if stair_up and state == States.HERO_TURN:
             for entity in current_map.entities:
-                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                if entity.stair_up:
+                    hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                    if hero_at_stairs:
 
-                if entity.stair_up and hero_at_stairs:
+                        if dungeon.current_lvl == 0:
+                            msg_log.add('You go up the stairs and leave the dungeon forever...')
+                            state = States.HERO_DEAD
+                            # gameexit = True
+                            break
 
-                    if dungeon.current_lvl == 0:
-                        msg_log.add('You go up the stairs and leave the dungeon forever...')
-                        state = States.HERO_DEAD
-                        gameexit = True
+                        elif dungeon.move_upstairs():
+                            current_map = dungeon.current_map()
+                            msg_log.add('You ascend the stairs up.')
 
-                    elif dungeon.move_upstairs():
-                        current_map = dungeon.current_map()
-                        msg_log.add('You ascend the stairs up.')
-
-                        fov_map = initialize_fov(current_map)
-                        fov_recompute = True
-                        render_eng.con.clear()
-                        break
-                    else:
-                        raise ValueError("Something weird happened with going upstairs!")
+                            fov_map = initialize_fov(current_map)
+                            fov_recompute = True
+                            render_eng.con.clear()
+                            break
+                        else:
+                            raise ValueError("Something weird happened with going upstairs!")
 
             else:
                 msg_log.add('There are no stairs here.')
