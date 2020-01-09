@@ -173,7 +173,7 @@ def lvl_up_menu(render_eng, header, hero, menu_width):
         'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
     }
 
-    menu(render_eng, header, options, menu_width, config.scr_width, config.scr_height)
+    menu(render_eng, header, options, menu_width)
 
 
 def char_scr(render_eng, hero):

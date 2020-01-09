@@ -72,8 +72,7 @@ class RenderEngine(object):
 
         elif state == States.LEVEL_UP:
             lvl_up_menu(
-                self.root,
-                self.con,
+                self,
                 'Level up! Choose a stat to raise:',
                 dungeon.hero,
                 40,
