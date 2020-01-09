@@ -74,6 +74,24 @@ def test_generate_next_level__maps_are_numbered_correctly(basic_hero):
     assert d.levels[1].dungeon_lvl == 2
 
 
+def test_hero_at_stairs__valid_returns_True(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    down_stair = d.current_map().find_stair('>')
+    d.hero.x, d.hero.y = down_stair.x, down_stair.y
+    assert d.hero_at_stairs('>')
+
+
+def test_hero_at_stairs__invalid_returns_False(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    assert d.hero_at_stairs('>') is False
+
+
+def test_hero_at_stairs__starting_upstair_returns_True(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    # Hero starts on an upstair, so this should be True.
+    assert d.hero_at_stairs('<')
+
+
 def test_move_downstairs__next_lvl_DNE_we_create_it(basic_hero):
     d = maps.Dungeon(basic_hero)
     # Move the hero to the down stair

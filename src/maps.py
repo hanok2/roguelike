@@ -40,6 +40,13 @@ class Dungeon(object):
         new_map.make_map()
         self.levels.append(new_map)
 
+    def hero_at_stairs(self, stair_char):
+        for e in self.current_map().entities:
+            if e.char == stair_char:
+                return e.x == self.hero.x and e.y == self.hero.y
+        return False
+
+
     def move_downstairs(self):
         """ Removes the hero from the current level and places them at the
             up-stair at the next level.
