@@ -19,10 +19,7 @@ def main():
     render_eng = render_functions.RenderEngine()
 
     # Initialize game data
-    # hero = None
-    # entities = []
     dungeon = None
-    # current_map = None
     msg_log = None
     state = None
     turns = 0
@@ -63,11 +60,13 @@ def main():
             if show_load_err_msg and (new_game or load_saved_game or exit_game):
                 show_load_err_msg = False
             elif new_game:
+                log.debug('New game selected.')
                 dungeon, msg_log, state, turns = game_init.get_game_data()
                 state = States.HERO_TURN
                 show_main_menu = False
 
             elif load_saved_game:
+                log.debug('Load game selected.')
                 try:
                     dungeon, msg_log, state, turns = load_game()
                     show_main_menu = False
@@ -76,9 +75,10 @@ def main():
 
             elif options:
                 # todo: Fill out options menu
-                print('Options selected - STUB!')
+                log.debug('Options selected - STUB!')
 
             elif exit_game:
+                log.debug('Exit selected')
                 break
         else:
             # Reset a console to its default colors and the space character.
@@ -98,6 +98,7 @@ def main():
 
 
 def play_game(dungeon, msg_log, state, turns, render_eng):
+    log.debug('Calling play_game...')
     hero = dungeon.hero
     current_map = dungeon.current_map()
 
@@ -119,7 +120,9 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
     # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
     # while not tcod.console_is_window_closed():
 
+    log.debug('Entering game loop...')
     while True:
+        log.debug('turn: {}..'.format(turns))
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
@@ -129,6 +132,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         )
 
         if fov_recompute:
+            log.debug('fov_recompute...')
             recompute_fov(
                 fov_map,
                 hero.x,
@@ -180,6 +184,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         hero_turn_results = []
 
         if move and state == States.HERO_TURN:
+            log.debug('Attempting move.')
             dx, dy = move
             dest_x = hero.x + dx
             dest_y = hero.y + dy
@@ -188,9 +193,11 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 target = get_blockers_at_loc(current_map.entities, dest_x, dest_y)
 
                 if target:
+                    log.debug('Attacking.')
                     attack_results = hero.fighter.attack(target)
                     hero_turn_results.extend(attack_results)
                 else:
+                    log.debug('Moving.')
                     hero.move(dx, dy)
 
                     # Need to redraw FOV
@@ -200,10 +207,12 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 state = States.WORLD_TURN
 
         elif wait:
+            log.debug('Waiting.')
             # Skip the hero turn
             state = States.WORLD_TURN
 
         elif pickup and state == States.HERO_TURN:
+            log.debug('Attempting pickup.')
             for entity in current_map.entities:
                 item_pos_at_our_pos = entity.x == hero.x and entity.y == hero.y
 
@@ -216,15 +225,18 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 msg_log.add('There is nothing here to pick up.')
 
         if show_inv:
+            log.debug('Show inventory.')
             prev_state = state
             state = States.SHOW_INV
 
         if drop_inv:
+            log.debug('Drop inventory.')
             prev_state == state
             state = States.DROP_INV
 
         # Item usage
         if inv_index is not None and prev_state != States.HERO_DEAD and inv_index < len(hero.inv.items):
+            log.debug('Inventory menu.')
             item = hero.inv.items[inv_index]
 
             if state == States.SHOW_INV:
@@ -239,6 +251,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 hero_turn_results.extend(hero.inv.drop(item))
 
         if stair_down and state == States.HERO_TURN:
+            log.debug('Attempting stair down.')
             for entity in current_map.entities:
                 if entity.stair_down:
                     hero_at_stairs = entity.x == hero.x and entity.y == hero.y
@@ -261,6 +274,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 msg_log.add('There are no stairs here.')
 
         if stair_up and state == States.HERO_TURN:
+            log.debug('Attempting stair up.')
             for entity in current_map.entities:
                 if entity.stair_up:
                     hero_at_stairs = entity.x == hero.x and entity.y == hero.y
@@ -287,6 +301,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 msg_log.add('There are no stairs here.')
 
         if lvl_up:
+            log.debug('Level up stat boost.')
             # todo: Move stat boosts to config
             if lvl_up == 'hp':
                 hero.fighter.base_max_hp += 20
@@ -299,10 +314,12 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             state = prev_state
 
         if show_char_scr:
+            log.debug('Show character screen.')
             prev_state = state
             state = States.SHOW_STATS
 
         if state == States.TARGETING:
+            log.debug('Targeting.')
             if l_click:
                 target_x, target_y = l_click
 
@@ -319,6 +336,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 hero_turn_results.append({'cancel_target': True})
 
         if gameexit:
+            log.debug('Attempting exit.')
             if state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
                 state = prev_state
             elif state == States.TARGETING:
@@ -328,6 +346,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 return True
 
         if full_scr:
+            log.debug('Full screen.')
             # Toggle fullscreen on/off
             tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
 
@@ -344,21 +363,26 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             xp = result.get('xp')
 
             if msg:
+                log.debug('msg: {}.'.format(msg))
                 msg_log.add(msg)
 
             if cancel_target:
+                log.debug('Targeting cancelled.')
                 state = prev_state
                 msg_log.add('Targeting cancelled.')
 
             if xp:
+                log.debug('Adding xp.')
                 leveled_up = hero.lvl.add_xp(xp)
 
                 if leveled_up:
+                    log.debug('Hero level up.')
                     msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
                     prev_state = state
                     state = States.LEVEL_UP
 
             if dead_entity:
+                log.debug('Dead entity.')
                 if dead_entity == hero:
                     msg, state = kill_hero(dead_entity)
                 else:
@@ -367,13 +391,16 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 msg_log.add(msg)
 
             if item_added:
+                log.debug('Item added.')
                 current_map.entities.remove(item_added)
                 state = States.WORLD_TURN
 
             if item_consumed:
+                log.debug('Item consumed.')
                 state = States.WORLD_TURN
 
             if targeting:
+                log.debug('Targeting.')
                 # Set to HERO_TURN so that if cancelled, we don't go back to inv.
                 prev_state = States.HERO_TURN
                 state = States.TARGETING
@@ -381,10 +408,12 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 msg_log.add(targeting_item.item.targeting_msg)
 
             if item_dropped:
+                log.debug('Item dropped.')
                 current_map.entities.append(item_dropped)
                 state = States.WORLD_TURN
 
             if equip:
+                log.debug('Equip.')
                 equip_results = hero.equipment.toggle_equip(equip)
 
                 for equip_result in equip_results:
@@ -400,6 +429,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 state = States.WORLD_TURN
 
         if state == States.WORLD_TURN:
+            log.debug('World turn.')
             # Increment turn counter
             # This *may* go elsewhere, but we'll try it here first.
             turns += 1
