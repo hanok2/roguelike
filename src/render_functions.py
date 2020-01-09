@@ -112,16 +112,14 @@ class RenderEngine(object):
                             c='#',
                             fore=tcod.white,
                             back=tcod.black,
-                            # back=config.colors.get('light_ground'),
                         )
                     else:
                         tcod.console_put_char_ex(
                             con=self.con,
                             x=x, y=y,
                             c='.',
-                            fore=tcod.black,
-                            # back=config.colors.get('light_ground'),
-                            back=tcod.light_gray
+                            fore=tcod.white,
+                            back=tcod.black
                         )
 
                     # It's visible therefore explored
@@ -144,7 +142,6 @@ class RenderEngine(object):
                             x=x, y=y,
                             c='.',
                             fore=tcod.white,
-                            # back=tcod.darkest_gray,
                             back=tcod.black,
                         )
 
