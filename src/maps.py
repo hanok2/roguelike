@@ -33,7 +33,6 @@ class Dungeon(object):
 
     def generate_next_level(self):
         # Generate next dungeon level
-        # place up stair in the first room
         level_depth = len(self.levels) + 1
         new_map = Map(config.map_width, config.map_height, level_depth)
         new_map.make_map()
@@ -61,6 +60,15 @@ class Dungeon(object):
             self.levels[self.current_lvl].entities.append(self.hero)
             return True
         return False
+
+    def move_hero(self, dest_lvl, dest_x, dest_y):
+        """Moves the hero from the current to the destination level at the
+            specified x and y coordinates.
+            If the destination is a wall or unoccupied, we won't be able to move
+            the hero and will return False.
+            If the move succeeds, returns True.
+        """
+        pass
 
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=config.DEFAULT_DUNGEON_LVL):

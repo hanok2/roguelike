@@ -10,11 +10,46 @@ INVALID_LENGTH = 2
 """Tests for class Dungeon(object):"""
 
 # def test_dungeon_init__():
+    # hero
+    # level
+    # current_lvl
+    # make sure 1 level is generated on init
+    # place the hero somewhere
+    # make sure populate is called?
+
 # def test_current_map():
+    # Should return the Map for the current level
+    # Test with single level
+    # Test with 2 levels
+
 # def test_place_hero(, level):
+    # Should this take the hero as a parameter?
+    # Test that the hero is put somewhere
+
 # def test_generate_next_level():
+    # Test that levels increased by 1
+    # Test that the new level is numbered correctly
+
 # def test_move_downstairs():
+    # with 2 levels, test that hero DNE on first level
+    # with 2 levels, test that hero exists on second level
+    # Test that successful run return True
+    # Test that unsuccessful run return False
+
 # def test_move_upstairs():
+    # with 2 levels, test that hero DNE on second level
+    # with 2 levels, test that hero exists on first level
+    # Test that successful run return True
+    # Test that unsuccessful run return False
+
+# def test_move_hero?
+    # def move_hero(self, dest_lvl, dest_x, dest_y):
+    # with 2 levels, test that hero DNE on second level
+    # with 2 levels, test that hero exists on first level
+    # Test that successful run return True
+    # Test that unsuccessful run return False
+
+# def move_hero(self, dest_lvl, dest_x, dest_y):
 
 
 """Tests for class Map(object):"""
