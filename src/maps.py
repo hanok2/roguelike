@@ -41,14 +41,34 @@ class Dungeon(object):
         self.levels.append(new_map)
 
     def move_downstairs(self):
-        next_lvl = self.current_lvl + 1
-        hero_start_x, hero_start_y = self.levels[next_lvl].rooms[0].center()
-        return self.move_hero(next_lvl, hero_start_x, hero_start_y)
+        """ Removes the hero from the current level and places them at the
+            up-stair at the next level.
+            First checks if the hero is at a down-stair. If they are, proceeds
+            moving the hero and returns True, otherwise returns False.
+        """
+        down_stair = self.current_map().find_stair('>')
+
+        if self.hero.x == down_stair.x and self.hero.y == down_stair.y:
+            next_lvl = self.current_lvl + 1
+            hero_start_x, hero_start_y = self.levels[next_lvl].rooms[0].center()
+            return self.move_hero(next_lvl, hero_start_x, hero_start_y)
+
+        return False
 
     def move_upstairs(self):
-        next_lvl = self.current_lvl - 1
-        hero_start_x, hero_start_y = self.levels[next_lvl].rooms[-1].center()
-        return self.move_hero(next_lvl, hero_start_x, hero_start_y)
+        """ Removes the hero from the current level and places them at the
+            down-stair at the previous level.
+            First checks if the hero is at an up-stair. If they are, proceeds
+            moving the hero and returns True, otherwise returns False.
+        """
+        up_stair = self.current_map().find_stair('<')
+
+        if self.hero.x == up_stair.x and self.hero.y == up_stair.y:
+            next_lvl = self.current_lvl - 1
+            hero_start_x, hero_start_y = self.levels[next_lvl].rooms[-1].center()
+            return self.move_hero(next_lvl, hero_start_x, hero_start_y)
+
+        return False
 
     def move_hero(self, dest_lvl, dest_x, dest_y):
         """Moves the hero from the current to the destination level at the
@@ -113,9 +133,9 @@ class Map(object):
                 return True
         return False
 
-    def find_down_stair(self):
+    def find_stair(self, stair_char):
         for e in self.entities:
-            if e.stair_down:
+            if e.char == stair_char:
                 return e
         return None
 
