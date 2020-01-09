@@ -242,7 +242,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                     if dungeon.move_downstairs():
                         current_map = dungeon.current_map()
                         current_map.populate()
-                        # hero = dungeon.hero
+                        msg_log.add('You carefully descend the stairs down.')
 
                         fov_map = initialize_fov(current_map)
                         fov_recompute = True
@@ -257,7 +257,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         if stair_up and state == States.HERO_TURN:
             for entity in current_map.entities:
                 hero_at_stairs = entity.x == hero.x and entity.y == hero.y
-
                 if entity.stair_up and hero_at_stairs:
 
                     if dungeon.current_lvl == 0:
@@ -267,6 +266,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
                     elif dungeon.move_upstairs():
                         current_map = dungeon.current_map()
+                        msg_log.add('You ascend the stairs up.')
 
                         fov_map = initialize_fov(current_map)
                         fov_recompute = True
