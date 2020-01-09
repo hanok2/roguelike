@@ -97,7 +97,6 @@ def test_generate_next_level__maps_are_numbered_correctly():
     # d = maps.Dungeon(basic_hero)
 
 
-# Test moving to wall: Return false
 def test_move_hero__to_wall_returns_False(basic_hero):
     d = maps.Dungeon(basic_hero)
     m = maps.Map(10, 10, 2)
@@ -105,21 +104,19 @@ def test_move_hero__to_wall_returns_False(basic_hero):
     assert d.move_hero(dest_lvl=1, dest_x=0, dest_y=0) is False
 
 
-# Test moving to an occupied spot: Return false
-
 def test_move_hero__to_occupied_spot_returns_False(basic_hero):
     d = maps.Dungeon(basic_hero)
     rnd_monster = [e for e in d.current_map().entities if e.ai].pop()
     dest_x = rnd_monster.x
     dest_y = rnd_monster.y
-
     assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y) is False
 
 
-# Test moving to a valid spot on same floor: Return true
-
 def test_move_hero__valid_spot_same_floor_returns_True(basic_hero):
     d = maps.Dungeon(basic_hero)
+    dest_x, dest_y = d.current_map().get_random_open_spot()
+    assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
+
 
 # Test moving to a valid spot on same floor: Hero's X/Y updates
 # Test moving to a valid spot on same floor: Dungeon level remains same

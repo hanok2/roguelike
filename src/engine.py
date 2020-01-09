@@ -257,6 +257,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         if stair_up and state == States.HERO_TURN:
             for entity in current_map.entities:
                 hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+
                 if entity.stair_up and hero_at_stairs:
 
                     if dungeon.current_lvl == 0:

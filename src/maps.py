@@ -76,6 +76,8 @@ class Dungeon(object):
             For future: Might be good to track the Hero's current level.
         """
         # Check the destination:
+        # Does the destination level exist??
+
         # Is it a wall?
         src_map = self.levels[dest_lvl]
         if src_map.tiles[dest_x][dest_y].blocked:
@@ -87,15 +89,23 @@ class Dungeon(object):
             if e.x == dest_x and e.y == dest_y:
                 return False
 
-        # Search for the hero
-        # If not found - that is ok.
-
+        # Search for the hero(If not found - that is ok.)
         # If found, keep current location
-            # Remove the hero
+
+        # Remove the hero
+        src_map.rm_hero()
 
         # Place the hero at the destination
+        self.levels[dest_lvl].entities.append(self.hero)
+
         # Update hero x/y
+        self.hero.x, self.hero.y = dest_x, dest_y
+
         # Update current_lvl
+        self.current_lvl = dest_lvl
+
+        return True
+
 
 
 class Map(object):
