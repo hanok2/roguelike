@@ -10,15 +10,15 @@ def monster_chances(dungeon_lvl):
     return {
         'spider': 80,
         'orc': 80,
-        # 'troll': 20,
-        'troll': from_dungeon_lvl(config.troll_chances, dungeon_lvl)
+        'troll': 40,
+        # 'troll': from_dungeon_lvl(config.troll_chances, dungeon_lvl)
     }
 
 def get_random_monster(x, y, monster_chances):
     monster_choice = rnd_choice_from_dict(monster_chances)
 
     if monster_choice == 'spider':
-        fighter_comp = Fighter(hp=1, defense=0, power=1, xp=5)
+        fighter_comp = Fighter(hp=5, defense=0, power=2, xp=5)
         ai_comp = ApproachingBehavior()
         monster = Entity(
             x, y,
@@ -31,7 +31,7 @@ def get_random_monster(x, y, monster_chances):
             ai=ai_comp
         )
     elif monster_choice == 'orc':
-        fighter_comp = Fighter(hp=5, defense=0, power=2, xp=35)
+        fighter_comp = Fighter(hp=10, defense=1, power=3, xp=35)
         ai_comp = ApproachingBehavior()
         monster = Entity(
             x, y,
