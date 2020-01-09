@@ -1,4 +1,5 @@
 import tcod
+from . import components
 from .states import States
 from .render_functions import RenderOrder
 
@@ -16,6 +17,9 @@ def kill_monster(monster):
     monster.render_order = RenderOrder.CORPSE
     monster.fighter = None
     monster.ai = None
+
+    # Change to an item so we can pick it up!
+    monster.item = components.Item()
 
     death_msg = 'The {} dies!'.format(monster.name.capitalize())
     monster.name = 'remains of ' + monster.name
