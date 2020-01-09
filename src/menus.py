@@ -4,7 +4,6 @@ from . import config
 MAX_MENU_ITEMS = 26
 
 
-
 def menu(render_eng, header, options, width):
     """ Display a menu of options. Each option has a letter to the left side."""
     if len(options) > MAX_MENU_ITEMS:
@@ -22,20 +21,16 @@ def menu(render_eng, header, options, width):
     height = len(options) + header_height
 
     # Create an off-screen console that represents the menu's window
-    window = tcod.console_new(w=width, h=height)
+    window = tcod.console.Console(width=width, height=height)
 
-    # Print the header, with auto-wrap
-    tcod.console_set_default_foreground(con=window, col=tcod.white)
+    window.default_fg = tcod.white
+    window.default_bg = tcod.black
 
     # Print a string constrained to a rectangle with blend and alignment.
-    tcod.console_print_rect_ex(
-        con=window,
+    window.print(
         x=0, y=0,
-        w=width,
-        h=height,
-        flag=tcod.BKGND_NONE,
-        alignment=tcod.LEFT,
-        fmt=header
+        string=header,
+        alignment=tcod.LEFT
     )
 
     # Print all the options
@@ -44,17 +39,15 @@ def menu(render_eng, header, options, width):
     for k, v in options.items():
         text = '({}) {}'.format(k, v)
 
-        tcod.console_print_ex(
-            con=window,
+        window.print(
             x=0, y=y,
-            flag=tcod.BKGND_NONE,
-            alignment=tcod.LEFT,
-            fmt=text
+            string=text,
+            # bg=tcod.BKGND_NONE,
+            alignment=tcod.LEFT
         )
         y += 1
 
     x = int(config.scr_width / 2 - width / 2)
-    # y = int(config.scr_height / 2 - height / 2)
     y = 5
 
     # Blit the contents of "window" to the root console
@@ -64,8 +57,6 @@ def menu(render_eng, header, options, width):
         src_x=0, src_y=0,
         width=width,
         height=height,
-        fg_alpha=1.0,
-        bg_alpha=0.7,
     )
 
 
@@ -127,8 +118,6 @@ def main_menu(render_eng, menu_img):
 
     # Display game title
     title_x = int(config.scr_width / 2)
-
-    # title_y = int(config.scr_height / 2) - 4
     title_y = 3
 
     render_eng.root.print(
@@ -140,7 +129,6 @@ def main_menu(render_eng, menu_img):
     # Display author
     author_x = int(config.scr_width / 2)
     author_y = int(config.scr_height - 2)
-    # author_y = int(config.scr_height - 2)
 
     render_eng.root.print(
         x=author_x, y=author_y,
@@ -185,7 +173,6 @@ def char_scr(render_eng, hero):
 
     window.default_fg = tcod.white
 
-    # todo: Add a loop here
     info = [
         'Character Information',
         'Level: {}'.format(hero.lvl.current_lvl),
@@ -202,11 +189,11 @@ def char_scr(render_eng, hero):
             width=config.char_scr_width,
             height=config.char_scr_height,
             string=row,
+            bg=tcod.black,
             alignment=tcod.LEFT,
         )
 
     x = config.scr_width // 2 - config.char_scr_width // 2
-    # y = config.scr_height // 2 - config.char_scr_height // 2
     y = 5
 
     window.blit(
@@ -215,6 +202,6 @@ def char_scr(render_eng, hero):
         src_x=0, src_y=0,
         width=config.char_scr_width,
         height=config.char_scr_height,
-        fg_alpha=1.0,
-        bg_alpha=0.7
+        # fg_alpha=1.0,
+        # bg_alpha=0.7
     )
