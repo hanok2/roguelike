@@ -1,4 +1,6 @@
 venv
+logs
+temp
 .ropeproject
 __pycache__
 savegame.dat

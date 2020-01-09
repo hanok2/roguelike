@@ -1,6 +1,7 @@
 import tcod
 from . import config
 from . import game_init
+from . import logger
 from . import render_functions
 from .data_loaders import load_game, save_game
 from .death_functions import kill_monster, kill_hero
@@ -10,8 +11,11 @@ from .states import States
 from .input_handling import handle_keys, handle_mouse, handle_main_menu
 from .menus import main_menu, msg_box
 
+log = logger.setup_logger()
 
 def main():
+    log.debug('Started new game.')
+
     render_eng = render_functions.RenderEngine()
 
     # Initialize game data
