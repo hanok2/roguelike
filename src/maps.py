@@ -42,7 +42,9 @@ class Dungeon(object):
 
     def hero_at_stairs(self, stair_char):
         for e in self.current_map().entities:
-            if e.char == stair_char:
+            if stair_char == '>' and e.stair_down:
+                return e.x == self.hero.x and e.y == self.hero.y
+            if stair_char == '<' and e.stair_up:
                 return e.x == self.hero.x and e.y == self.hero.y
         return False
 
