@@ -212,7 +212,7 @@ class RenderEngine(object):
 
     def render_console_messages(self, msg_log):
         # Print the game messages, one line at a time
-        y = 1
+        y = 0
         for msg in msg_log.messages:
             self.msg_panel.default_fg = tcod.white
             self.msg_panel.print(x=msg_log.x, y=y, string=msg, alignment=tcod.LEFT)
