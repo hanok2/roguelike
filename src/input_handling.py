@@ -44,8 +44,12 @@ def handle_hero_turn_keys(key):
         return {'show_inv': True}
     elif key_char == 'd':
         return {'drop_inv': True}
-    elif key_char == '\\':
+
+    if key.lctrl and key_char == 'x':
+    # elif key.vk == tcod.KEY_CONTROL: and
+    # elif key_char == '\\':
         return {'show_char_scr': True}
+
 
     # Wait
     elif key_char == '.':
