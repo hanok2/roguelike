@@ -238,7 +238,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             item = hero.inv.items[inv_index]
 
             if state == States.SHOW_INV:
-                # hero_turn_results.extend(hero.inv.use(item))
                 hero_turn_results.extend(
                     hero.inv.use(
                         item, entities=current_map.entities, fov_map=fov_map
@@ -358,6 +357,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             equip = result.get('equip')
             targeting = result.get('targeting')
             cancel_target = result.get('cancel_target')
+            cancel_inv = result.get('cancel_inv')
             xp = result.get('xp')
 
             if msg:
@@ -368,6 +368,11 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 log.debug('Targeting cancelled.')
                 state = prev_state
                 msg_log.add('Targeting cancelled.')
+
+            if cancel_inv:
+                log.debug('Inventory menu cancelled')
+                state = prev_state
+
 
             if xp:
                 log.debug('Adding xp.')

@@ -34,7 +34,9 @@ class Inventory(object):
             if equippable_comp:
                 results.append({'equip': item_entity})
             else:
-                results.append({'msg': 'The {} cannot be used.'.format(item_entity.name)})
+                results.append({
+                    'msg': 'The {} cannot be used.'.format(item_entity.name),
+                })
         else:
             # How does this work? Is there a cleaner way to do this??
             # kwargs = {**item_comp.func_kwargs, **kwargs}  #
