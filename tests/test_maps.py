@@ -7,28 +7,69 @@ from ..src import rect
 DEFAULT_LENGTH = 50
 INVALID_LENGTH = 2
 
+@pytest.fixture
+def basic_hero():
+    return entity.Entity(0, 0, '@', None, 'Player', human=True)
+
+
 """Tests for class Dungeon(object):"""
 
-# def test_dungeon_init__():
-    # hero
-    # level
-    # current_lvl
-    # make sure 1 level is generated on init
-    # place the hero somewhere
+def test_dungeon_init__beginning_variables(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    assert d.hero is basic_hero
+    assert d.current_lvl == 0
+
+
+def test_dungeon_init__1_level_exists(basic_hero):
+    # Make sure 1 level is generated on init
+    d = maps.Dungeon(basic_hero)
+    assert len(d.levels) == 1
+
+
+def test_dungeon_init__hero_exists_on_map(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    m = d.current_map()
+    assert any([True for e in m.entities if e.human])
+
+
+# def test_dungeon_init__populate_was_called():
     # make sure populate is called?
 
-# def test_current_map():
-    # Should return the Map for the current level
-    # Test with single level
-    # Test with 2 levels
+
+def test_current_map__1_level():
+    d = maps.Dungeon(basic_hero)
+    m = d.current_map()
+    assert m.dungeon_lvl == d.current_lvl + 1
+
+
+def test_current_map__2_levels():
+    d = maps.Dungeon(basic_hero)
+    d.generate_next_level()
+    m = d.current_map()
+    assert m.dungeon_lvl == d.current_lvl + 1
+
+    d.current_lvl == 1
+    m = d.current_map()
+    assert m.dungeon_lvl == d.current_lvl + 1
+
 
 # def test_place_hero(, level):
     # Should this take the hero as a parameter?
     # Test that the hero is put somewhere
 
-# def test_generate_next_level():
-    # Test that levels increased by 1
-    # Test that the new level is numbered correctly
+def test_generate_next_level__levels_increases():
+    d = maps.Dungeon(basic_hero)
+    assert len(d.levels) == 1
+    d.generate_next_level()
+    assert len(d.levels) == 2
+
+
+def test_generate_next_level__maps_are_numbered_correctly():
+    d = maps.Dungeon(basic_hero)
+    assert d.levels[0].dungeon_lvl == 1
+    d.generate_next_level()
+    assert d.levels[1].dungeon_lvl == 2
+
 
 # def test_move_downstairs():
     # with 2 levels, test that hero DNE on first level
@@ -80,14 +121,13 @@ def test_map_rm_hero_if_absent_returns_False():
     # Should be False because the map is not initialized with the hero in it.
     assert result is False
 
-def test_map_rm_hero_if_present_returns_True():
+def test_map_rm_hero_if_present_returns_True(basic_hero):
     m = maps.Map(width=3, height=3)
-    hero = entity.Entity(0, 0, '@', None, 'Player', human=True)
-    m.entities.append(hero)
+    m.entities.append(basic_hero)
     result = m.rm_hero()
     assert result is True
     # Also check there is no hero in the entities
-    assert hero not in m.entities
+    assert basic_hero not in m.entities
 
 
 def test_map_find_down_stair():
@@ -301,12 +341,11 @@ def test_map_is_occupied__not_occupied_returns_False():
     result = m.is_occupied(0, 0)
     assert result is False
 
-def test_map_is_occupied__occupied_return_True():
+def test_map_is_occupied__occupied_return_True(basic_hero):
     # Test if there are any entities at the coordinates
     m = maps.Map(width=10, height=10)
     x, y = 0, 0
-    hero = entity.Entity(x, y, '@', None, 'Player', human=True)
-    m.entities.append(hero)
+    m.entities.append(basic_hero)
     assert m.is_occupied(x, y) is True
 
 

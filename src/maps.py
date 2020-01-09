@@ -15,12 +15,17 @@ class Dungeon(object):
     def __init__(self, hero):
         self.hero = hero
         self.levels = []
+
+        # Note: Can we fix this with a property? To match up with Maps?
         self.current_lvl = 0
 
         # Generate the first level on initialization
         self.generate_next_level()
         self.place_hero(self.current_lvl)
         self.current_map().populate()
+
+    # def current_lvl(self):
+        # Find the hero and return the level the hero is on.
 
     def current_map(self):
         return self.levels[self.current_lvl]
