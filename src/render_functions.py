@@ -304,12 +304,14 @@ class RenderEngine(object):
 
 
 def get_names_under_mouse(mouse, entities, fov_map):
-    (x, y) = (mouse.cx, mouse.cy)
+    # note: Due to the message console - we have to offset the y.
+    x, y = mouse.cx, mouse.cy - config.msg_height
 
     # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-    names = [entity.name for entity in entities
-             if entity.x == x and entity.y == y and
-             tcod.map_is_in_fov(m=fov_map, x=entity.x, y=entity.y)]
+    names = [e.name for e in entities
+             if e.x == x and e.y == y
+             and tcod.map_is_in_fov(m=fov_map, x=e.x, y=e.y)
+             ]
 
     names = ', '.join(names)
 
