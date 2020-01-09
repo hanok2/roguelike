@@ -33,7 +33,6 @@ def main():
     mouse = tcod.Mouse()
 
     while True:
-
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
             mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
@@ -122,7 +121,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
     log.debug('Entering game loop...')
     while True:
-        log.debug('turn: {}..'.format(turns))
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
@@ -429,7 +427,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 state = States.WORLD_TURN
 
         if state == States.WORLD_TURN:
-            log.debug('World turn.')
+            log.debug('Turn: {}'.format(turns))
             # Increment turn counter
             # This *may* go elsewhere, but we'll try it here first.
             turns += 1

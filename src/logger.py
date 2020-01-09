@@ -4,11 +4,11 @@ The file writing handler writes explicit date/time/loglevel/msg to debug.log.
 The console handler just prints the msg to console.
 """
 
+import datetime
 import logging
 import os
 
 LOGDIR = 'logs/'
-DEBUG_FILE = 'logs/debug.log'
 
 
 def setup_logger():
@@ -18,6 +18,11 @@ def setup_logger():
     # Setup logging
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
+
+    # setup filename:
+    dt = datetime.datetime
+    file_stamp = 'session {}'.format(dt.now().strftime('%m-%d-%Y %H:%M:%S'))
+    DEBUG_FILE = 'logs/{}.log'.format(file_stamp)
 
     # Setup file handlers
     debug_fh = logging.FileHandler(DEBUG_FILE)
