@@ -97,6 +97,7 @@ def test_generate_next_level__maps_are_numbered_correctly():
     # d = maps.Dungeon(basic_hero)
 
 
+
 def test_move_hero__to_wall_returns_False(basic_hero):
     d = maps.Dungeon(basic_hero)
     m = maps.Map(10, 10, 2)
@@ -112,20 +113,55 @@ def test_move_hero__to_occupied_spot_returns_False(basic_hero):
     assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y) is False
 
 
-def test_move_hero__valid_spot_same_floor_returns_True(basic_hero):
+def test_move_hero__same_floor_returns_True(basic_hero):
     d = maps.Dungeon(basic_hero)
     dest_x, dest_y = d.current_map().get_random_open_spot()
     assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
 
 
-# Test moving to a valid spot on same floor: Hero's X/Y updates
-# Test moving to a valid spot on same floor: Dungeon level remains same
-# Test moving to a valid spot on different floor: Return true
-# Test moving to a valid spot on different floor: Hero's X/Y updates
-# Test moving to a valid spot on different floor: Dungeon current level changes
-# Valid spot: Hero doesn't exist at previous spot
-# Valid spot: Hero exists at new spot
+def test_move_hero__same_floor_hero_xy_updated(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    dest_x, dest_y = d.current_map().get_random_open_spot()
+    d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
+    assert d.hero.x == dest_x
+    assert d.hero.y == dest_y
 
+
+def test_move_hero__same_floor_lvl_remains_same(basic_hero):
+    d = maps.Dungeon(basic_hero)
+    d_lvl = d.current_lvl
+    dest_x, dest_y = d.current_map().get_random_open_spot()
+    d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
+    assert d.current_lvl == d_lvl
+
+
+
+
+def test_move_hero__diff_floor_returns_True(basic_hero):
+    dest_lvl = 1
+    d = maps.Dungeon(basic_hero)
+    d.generate_next_level()
+    dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
+    assert d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
+
+
+def test_move_hero__diff_floor_hero_xy_updated(basic_hero):
+    dest_lvl = 1
+    d = maps.Dungeon(basic_hero)
+    d.generate_next_level()
+    dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
+    d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
+    assert d.hero.x == dest_x
+    assert d.hero.y == dest_y
+
+
+def test_move_hero__diff_floor_dungeon_lvl_updated(basic_hero):
+    dest_lvl = 1
+    d = maps.Dungeon(basic_hero)
+    d.generate_next_level()
+    dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
+    d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
+    assert d.current_lvl == dest_lvl
 
 
 """Tests for class Map(object):"""

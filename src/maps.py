@@ -107,7 +107,6 @@ class Dungeon(object):
         return True
 
 
-
 class Map(object):
     def __init__(self, width, height, dungeon_lvl=config.DEFAULT_DUNGEON_LVL):
         # Error checking
