@@ -239,6 +239,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 hero_at_stairs = entity.x == hero.x and entity.y == hero.y
                 if entity.stair_down and hero_at_stairs:
                     dungeon.generate_next_level()
+
                     if dungeon.move_downstairs():
                         current_map = dungeon.current_map()
                         current_map.populate()

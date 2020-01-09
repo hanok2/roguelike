@@ -21,7 +21,10 @@ class Dungeon(object):
 
         # Generate the first level on initialization
         self.generate_next_level()
-        self.place_hero(self.current_lvl)
+
+        hero_start_x, hero_start_y = self.levels[0].rooms[0].center()
+        self.move_hero(0, hero_start_x, hero_start_y)
+
         self.current_map().populate()
 
     # def current_lvl(self):
@@ -29,12 +32,6 @@ class Dungeon(object):
 
     def current_map(self):
         return self.levels[self.current_lvl]
-
-    def place_hero(self, level):
-        x, y = self.levels[level].rooms[0].center()
-        self.hero.x = x
-        self.hero.y = y
-        self.levels[level].entities.append(self.hero)
 
     def generate_next_level(self):
         # Generate next dungeon level
@@ -44,27 +41,14 @@ class Dungeon(object):
         self.levels.append(new_map)
 
     def move_downstairs(self):
-        # Remove the hero from the current level
-        if self.current_map().rm_hero():
-            self.current_lvl += 1
-
-            # Place the hero on the next level
-            self.place_hero(self.current_lvl)
-
-            return True
-        return False
+        next_lvl = self.current_lvl + 1
+        hero_start_x, hero_start_y = self.levels[next_lvl].rooms[0].center()
+        return self.move_hero(next_lvl, hero_start_x, hero_start_y)
 
     def move_upstairs(self):
-        if self.current_map().rm_hero():
-            self.current_lvl -= 1
-
-            # todo: Find where the up-stair is on the next level
-            x, y = self.levels[self.current_lvl].rooms[-1].center()
-            self.hero.x = x
-            self.hero.y = y
-            self.levels[self.current_lvl].entities.append(self.hero)
-            return True
-        return False
+        next_lvl = self.current_lvl - 1
+        hero_start_x, hero_start_y = self.levels[next_lvl].rooms[-1].center()
+        return self.move_hero(next_lvl, hero_start_x, hero_start_y)
 
     def move_hero(self, dest_lvl, dest_x, dest_y):
         """Moves the hero from the current to the destination level at the
