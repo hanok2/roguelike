@@ -1,9 +1,20 @@
 import pytest
 from ..src import entity
+from ..src import maps
+from ..src import tile
+
+from .test_death_functions import orc
 from ..src.render_functions import RenderOrder
 from ..src.components import Fighter, Item, Level, Equipment, Equippable, ApproachingBehavior
 from ..src.inventory import Inventory
 from ..src.stairs import Stairs
+
+@pytest.fixture
+def open_map():
+    # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
+    m = maps.Map(10, 10)
+    m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
+    return m
 
 
 def test_Entity_init__defaults():
@@ -110,8 +121,95 @@ def test_Entity_move__negative_values():
     assert e.y == 12
 
 
-# def move_towards(self, target_x, target_y, game_map):
-    # Move to map???
+def test_Entity_move_towards__negative_target_x_raises_exception(open_map):
+    e = entity.Entity(x=10, y=10, char='@', color=None, name='Player')
+    with pytest.raises(ValueError):
+        e.move_towards(-1, 0, open_map)
+
+
+def test_Entity_move_towards__negative_target_y_raises_exception(open_map):
+    e = entity.Entity(x=10, y=10, char='@', color=None, name='Player')
+    with pytest.raises(ValueError):
+        e.move_towards(0, -1, open_map)
+
+
+def test_Entity_move_towards__invalid_coordinates_raises_exception(open_map):
+    e = entity.Entity(x=10, y=10, char='@', color=None, name='Player')
+    with pytest.raises(IndexError):
+        e.move_towards(100, 100, open_map)
+
+
+def test_Entity_move_towards__blocked_doesnt_move():
+    m = maps.Map(10, 10)
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(6, 6, m)
+    assert e.x == 5
+    assert e.y == 5
+
+
+def test_Entity_move_towards__occupied_doesnt_move(open_map, orc):
+    e = entity.Entity(x=1, y=1, char='@', color=None, name='Player')
+    open_map.entities.append(e)
+    open_map.entities.append(orc)
+    e.move_towards(orc.x, orc.y, open_map)
+    assert e.x == 1
+    assert e.y == 1
+
+
+def test_Entity_move_towards__target_north(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(5, 4, open_map)
+    assert e.x == 5
+    assert e.y == 4
+
+
+def test_Entity_move_towards__target_south(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(5, 6, open_map)
+    assert e.x == 5
+    assert e.y == 6
+
+
+def test_Entity_move_towards__target_east(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(6, 5, open_map)
+    assert e.x == 6
+    assert e.y == 5
+
+
+def test_Entity_move_towards__target_west(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(4, 5, open_map)
+    assert e.x == 4
+    assert e.y == 5
+
+
+def test_Entity_move_towards__target_NW(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(4, 4, open_map)
+    assert e.x == 4
+    assert e.y == 4
+
+
+def test_Entity_move_towards__target_NE(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(6, 4, open_map)
+    assert e.x == 6
+    assert e.y == 4
+
+
+def test_Entity_move_towards__target_SE(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(6, 6, open_map)
+    assert e.x == 6
+    assert e.y == 6
+
+
+def test_Entity_move_towards__target_SW(open_map):
+    e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
+    e.move_towards(4, 6, open_map)
+    assert e.x == 4
+    assert e.y == 6
 
 # def move_astar(self, target, entities, game_map):
     # Move to map???
