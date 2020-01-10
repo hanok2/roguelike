@@ -178,6 +178,11 @@ class Level(object):
 
 class Equippable(object):
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0):
+        if not slot:
+            raise ValueError('slot must not be None!')
+        elif power_bonus < 0 or defense_bonus < 0 or max_hp_bonus < 0:
+            raise ValueError('bonus must not be less than 0!')
+
         self.slot = slot
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
