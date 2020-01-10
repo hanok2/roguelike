@@ -28,14 +28,31 @@ def test_dungeon_init__1_level_exists(basic_hero):
     assert len(d.levels) == 1
 
 
+@pytest.mark.skip(reason='Cannot implement yet because mocking causes problem with hero access to levels list.')
+def test_dungeon_init__generate_next_lvl_called(mocker, basic_hero):
+    mocker.patch.object(maps.Dungeon, 'generate_next_level')
+    d = maps.Dungeon(basic_hero)
+    d.generate_next_level.assert_called_once()
+
+
 def test_dungeon_init__hero_exists_on_map(basic_hero):
     d = maps.Dungeon(basic_hero)
     m = d.current_map()
     assert any([True for e in m.entities if e.human])
 
 
-# def test_dungeon_init__populate_was_called():
-    # make sure populate is called?
+def test_dungeon_init__move_hero_called(mocker, basic_hero):
+    mocker.patch.object(maps.Dungeon, 'move_hero')
+    d = maps.Dungeon(basic_hero)
+    d.move_hero.assert_called_once()
+
+
+def test_dungeon_init__populate_called(mocker, basic_hero):
+    mocker.patch.object(maps.Map, 'populate')
+    d = maps.Dungeon(basic_hero)
+    m = d.current_map()
+
+    m.populate.assert_called_once()
 
 
 def test_current_map__1_level(basic_hero):
