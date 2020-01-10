@@ -81,7 +81,6 @@ class Entity(object):
         if not (blocked_at or occupied):
             self.move(dx, dy)
 
-
     def move_astar(self, target, entities, game_map):
         # Create a FOV map that has the dimensions of the map
         fov = tcod.map_new(game_map.width, game_map.height)
