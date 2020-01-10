@@ -1,3 +1,4 @@
+import pytest
 from ..src import entity
 from ..src.render_functions import RenderOrder
 from ..src.components import Fighter, Item, Level, Equipment, Equippable, ApproachingBehavior
@@ -85,8 +86,30 @@ def test_Entity_init__human():
     assert e.human
 
 
+def test_Entity_move__to_a_negative_x():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    with pytest.raises(ValueError):
+        e.move(-1, 2)
 
-# def move(self, dx, dy):
+def test_Entity_move__to_a_negative_y():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    with pytest.raises(ValueError):
+        e.move(1, -2)
+
+def test_Entity_move__positive_values():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.move(1, 2)
+    assert e.x == 1
+    assert e.y == 2
+
+
+def test_Entity_move__negative_values():
+    e = entity.Entity(x=10, y=10, char='@', color=None, name='Player')
+    e.move(-1, 2)
+    assert e.x == 9
+    assert e.y == 12
+
+
 # def move_towards(self, target_x, target_y, game_map, entities):
     # Move to map???
 # def move_astar(self, target, entities, game_map):
