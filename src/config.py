@@ -5,6 +5,7 @@ window_title = 'Infinity Dronez'
 game_title = 'Infinity Dronez Version {}'.format(VERSION)
 author = 'hackemslashem'
 
+savefile = 'savegame.dat'
 tileset_file = 'images/arial10x10.png'
 menu_img = 'images/menu_bg.png'
 

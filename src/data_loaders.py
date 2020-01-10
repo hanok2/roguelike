@@ -1,30 +1,23 @@
 import os
 import shelve
+from . import config
 
 def save_game(dungeon, msg_log, state, turns):
-    with shelve.open('savegame.dat', 'n') as data_file:
-        # data_file['hero_index'] = entities.index(hero)
-        # data_file['entities'] = entities
+    with shelve.open(config.savefile, 'n') as data_file:
         data_file['dungeon'] = dungeon
-        # data_file['current_map'] = current_map
         data_file['msg_log'] = msg_log
         data_file['state'] = state
         data_file['turns'] = turns
 
 
 def load_game():
-    if not os.path.isfile('savegame.dat'):
+    if not os.path.isfile(config.savefile):
         raise FileNotFoundError
 
-    with shelve.open('savegame.dat', 'r') as data_file:
-        # hero_index = data_file['hero_index']
-        # entities = data_file['entities']
+    with shelve.open(config.savefile, 'r') as data_file:
         dungeon = data_file['dungeon']
-        # current_map = data_file['current_map']
         msg_log = data_file['msg_log']
         state = data_file['state']
         turns = data_file['turns']
-
-    # hero = entities[hero_index ]
 
     return dungeon, msg_log, state, turns
