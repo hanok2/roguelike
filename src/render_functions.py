@@ -29,13 +29,9 @@ class RenderEngine(object):
             fullscreen=False
         )
 
-        # Initialize the console
+        # Initialize the consoles
         self.con = tcod.console.Console(width=config.scr_width, height=config.scr_height)
-
-        # Initialize the status panel
         self.panel = tcod.console.Console(width=config.scr_width, height=config.panel_height)
-
-        # Initialize message panel
         self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
 
     def render_all(self, dungeon, fov_map, fov_recompute, msg_log, mouse, state, turns):
@@ -92,13 +88,11 @@ class RenderEngine(object):
 
 
     def render_map_tiles(self, game_map, fov_map):
+        # visible = fov_map.fov[:]
+
         for y in range(game_map.height):
             for x in range(game_map.width):
-                # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-                # This function is slow
-                visible = tcod.map_is_in_fov(m=fov_map, x=x, y=y)
-
-                # visible = fov_map.fov
+                visible = fov_map.fov[y, x]
 
                 wall = game_map.tiles[x][y].block_sight
 
@@ -160,9 +154,7 @@ class RenderEngine(object):
 
     def draw_entity(self, entity, fov_map, game_map):
         # Draw an entity on the console
-
-        # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-        entity_in_fov = tcod.map_is_in_fov(fov_map, entity.x, entity.y)
+        entity_in_fov = fov_map.fov[entity.y, entity.x]
         stair_entity = ((entity.stair_down or entity.stair_up) and game_map.tiles[entity.x][entity.y].explored)
 
         if entity_in_fov or stair_entity:
@@ -214,13 +206,11 @@ class RenderEngine(object):
 
         self.msg_panel.blit(
             dest=self.root,
-            # dest_x=0, dest_y=config.panel_y,
             dest_x=0, dest_y=0,
             src_x=0, src_y=0,
             width=config.scr_width,
             height=config.msg_height,
         )
-
 
     def render_status_bar(self, dungeon, fov_map, mouse, turns):
         hero = dungeon.hero
@@ -301,12 +291,6 @@ def get_names_under_mouse(mouse, entities, fov_map):
     # note: Due to the message console - we have to offset the y.
     x, y = mouse.cx, mouse.cy - config.msg_height
 
-    # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-    names = [e.name for e in entities
-             if e.x == x and e.y == y
-             and tcod.map_is_in_fov(m=fov_map, x=e.x, y=e.y)
-             ]
-
+    names = [e.name for e in entities if e.x == x and e.y == y and fov_map.fov[e.y, e.x]]
     names = ', '.join(names)
-
     return names.capitalize()

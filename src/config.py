@@ -43,7 +43,15 @@ max_monsters_per_map = 20
 max_monsters_weights = [[2, 1], [3, 4], [5, 6]]
 troll_chances = [[15, 3], [30, 5], [60, 7]]
 
+# tcod.FOV_BASIC: Simple ray-cast implementation.
+# tcod.FOV_DIAMOND
+# tcod.FOV_SHADOW: Recursive shadow caster.
+# tcod.FOV_PERMISSIVE(n): n starts at 0 (most restrictive) and goes up to 8 (most permissive.)
+# tcod.FOV_RESTRICTIVE
+
 fov_algorithm = 0              # 0 is default alg tcod uses
+# fov_algorithm = tcod.FOV_BASIC
+
 fov_light_walls = True          # Light up walls we see
 fov_radius = 10                # How far can we see?
 

@@ -38,8 +38,7 @@ def cast_lightning(*args, **kwargs):
     closest_distance = max_range + 1
 
     for entity in entities:
-        # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-        if entity.fighter and entity != caster and tcod.map_is_in_fov(m=fov_map, x=entity.x, y=entity.y):
+        if entity.fighter and entity != caster and fov_map.fov[entity.y, entity.x]:
             distance = caster.distance_to(entity)
 
             if distance < closest_distance:
@@ -74,8 +73,7 @@ def cast_fireball(*args, **kwargs):
 
     results = []
 
-    # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-    if not tcod.map_is_in_fov(m=fov_map, x=target_x, y=target_y):
+    if not fov_map.fov[target_y, target_x]:
         results.append({
             'consumed': False,
             'msg': 'You cannot target a tile outside your field of view.'
@@ -105,8 +103,7 @@ def cast_confuse(*args, **kwargs):
 
     results = []
 
-    # Deprecated since version 4.5: Use tcod.map.Map.fov to check this property.
-    if not tcod.map_is_in_fov(m=fov_map, x=target_x, y=target_y):
+    if not fov_map.fov[target_y, target_x]:
         results.append({
             'consumed': False,
             'msg': 'You cannot target a tile outside your field of view.'
