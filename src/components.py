@@ -1,4 +1,5 @@
 from random import randint
+from . import config
 from .equipment_slots import EquipmentSlots
 
 
@@ -146,8 +147,10 @@ class Item(object):
 
 
 class Level(object):
-    def __init__(self, current_lvl=1, current_xp=0, lvl_up_base=200, lvl_up_factor=150):
-        # Note: Consider putting defaults in constants dict.
+    def __init__(self, current_lvl=config.default_lvl,
+                 current_xp=config.starting_xp,
+                 lvl_up_base=config.lvl_up_base,
+                 lvl_up_factor=config.lvl_up_factor):
         self.current_lvl = current_lvl
         self.current_xp = current_xp
         self.lvl_up_base = lvl_up_base
@@ -160,19 +163,17 @@ class Level(object):
         return self.lvl_up_base + self.current_lvl * self.lvl_up_factor
 
     def add_xp(self, xp):
+        if xp < 0:
+            raise ValueError('xp must be greater than or equal to 0!')
+
         self.current_xp += xp
 
         if self.current_xp > self.xp_to_next_lvl:
-            # Maybe remove this line, seems like we are short-changing the player
-            # self.current_xp -= self.xp_to_next_lvl
-
-            # For now - reset the XP
-            self.current_xp = 0
+            self.current_xp -= self.xp_to_next_lvl
             self.current_lvl += 1
-
             return True
-        else:
-            return False
+
+        return False
 
 
 class Equippable(object):

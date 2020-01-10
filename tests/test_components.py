@@ -1,6 +1,7 @@
 import pytest
 import tcod
 from ..src import components
+from ..src import config
 from ..src import entity
 from ..src import render_functions
 
@@ -201,9 +202,64 @@ def test_Item_init__no_args():
 
 """ Tests for class Level(object): """
 
-# def test_init_():
-# def test_xp_to_next_lvl():
-# def test_add_xp():
+def test_Level_init__no_args():
+    l = components.Level()
+    assert l.current_lvl == config.default_lvl
+    assert l.current_xp == config.starting_xp
+    assert l.lvl_up_base == config.lvl_up_base
+    assert l.lvl_up_factor == config.lvl_up_factor
+
+
+def test_xp_to_next_lvl():
+    l = components.Level()
+    result = l.xp_to_next_lvl
+    expected = l.lvl_up_base + l.current_lvl * l.lvl_up_factor
+    assert result == expected
+
+
+def test_add_xp__negative_xp_raises_exception():
+    l = components.Level()
+    with pytest.raises(ValueError):
+        l.add_xp(-1)
+
+
+def test_add_xp__at_threshold_returns_False():
+    l = components.Level()
+    xp = l.xp_to_next_lvl
+    assert l.add_xp(xp) is False
+
+
+def test_add_xp__above_lvl_returns_True():
+    l = components.Level()
+    xp = l.xp_to_next_lvl + 1
+    assert l.add_xp(xp) is True
+
+
+def test_add_xp__above_lvl_increments_lvl():
+    l = components.Level()
+    prev_lvl = l.current_lvl
+    xp = l.xp_to_next_lvl + 1
+    l.add_xp(xp)
+    assert l.current_lvl == prev_lvl + 1
+
+
+def test_add_xp__above_lvl_reset_current_xp_with_remainder():
+    l = components.Level()
+    xp = l.xp_to_next_lvl + 1
+    l.add_xp(xp)
+    assert l.current_xp == 1
+
+
+def test_add_xp__below_lvl_returns_False():
+    l = components.Level()
+    xp = l.xp_to_next_lvl - 1
+    assert l.add_xp(xp) is False
+
+
+def test_add_xp__below_lvl_increases_current_xp():
+    l = components.Level()
+    l.add_xp(1)
+    assert l.current_xp == 1
 
 
 """ Tests for class Equippable(object): """

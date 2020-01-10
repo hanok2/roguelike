@@ -43,6 +43,12 @@ max_monsters_per_map = 20
 max_monsters_weights = [[2, 1], [3, 4], [5, 6]]
 troll_chances = [[15, 3], [30, 5], [60, 7]]
 
+# Level data
+default_lvl = 1
+starting_xp = 0
+lvl_up_base = 200
+lvl_up_factor = 150
+
 # tcod.FOV_BASIC: Simple ray-cast implementation.
 # tcod.FOV_DIAMOND
 # tcod.FOV_SHADOW: Recursive shadow caster.
