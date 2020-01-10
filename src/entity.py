@@ -144,13 +144,13 @@ class Entity(object):
         tcod.path_delete(my_path)
 
     def distance(self, x, y):
-        # get the distance between the entity and an arbitrary point.
+        """ Returns the distance between the entity and an arbitrary point."""
         dx = x - self.x
         dy = y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
-    def distance_to(self, other):
-        dx = other.x - self.x
-        dy = other.y - self.y
-
-        return math.sqrt(dx ** 2 + dy ** 2)
+    def distance_to_entity(self, other):
+        """A wrapper for self.distance - Returns the distance from this entity
+            to the passed entity.
+        """
+        return self.distance(other.x, other.y)

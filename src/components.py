@@ -96,7 +96,7 @@ class ApproachingBehavior(object):
         monster = self.owner
 
         if fov_map.fov[monster.y, monster.x]:
-            if monster.distance_to(target) >= 2:
+            if monster.distance_to_entity(target) >= 2:
                 monster.move_astar(target, game_map)
 
             elif target.fighter.hp > 0:

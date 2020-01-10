@@ -1,8 +1,8 @@
 import pytest
+from pytest_mock import mocker
 from ..src import entity
 from ..src import maps
 from ..src import tile
-
 from .test_death_functions import orc
 from ..src.render_functions import RenderOrder
 from ..src.components import Fighter, Item, Level, Equipment, Equippable, ApproachingBehavior
@@ -234,7 +234,10 @@ def test_distance__1_diagonal_tile_away_returns_something():
     assert result == 1.41
 
 
+def test_Entity_distance_to_entity(mocker, orc):
+    e = entity.Entity(x=1, y=1, char='@', color=None, name='Player')
+    mocker.patch.object(entity.Entity, 'distance')
+    e.distance_to_entity(orc)
 
-
-# def distance_to(self, other):
-# Move to map
+    # Check that it calls Entity.distance with the entity's x/y
+    e.distance.assert_called_once_with(orc.x, orc.y)
