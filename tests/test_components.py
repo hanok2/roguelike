@@ -159,12 +159,33 @@ def test_attack__no_dmg_returns_results(hero, orc):
 
 """ Tests for class ApproachingBehavior(object): """
 
+# Requires some major mocking or testing...
 # def test_take_turn():
+# def take_turn(self, target, fov_map, game_map, entities):
+    # hero is usually target
+    # target needs .x and .y
+
 
 """ Tests for class ConfusedBehavior(object): """
 
-# def test_init_():
-# def test_take_turn():
+def test_ConfusedBehavior_init__(orc):
+    prev_ai = orc.ai
+    cb = components.ConfusedBehavior(prev_ai)
+    assert cb.prev_ai == prev_ai
+    assert cb.num_turns == 10
+
+
+def test_ConfusedBehavior_init__negative_turns_raises_exception(orc):
+    with pytest.raises(ValueError):
+        components.ConfusedBehavior(orc.ai, num_turns=-1)
+
+
+# Requires some major mocking or testing...
+# def test_take_turn__turns_0_returns_result(orc):
+    # cb = components.ConfusedBehavior(orc.ai, num_turns=1)
+    # cb.take_turn()
+
+# def take_turn(self, target, fov_map, game_map, entities):
 
 """ Tests for class Item(object): """
 

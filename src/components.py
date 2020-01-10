@@ -109,6 +109,9 @@ class ApproachingBehavior(object):
 class ConfusedBehavior(object):
     """AI for an entity/monster to move randomly for a set number of turns."""
     def __init__(self, prev_ai, num_turns=10):
+        if num_turns < 0:
+            raise ValueError('num_turns needs to be 0 or greater!')
+
         self.prev_ai = prev_ai
         self.num_turns = num_turns
 
