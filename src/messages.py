@@ -3,6 +3,9 @@ import textwrap
 
 class MsgLog(object):
     def __init__(self, x, width, height):
+        if height < 1:
+            raise ValueError('MsgLog height must be at least 1!')
+
         self.messages = []
         self.x = x
         self.width = width
@@ -13,8 +16,10 @@ class MsgLog(object):
         new_msg_lines = textwrap.wrap(msg, self.width)
 
         for line in new_msg_lines:
-            # If the buffer is full, remove the first line to make room for the new one
-            if len(self.messages) == self.height:
-                del self.messages[0]
-
             self.messages.append(line)
+
+    def current_msgs(self):
+        """Returns the most recent (and relevant) messages. The quantity depends
+            on the height attribute.
+        """
+        return self.messages[-self.height:]
