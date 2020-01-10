@@ -53,7 +53,7 @@ fov_algorithm = 0              # 0 is default alg tcod uses
 # fov_algorithm = tcod.FOV_BASIC
 
 fov_light_walls = True          # Light up walls we see
-fov_radius = 10                # How far can we see?
+fov_radius = 5                # How far can we see?
 
 colors = {
     # 'dark_wall': tcod.Color(0, 0, 100),

@@ -30,12 +30,12 @@ def recompute_fov(fov_map, x, y, radius, light_walls=True, algorithm=0):
 
     # tcod.map_compute_fov( m=fov_map, x=x, y=y, radius=radius, light_walls=light_walls, algo=algorithm)
 
-    # fov_map.compute_fov(
-        # x=x,
-        # y=y,
-        # radius=radius,
-        # light_walls=light_walls,
-        # algorithm=algorithm
-    # )
+    fov_map.compute_fov(
+        x=x,
+        y=y,
+        radius=radius,
+        light_walls=light_walls,
+        algorithm=algorithm
+    )
 
-    fov_map.compute_fov(x=x, y=y)
+    # fov_map.compute_fov(x=x, y=y)
