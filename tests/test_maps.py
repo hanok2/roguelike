@@ -1,4 +1,6 @@
 import pytest
+from pytest_mock import mocker
+
 from ..src import entity
 from ..src import maps
 from ..src import config
@@ -483,12 +485,26 @@ def test_map_make_map__up_and_down_stairs_in_diff_rooms():
     # Need a pathfinding algorithm??
 
 
-# def test_map_populate():
-    # This is probably not important to test until much later
-    # Test that it calls place_monsters and place_items?
-    # Test for minimum amount of monsters/items?
-    # Test for at least 1 monster?
-    # Test for at least 1 item?
+def test_map_populate__calls_place_entities_and_items(mocker):
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    mocker.patch.object(m, 'place_monsters')
+    mocker.patch.object(m, 'place_items')
+    m.populate()
+
+    m.place_monsters.assert_called_once_with()
+    m.place_items.assert_called()
+
+
+def test_map_populate__no_rooms_does_not_call_place_items(mocker):
+    m = maps.Map(width=50, height=50)
+    mocker.patch.object(m, 'place_monsters')
+    mocker.patch.object(m, 'place_items')
+    m.populate()
+
+    m.place_monsters.assert_called_once_with()
+    assert not m.place_items.called
+
 
 def test_map_is_occupied__not_occupied_returns_False():
     # Test if there are any entities at the coordinates
