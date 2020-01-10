@@ -1,6 +1,6 @@
-import os
 import shelve
 from . import config
+
 
 def save_game(dungeon, msg_log, state, turns):
     with shelve.open(config.savefile, 'n') as data_file:
@@ -11,9 +11,6 @@ def save_game(dungeon, msg_log, state, turns):
 
 
 def load_game():
-    if not os.path.isfile(config.savefile):
-        raise FileNotFoundError
-
     with shelve.open(config.savefile, 'r') as data_file:
         dungeon = data_file['dungeon']
         msg_log = data_file['msg_log']
