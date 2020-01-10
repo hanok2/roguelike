@@ -3,7 +3,12 @@ import tcod
 from ..src import components
 from ..src import config
 from ..src import entity
+from ..src import equipment_slots
 from ..src import render_functions
+
+POW_BONUS = 100
+DEF_BONUS = 500
+HPX_BONUS = 1000
 
 @pytest.fixture
 def hero():
@@ -17,7 +22,6 @@ def hero():
         equipment=None,
         fighter=fighter_comp
     )
-
 
 @pytest.fixture
 def orc():
@@ -33,6 +37,24 @@ def orc():
         fighter=fighter_comp,
         ai=ai_comp
     )
+
+@pytest.fixture
+def ring_of_power():
+    equippable_comp = components.Equippable(
+        equipment_slots.EquipmentSlots.OFF_HAND,
+        power_bonus=POW_BONUS,
+        defense_bonus=DEF_BONUS,
+        max_hp_bonus=HPX_BONUS
+    )
+
+    return entity.Entity(
+        x=0, y=0,
+        char='o',
+        color=tcod.white,
+        name='Ring of Power',
+        equippable=equippable_comp
+    )
+
 
 
 """ Tests for class Fighter(object): """
@@ -291,12 +313,95 @@ def test_Equippable_init__negative_max_hp_bonus_raises_exception():
         components.Equippable('slot', max_hp_bonus=-1)
 
 
-
 """ Tests for class Equipment(object): """
 
-# def test_Equipment_init():
+def test_Equipment_init():
+    e = components.Equipment()
 
-# def test_Equipment_max_hp_bonus():
-# def test_Equipment_power_bonus():
-# def test_Equipment_defense_bonus():
-# def test_Equipment_toggle_equip():
+    assert e.main_hand is None
+    assert e.off_hand is None
+
+
+def test_Equipment_max_hp_bonus__nothing_equipped_returns_0():
+    e = components.Equipment()
+    assert e.max_hp_bonus == 0
+
+
+def test_Equipment_max_hp_bonus__main_hand_bonus(ring_of_power):
+    e = components.Equipment(main_hand=ring_of_power)
+    result = e.max_hp_bonus
+    assert result == HPX_BONUS
+
+
+def test_Equipment_max_hp_bonus__off_hand_bonus(ring_of_power):
+    e = components.Equipment(off_hand=ring_of_power)
+    result = e.max_hp_bonus
+    assert result == HPX_BONUS
+
+
+def test_Equipment_max_hp_bonus__both_hands_bonus(ring_of_power):
+    e = components.Equipment(main_hand=ring_of_power, off_hand=ring_of_power)
+    result = e.max_hp_bonus
+    assert result == HPX_BONUS * 2
+
+
+def test_Equipment_power_bonus__nothing_equipped_returns_0():
+    e = components.Equipment()
+    assert e.power_bonus == 0
+
+
+def test_Equipment_power_bonus__main_hand_bonus(ring_of_power):
+    e = components.Equipment(main_hand=ring_of_power)
+    result = e.power_bonus
+    assert result == POW_BONUS
+
+
+def test_Equipment_power_bonus__off_hand_bonus(ring_of_power):
+    e = components.Equipment(off_hand=ring_of_power)
+    result = e.power_bonus
+    assert result == POW_BONUS
+
+
+def test_Equipment_power_bonus__both_hands_bonus(ring_of_power):
+    e = components.Equipment(main_hand=ring_of_power, off_hand=ring_of_power)
+    result = e.power_bonus
+    assert result == POW_BONUS * 2
+
+
+def test_Equipment_defense_bonus__nothing_equipped_returns_0():
+    e = components.Equipment()
+    assert e.defense_bonus == 0
+
+
+def test_Equipment_defense_bonus__main_hand_bonus(ring_of_power):
+    e = components.Equipment(main_hand=ring_of_power)
+    result = e.defense_bonus
+    assert result == DEF_BONUS
+
+
+def test_Equipment_defense_bonus__off_hand_bonus(ring_of_power):
+    e = components.Equipment(off_hand=ring_of_power)
+    result = e.defense_bonus
+    assert result == DEF_BONUS
+
+
+def test_Equipment_defense_bonus__both_hands_bonus(ring_of_power):
+    e = components.Equipment(main_hand=ring_of_power, off_hand=ring_of_power)
+    result = e.defense_bonus
+    assert result == DEF_BONUS * 2
+
+
+def test_Equipment_toggle_equip__nothing_equipped(ring_of_power):
+    e = components.Equipment()
+    results = e.toggle_equip(ring_of_power)
+
+    # Nothing equipped - equipping returns the slot
+    assert results == [{'equipped': e.off_hand}]
+
+
+def test_Equipment_toggle_equip__unequips_item(ring_of_power):
+    e = components.Equipment(off_hand=ring_of_power)
+    results = e.toggle_equip(ring_of_power)
+
+    # Dequipping an item returns the item
+    assert results == [{'dequipped': ring_of_power}]
