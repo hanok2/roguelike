@@ -47,6 +47,9 @@ class Fighter(object):
         return self.base_defense + bonus
 
     def take_dmg(self, amt):
+        if amt < 0:
+            raise ValueError('take_dmg amt must be a positive number!')
+
         results = []
         self.hp -= amt
 
@@ -59,6 +62,8 @@ class Fighter(object):
         return results
 
     def heal(self, amt):
+        if amt < 0:
+            raise ValueError('heal amt must be a positive number!')
         self.hp += amt
 
         if self.hp > self.max_hp:

@@ -1,5 +1,38 @@
 import pytest
+import tcod
 from ..src import components
+from ..src import entity
+from ..src import render_functions
+
+@pytest.fixture
+def hero():
+    fighter_comp = components.Fighter(hp=100, defense=1, power=2)
+    return entity.Entity(
+        x=0, y=0,
+        char='@',
+        color=None,
+        name='Player',
+        human=True,
+        equipment=None,
+        fighter=fighter_comp
+    )
+
+
+@pytest.fixture
+def orc():
+    fighter_comp = components.Fighter(hp=10, defense=1, power=3, xp=35)
+    ai_comp = components.ApproachingBehavior()
+    return entity.Entity(
+        x=0, y=0,
+        char='o',
+        color=tcod.desaturated_green,
+        name='Orc',
+        blocks=True,
+        render_order=render_functions.RenderOrder.ACTOR,
+        fighter=fighter_comp,
+        ai=ai_comp
+    )
+
 
 """ Tests for class Fighter(object): """
 
@@ -33,11 +66,95 @@ def test_init__xp_lt_0_raises_exception():
 
 
 # def test_max_hp():
+    # How to test w/o owner?
 # def test_power():
+    # How to test w/o owner?
 # def test_defense():
-# def test_take_dmg():
-# def test_heal():
-# def test_attack():
+    # How to test w/o owner?
+
+
+def test_take_dmg__reduces_hp():
+    hp = 10
+    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    f.take_dmg(1)
+    assert f.hp == 9
+
+
+def test_take_dmg__negative_dmg_raises_exception():
+    f = components.Fighter(hp=10, defense=0, power=0, xp=0)
+    with pytest.raises(ValueError):
+        f.take_dmg(-1)
+
+
+def test_take_dmg__returns_empty_results():
+    hp = 10
+    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    result = f.take_dmg(1)
+    assert not result
+
+
+def test_take_dmg__lethal_dmg_returns_dead_results():
+    hp = 10
+    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    f.owner = 'owner'
+    result = f.take_dmg(15)
+    result = result.pop()  # get the dict from the list
+    assert result['xp'] == 0
+    assert result['dead'] == 'owner'
+
+
+def test_heal__hp_is_recovered():
+    hp = 10
+    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    f.owner = None
+    f.take_dmg(1)
+    f.heal(1)
+    assert f.hp == hp
+
+
+def test_heal__excess_hp_doesnt_go_over_max():
+    f = components.Fighter(hp=10, defense=0, power=0, xp=0)
+    f.owner = None
+    f.heal(100)
+    assert f.hp == f.max_hp
+
+
+def test_heal__negative_amt_raises_exception():
+    f = components.Fighter(hp=10, defense=0, power=0, xp=0)
+    f.owner = None
+    with pytest.raises(ValueError):
+        f.heal(-1)
+
+# Revamp once we figure out owner co-dependence
+def test_attack__target_takes_dmg(hero, orc):
+    dmg = hero.fighter.power - orc.fighter.defense
+    expected_hp = orc.fighter.hp - dmg
+    hero.fighter.attack(orc)
+    assert orc.fighter.hp == expected_hp
+
+
+def test_attack__dmg_returns_results(hero, orc):
+    results = hero.fighter.attack(orc)
+    results = results.pop()  # Get the dict from the list
+    assert len(results) == 1
+    assert results['msg'] == 'Player attacks Orc!'
+
+
+def test_attack__target_doesnt_take_dmg(hero, orc):
+    hero.fighter.base_power = 1
+    dmg = hero.fighter.power - orc.fighter.defense
+    assert dmg == 0
+
+    expected_hp = orc.fighter.hp
+    hero.fighter.attack(orc)
+    assert orc.fighter.hp == expected_hp
+
+
+def test_attack__no_dmg_returns_results(hero, orc):
+    hero.fighter.base_power = 1
+    results = hero.fighter.attack(orc)
+    results = results.pop()  # Get the dict from the list
+    assert results['msg'] == 'Player attacks Orc... But does no damage.'
 
 
 """ Tests for class ApproachingBehavior(object): """

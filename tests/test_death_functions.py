@@ -33,6 +33,7 @@ def orc():
         ai=ai_comp
     )
 
+
 def test_kill_hero__char_is_corpse(basic_hero):
     death_functions.kill_hero(basic_hero)
     assert basic_hero.char == '%'
