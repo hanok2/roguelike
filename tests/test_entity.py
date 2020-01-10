@@ -110,8 +110,9 @@ def test_Entity_move__negative_values():
     assert e.y == 12
 
 
-# def move_towards(self, target_x, target_y, game_map, entities):
+# def move_towards(self, target_x, target_y, game_map):
     # Move to map???
+
 # def move_astar(self, target, entities, game_map):
     # Move to map???
 

@@ -90,15 +90,14 @@ class Fighter(object):
 
 class ApproachingBehavior(object):
     """AI for an entity/monster to approach the hero when within line of sight"""
-    def take_turn(self, target, fov_map, game_map, entities):
+    def take_turn(self, target, fov_map, game_map):
         results = []
 
         monster = self.owner
 
         if fov_map.fov[monster.y, monster.x]:
             if monster.distance_to(target) >= 2:
-                # monster.move_towards(target.x, target.y, game_map, entities)
-                monster.move_astar(target, entities, game_map)
+                monster.move_astar(target, game_map)
 
             elif target.fighter.hp > 0:
                 attack_results = monster.fighter.attack(target)

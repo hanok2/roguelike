@@ -72,7 +72,10 @@ class Entity(object):
         self.x += dx
         self.y += dy
 
-    def move_towards(self, target_x, target_y, game_map, entities):
+    def move_towards(self, target_x, target_y, game_map):
+        """Very simple movement function to take the most direct path toward
+            the hero. No diagonal movement?
+        """
         dx = target_x - self.x
         dy = target_y - self.y
         dist = math.sqrt(dx ** 2 + dy ** 2)
@@ -86,20 +89,25 @@ class Entity(object):
         if not (blocked_at or occupied):
             self.move(dx, dy)
 
-    def move_astar(self, target, entities, game_map):
+    def move_astar(self, target, game_map):
         # Create a FOV map that has the dimensions of the map
         fov = tcod.map_new(game_map.width, game_map.height)
 
         # Scan the current map each turn and set all the walls as unwalkable
         for y1 in range(game_map.height):
             for x1 in range(game_map.width):
-                tcod.map_set_properties(fov, x1, y1, not game_map.tiles[x1][y1].block_sight,
-                                           not game_map.tiles[x1][y1].blocked)
+                tcod.map_set_properties(
+                    fov,
+                    x1,
+                    y1,
+                    not game_map.tiles[x1][y1].block_sight,
+                    not game_map.tiles[x1][y1].blocked
+                )
 
         # Scan all the objects to see if there are objects that must be navigated around
         # Check also that the object isn't self or the target (so that the start and the end points are free)
         # The AI class handles the situation if self is next to the target so it will not use this A* function anyway
-        for entity in entities:
+        for entity in game_map.entities:
             if entity.blocks and entity != self and entity != target:
                 # Set the tile as a wall so it must be navigated around
                 tcod.map_set_properties(fov, entity.x, entity.y, True, False)
@@ -124,7 +132,7 @@ class Entity(object):
         else:
             # Keep the old move function as a backup so that if there are no paths (for example another monster blocks a corridor)
             # it will still try to move towards the player (closer to the corridor opening)
-            self.move_towards(target.x, target.y, game_map, entities)
+            self.move_towards(target.x, target.y, game_map)
 
             # Delete the path to free memory
         tcod.path_delete(my_path)

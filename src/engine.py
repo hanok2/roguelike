@@ -443,7 +443,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                         hero,
                         fov_map,
                         current_map,
-                        current_map.entities
                     )
 
                     for result in turn_results:
