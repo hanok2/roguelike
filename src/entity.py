@@ -76,7 +76,7 @@ class Entity(object):
         dy = int(round(dy / dist))
 
         blocked_at = game_map.is_blocked(self.x + dx, self.y + dy)
-        occupied = get_blockers_at_loc(entities, self.x + dx, self.y + dy)
+        occupied = game_map.get_blocker_at_loc(self.x + dx, self.y + dy)
 
         if not (blocked_at or occupied):
             self.move(dx, dy)
@@ -132,12 +132,3 @@ class Entity(object):
         dx = other.x - self.x
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
-
-def get_blockers_at_loc(entities, dest_x, dest_y):
-    for entity in entities:
-        matching_coords = entity.x == dest_x and entity.y == dest_y
-
-        if entity.blocks and matching_coords:
-            return entity
-
-    return None

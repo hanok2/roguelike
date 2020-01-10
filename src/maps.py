@@ -348,3 +348,15 @@ class Map(object):
         )
         self.entities.append(stair_up)
         return stair_up
+
+    def get_blocker_at_loc(self, x, y):
+        """Scans through all entities on map that match the x, y coordinates and
+            if an entity matches and blocks - we return it.
+            Otherwise, returns None.
+        """
+        blockers = [e for e in self.entities if e.x == x and e.y == y]
+        blockers = [e for e in blockers if e.blocks]
+
+        if blockers:
+            return blockers.pop()
+        return None

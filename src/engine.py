@@ -5,7 +5,6 @@ from . import logger
 from . import render_functions
 from .data_loaders import load_game, save_game
 from .death_functions import kill_monster, kill_hero
-from .entity import get_blockers_at_loc
 from .fov import initialize_fov, recompute_fov
 from .states import States
 from .input_handling import handle_keys, handle_mouse, handle_main_menu
@@ -188,7 +187,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             dest_y = hero.y + dy
 
             if not current_map.is_blocked(dest_x, dest_y):
-                target = get_blockers_at_loc(current_map.entities, dest_x, dest_y)
+                target = current_map.get_blocker_at_loc(dest_x, dest_y)
 
                 if target:
                     log.debug('Attacking.')

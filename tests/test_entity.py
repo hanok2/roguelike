@@ -97,7 +97,3 @@ def test_Entity_init__human():
 
 # def distance_to(self, other):
 # Move to map
-
-
-# def get_blockers_at_loc(entities, dest_x, dest_y):
-# Move to map

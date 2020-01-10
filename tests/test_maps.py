@@ -651,3 +651,22 @@ def test_map_place_stairs_up_on_wall_raises_exception():
     x, y = 0, 0
     with pytest.raises(ValueError):
         m.place_stairs_up(x, y)
+
+
+def test_map_get_blocker_at_loc__blocked_returns_entity():
+    m = maps.Map(width=50, height=50)
+    m.make_map()
+    m.place_monsters()
+
+    # Note - might be fragile - depending on monsters added last
+    monster = m.entities[-1]
+
+    print(monster.name)
+    result = m.get_blocker_at_loc(monster.x, monster.y)
+    assert result == monster
+
+
+def test_map_get_blocker_at_loc__not_blocked_returns_None():
+    m = maps.Map(width=50, height=50)
+    result = m.get_blocker_at_loc(0, 0)
+    assert result is None
