@@ -187,9 +187,17 @@ def test_ConfusedBehavior_init__negative_turns_raises_exception(orc):
 
 # def take_turn(self, target, fov_map, game_map, entities):
 
+
 """ Tests for class Item(object): """
 
-# def test_init_():
+
+def test_Item_init__no_args():
+    i = components.Item()
+    assert i.use_func is None
+    assert i.targeting is False
+    assert i.targeting_msg is None
+    assert i.func_kwargs == {}
+
 
 """ Tests for class Level(object): """
 
