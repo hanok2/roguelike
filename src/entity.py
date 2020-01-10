@@ -145,9 +145,12 @@ class Entity(object):
 
     def distance(self, x, y):
         # get the distance between the entity and an arbitrary point.
-        return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
+        dx = x - self.x
+        dy = y - self.y
+        return math.sqrt(dx ** 2 + dy ** 2)
 
     def distance_to(self, other):
         dx = other.x - self.x
         dy = other.y - self.y
+
         return math.sqrt(dx ** 2 + dy ** 2)

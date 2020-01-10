@@ -211,11 +211,30 @@ def test_Entity_move_towards__target_SW(open_map):
     assert e.x == 4
     assert e.y == 6
 
+
 # def move_astar(self, target, entities, game_map):
     # Move to map???
 
-# def distance(self, x, y):
-# Move to map
+
+def test_distance__same_point_returns_0():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    result = e.distance(0, 0)
+    assert result == 0
+
+
+def test_distance__1_tile_away_returns_1():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    result = e.distance(1, 0)
+    assert result == 1
+
+
+def test_distance__1_diagonal_tile_away_returns_something():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    result = round(e.distance(1, 1), 2)
+    assert result == 1.41
+
+
+
 
 # def distance_to(self, other):
 # Move to map
