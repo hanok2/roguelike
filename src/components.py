@@ -1,10 +1,18 @@
 from random import randint
-import tcod
 from .equipment_slots import EquipmentSlots
 
 
 class Fighter(object):
     def __init__(self, hp, defense, power, xp=0):
+        if hp <= 0:
+            raise ValueError('Fighter hp must be greater than 0!')
+        elif defense < 0:
+            raise ValueError('Fighter defense must be greater than or equal to 0!')
+        elif power < 0:
+            raise ValueError('Fighter power must be greater than or equal to 0!')
+        elif xp < 0:
+            raise ValueError('Fighter xp must be greater than or equal to 0!')
+
         self.base_max_hp = hp
         self.hp = hp
         self.base_defense = defense
@@ -136,7 +144,6 @@ class Level(object):
         self.current_xp = current_xp
         self.lvl_up_base = lvl_up_base
         self.lvl_up_factor = lvl_up_factor
-
 
     @property
     def xp_to_next_lvl(self):
