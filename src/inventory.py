@@ -1,10 +1,10 @@
-import tcod
-
 class Inventory(object):
     def __init__(self, capacity):
+        if capacity <= 0:
+            raise ValueError('capacity needs to be a positive number!')
+
         self.capacity = capacity
         self.items = []
-
 
     def add_item(self, item):
         results = []
