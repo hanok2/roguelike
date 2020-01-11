@@ -48,13 +48,12 @@ def ring_of_power():
     )
 
     return entity.Entity(
-        x=0, y=0,
+        x=2, y=3,
         char='o',
         color=tcod.white,
         name='Ring of Power',
         equippable=equippable_comp
     )
-
 
 
 """ Tests for class Fighter(object): """

@@ -1,8 +1,23 @@
 import pytest
+from ..src import components
+from ..src import entity
 from ..src import inventory
 from .test_components import ring_of_power
 
 """ Tests for Inventory """
+
+# todo: Replace this with player generator!!!!!!!!!!!!!!!!!!
+@pytest.fixture
+def hero():
+    return entity.Entity(
+        x=0, y=0,
+        char='@',
+        color=None,
+        name='Player',
+        human=True,
+        equipment=components.Equipment(),
+        inv=inventory.Inventory(26)
+    )
 
 
 def test_Inventory_init__negative_capacity_raises_exception():
@@ -120,4 +135,72 @@ def test_Inventory_rm_item__DNE_returns_False(ring_of_power):
     assert i.rm_item(ring_of_power) is False
 
 
-# def test_Inventory_drop(self, item):
+# todo: Simplify this???
+def test_Inventory_drop__item_DNE_raise_exception(ring_of_power, hero):
+    with pytest.raises(ValueError):
+        hero.inv.drop(ring_of_power)
+
+
+def test_Inventory_drop__returns_result_msg(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    results = hero.inv.drop(ring_of_power).pop()
+    assert results['msg'] == 'You dropped the Ring of Power.'
+
+
+def test_Inventory_drop__returns_result_item_dropped(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    results = hero.inv.drop(ring_of_power).pop()
+    assert results['item_dropped'] == ring_of_power
+
+
+def test_Inventory_drop__updates_item_xy(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    hero.inv.drop(ring_of_power)
+    assert ring_of_power.x == hero.x
+    assert ring_of_power.y == hero.y
+
+
+@pytest.mark.skip(reason='need to mock')
+def test_Inventory_drop__equipped_item_called_drop_equipped(ring_of_power, hero):
+    pass
+
+
+# Todo: Revise the results system! We can see how ugly this is.
+def test_Inventory_drop__equipped_item__results(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    hero.equipment.toggle_equip(ring_of_power)
+    results = hero.inv.drop(ring_of_power)
+
+    assert results[0]['dequipped'] == ring_of_power
+
+    assert results[1]['msg'] == 'You dropped the Ring of Power.'
+    assert results[1]['item_dropped'] == ring_of_power
+
+
+def test_Inventory_drop__equipped_item__updates_item_xy(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    hero.equipment.toggle_equip(ring_of_power)
+    hero.inv.drop(ring_of_power)
+
+    assert ring_of_power.x == hero.x
+    assert ring_of_power.y == hero.y
+
+def test_Inventory_drop__equipped_item__item_dropped(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    hero.equipment.toggle_equip(ring_of_power)
+
+    hero.inv.drop(ring_of_power)
+    assert ring_of_power not in hero.inv.items
+
+
+def test_Inventory_chk_equipped__equipped_item_returns_result(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    hero.equipment.toggle_equip(ring_of_power)
+
+    results = hero.inv.chk_equipped(ring_of_power)
+    assert results[0]['dequipped'] == ring_of_power
+
+
+def test_Inventory_chk_equipped__not_equipped_returns_empty_result(ring_of_power, hero):
+    hero.inv.add_item(ring_of_power)
+    assert hero.inv.chk_equipped(ring_of_power) == []
