@@ -1,3 +1,5 @@
+INV_FULL_MSG = 'You cannot carry any more, your inventory is full.'
+
 class Inventory(object):
     def __init__(self, capacity):
         if capacity <= 0:
@@ -10,14 +12,16 @@ class Inventory(object):
         results = []
 
         if len(self.items) >= self.capacity:
+            # todo: Move msg to constant
             results.append({
                 'item_added': None,
-                'msg': 'You cannot carry any more, your inventory is full.'
+                'msg': INV_FULL_MSG
             })
         else:
+            # todo: Move msg to constant
             results.append({
                 'item_added': item,
-                'msg': 'You pick up the {}!'.format(item.name)
+                'msg': 'You pick up the {}.'.format(item.name)
             })
 
             self.items.append(item)
