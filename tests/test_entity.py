@@ -121,6 +121,27 @@ def test_Entity_move__negative_values():
     assert e.y == 12
 
 
+def test_calc_move__same_point_returns_0_0():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    dx, dy = e.calc_move(0, 0)
+    assert dx == 0
+    assert dy == 0
+
+
+def test_calc_move__south():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    dx, dy = e.calc_move(0, 1)
+    assert dx == 0
+    assert dy == 1
+
+
+def test_calc_move__knights_jump_south():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    dx, dy = e.calc_move(1, 2)
+    assert dx == 0
+    assert dy == 1
+
+
 def test_Entity_move_towards__negative_target_x_raises_exception(open_map):
     e = entity.Entity(x=10, y=10, char='@', color=None, name='Player')
     with pytest.raises(ValueError):

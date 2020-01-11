@@ -72,19 +72,27 @@ class Entity(object):
         self.x += dx
         self.y += dy
 
+    def calc_move(self, target_x, target_y):
+        """Calculates how to get to a target coordinate from the entity's
+            coordinates. Returns a (dx, dy) tuple representing the change in
+            x and y required to get there.
+        """
+        dist = self.distance(target_x, target_y)
+        if dist == 0:
+            return 0, 0
+
+        dx = int(round((target_x - self.x) / dist))
+        dy = int(round((target_y - self.y) / dist))
+        return dx, dy
+
     def move_towards(self, target_x, target_y, game_map):
         """Very simple movement function to take the most direct path toward
-            the hero. No diagonal movement?
+            the hero.
         """
         if target_x < 0 or target_y < 0:
             raise ValueError('Target coordinates cannot be negative! ({}, {})'.format(target_x, target_y))
 
-        dx = target_x - self.x
-        dy = target_y - self.y
-        dist = math.sqrt(dx ** 2 + dy ** 2)
-
-        dx = int(round(dx / dist))
-        dy = int(round(dy / dist))
+        dx, dy = self.calc_move(target_x, target_y)
 
         dest_x = self.x + dx
         dest_y = self.y + dy
