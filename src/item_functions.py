@@ -1,5 +1,8 @@
-import tcod
 from .components import ConfusedBehavior
+
+# Is *args really necessary for these?
+# If the entity is expected in args[0] is there a better way?
+#   can we pass the entity in kwargs instead?
 
 
 def heal(*args, **kwargs):
@@ -37,6 +40,7 @@ def cast_lightning(*args, **kwargs):
     target = None
     closest_distance = max_range + 1
 
+    # Export to map? Instead of importing entities/fov_map, just import game_map
     for entity in entities:
         if entity.fighter and entity != caster and fov_map.fov[entity.y, entity.x]:
             distance = caster.distance_to(entity)
@@ -87,15 +91,14 @@ def cast_fireball(*args, **kwargs):
 
     for entity in entities:
         if entity.distance(target_x, target_y) <= radius and entity.fighter:
-            results.append({
-                'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)
-            })
+            results.append({'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)})
             results.extend(entity.fighter.take_dmg(dmg))
 
     return results
 
 
 def cast_confuse(*args, **kwargs):
+    # Convert to [] notation
     entities = kwargs.get('entities')
     fov_map = kwargs.get('fov_map')
     target_x = kwargs.get('target_x')
