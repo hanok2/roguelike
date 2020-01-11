@@ -74,8 +74,50 @@ def test_Inventory_add_item_outside_capacity_results_item_added(ring_of_power):
     assert result['item_added'] is None
 
 
-# def test_Inventory_use(self, item_entity, **kwargs):
+@pytest.mark.skip(reason='Need to flesh this test out more - need resources.')
+def test_Inventory_use():
+    pass
+    # Needs item_entity with item_comp
+    # Test consumable items (scrolls/potions)
+    # Test equippable items (shield/sword)
+    # Test targetable items (confuse monster/lightning)
+    # Test return results
 
-# def test_Inventory_rm_item(self, item):
+
+# todo: Add multiple items to inventory for this test
+def test_Inventory_rm_item__in_inv_items_decreases(ring_of_power):
+    i = inventory.Inventory(1)
+    i.add_item(ring_of_power)
+    i.rm_item(ring_of_power)
+    assert i.items == []
+
+
+# todo: Add multiple items to inventory for this test
+def test_Inventory_rm_item__in_inv_removes_item(ring_of_power):
+    i = inventory.Inventory(1)
+    i.add_item(ring_of_power)
+    i.rm_item(ring_of_power)
+    assert ring_of_power not in i.items
+
+
+# todo: Add multiple items to inventory for this test
+def test_Inventory_rm_item__in_inv_returns_True(ring_of_power):
+    i = inventory.Inventory(1)
+    i.add_item(ring_of_power)
+    assert i.rm_item(ring_of_power)
+
+
+# todo: Add multiple items to inventory for this test
+def test_Inventory_rm_item__DNE_items_remains_same(ring_of_power):
+    i = inventory.Inventory(1)
+    i.rm_item(ring_of_power)
+    assert i.items == []
+
+
+# todo: Add multiple items to inventory for this test
+def test_Inventory_rm_item__DNE_returns_False(ring_of_power):
+    i = inventory.Inventory(1)
+    assert i.rm_item(ring_of_power) is False
+
 
 # def test_Inventory_drop(self, item):

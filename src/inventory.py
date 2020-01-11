@@ -69,7 +69,10 @@ class Inventory(object):
         return results
 
     def rm_item(self, item):
+        if item not in self.items:
+            return False
         self.items.remove(item)
+        return True
 
     def drop(self, item):
         results = []
