@@ -1,40 +1,14 @@
-import tcod
 from . import config
-from . import factory
 from . import maps
-from .entity import Entity
-from .components import Fighter, Level, Equipment
-from .inventory import Inventory
+from . import player
 from .messages import MsgLog
-from .render_functions import RenderOrder
 from .states import States
 
 
+# todo: Convert to a Game object, tracking all game data....
 def get_game_data():
-    # Player components
-    fighter_comp = Fighter(hp=100, defense=1, power=2)
-    inv_comp = Inventory(26)
-    lvl_comp = Level()
-    equipment_comp = Equipment()
-
-    # Create entities
-    hero = Entity(
-        0, 0,
-        '@',
-        tcod.white,
-        'Player',
-        blocks=True,
-        render_order=RenderOrder.ACTOR,
-        fighter=fighter_comp,
-        inv=inv_comp,
-        lvl=lvl_comp,
-        equipment=equipment_comp,
-        human=True
-
-    )
-    dagger = factory.mk_entity('dagger', 0, 0)
-    hero.inv.add_item(dagger)
-    hero.equipment.toggle_equip(dagger)
+    # Create the hero
+    hero = player.get_hero()
 
     # Initialize the Dungeon
     dungeon = maps.Dungeon(hero)
