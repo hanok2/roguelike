@@ -4,7 +4,6 @@ from .components import ConfusedBehavior
 # If the entity is expected in args[0] is there a better way?
 #   can we pass the entity in kwargs instead?
 
-
 def heal(*args, **kwargs):
     # Entity is first arg in args
     # 'amt' is required in kwargs
@@ -30,10 +29,10 @@ def heal(*args, **kwargs):
 
 def cast_lightning(*args, **kwargs):
     caster = args[0]  # First arg is entity
-    entities = kwargs.get('entities')
-    fov_map = kwargs.get('fov_map')
-    dmg = kwargs.get('dmg')
-    max_range = kwargs.get('max_range')
+    entities = kwargs['entities']
+    fov_map = kwargs['fov_map']
+    dmg = kwargs['dmg']
+    max_range = kwargs['max_range']
 
     results = []
 
@@ -43,7 +42,7 @@ def cast_lightning(*args, **kwargs):
     # Export to map? Instead of importing entities/fov_map, just import game_map
     for entity in entities:
         if entity.fighter and entity != caster and fov_map.fov[entity.y, entity.x]:
-            distance = caster.distance_to(entity)
+            distance = caster.distance_to_entity(entity)
 
             if distance < closest_distance:
                 target = entity
