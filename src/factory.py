@@ -97,6 +97,14 @@ def mk_entity(entity_name, x, y):
             'Sword',
             equippable=Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         )
+    elif entity_name == 'dagger':
+        return Entity(
+            0, 0,
+            '(',
+            tcod.sky,
+            'Dagger',
+            equippable=Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
+        )
     elif entity_name == 'shield':
         return Entity(
             x, y,

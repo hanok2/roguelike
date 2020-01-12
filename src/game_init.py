@@ -1,9 +1,9 @@
 import tcod
 from . import config
+from . import factory
 from . import maps
 from .entity import Entity
-from .components import Fighter, Level, Equipment, Equippable
-from .equipment_slots import EquipmentSlots
+from .components import Fighter, Level, Equipment
 from .inventory import Inventory
 from .messages import MsgLog
 from .render_functions import RenderOrder
@@ -32,15 +32,7 @@ def get_game_data():
         human=True
 
     )
-
-    equippable_comp = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
-    dagger = Entity(
-        0, 0,
-        '(',
-        tcod.sky,
-        'Dagger',
-        equippable=equippable_comp
-    )
+    dagger = factory.mk_entity('dagger', 0, 0)
     hero.inv.add_item(dagger)
     hero.equipment.toggle_equip(dagger)
 
