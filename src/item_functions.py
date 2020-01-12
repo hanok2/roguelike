@@ -67,12 +67,12 @@ def cast_lightning(*args, **kwargs):
 
 
 def cast_fireball(*args, **kwargs):
-    entities = kwargs.get('entities')
-    fov_map = kwargs.get('fov_map')
-    dmg = kwargs.get('dmg')
-    radius = kwargs.get('radius')
-    target_x = kwargs.get('target_x')
-    target_y = kwargs.get('target_y')
+    entities = kwargs['entities']
+    fov_map = kwargs['fov_map']
+    dmg = kwargs['dmg']
+    radius = kwargs['radius']
+    target_x = kwargs['target_x']
+    target_y = kwargs['target_y']
 
     results = []
 

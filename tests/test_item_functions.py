@@ -30,7 +30,7 @@ def test_map():
         (1, 0), (3, 0), (5, 0),
         (2, 1),
         (1, 2), (2, 2), (3, 2),
-        (2, 3),
+        (2, 3), (3, 3),
         (9, 9)
     ]
     orcs = [factory.mk_entity('orc', x, y) for x, y in orc_coordinates]
@@ -39,6 +39,7 @@ def test_map():
     return m
 
 
+""" Tests for heal() """
 
 def test_heal__using_dict_for_kwargs(hero):
     # entity comes from args[0]
@@ -87,7 +88,8 @@ def test_heal__below_max_hp__msg(hero):
     assert results[0]['msg'] == 'You drink the healing potion and start to feel better!'
 
 
-# def cast_lightning(*args, **kwargs):
+""" Tests for cast_lightning() """
+
 
 def test_cast_lightning__no_entity_raises_exception():
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'max_range':3}
@@ -255,29 +257,152 @@ def test_cast_lightning__out_of_fov__returns_msg(open_map, hero):
     pass
 
 
-# def cast_fireball(*args, **kwargs):
-    # kwargs: entities
-    # kwargs: fov_map
-    # kwargs: dmg
-    # kwargs: radius
-    # kwargs: target_x
-    # kwargs: target_y
-
-    # if outside FOV:
-        # 'consumed': False,
-        # 'msg': 'You cannot target a tile outside your field of view.'
-
-    # if successful:
-        # 'consumed': True,
-        # 'msg': 'The fireball explodes, burning everything within {} tiles!'.format(radius)
-
-    # if successful and damages enemies:
-            # results.append({'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg) })
-            # results.extend(entity.fighter.take_dmg(dmg))
-
-    # Also check that hero gets damaged if too close
+""" Tests for cast_fireball() """
 
 
+def test_cast_fireball__no_entities_raises_exception():
+    kwargs = {'fov_map':None, 'dmg':10, 'radius':3, 'target_x': 0, 'target_y': 0}
+    with pytest.raises(KeyError):
+        item_functions.cast_fireball(**kwargs)
+
+
+def test_cast_fireball__no_fov_map_raises_exception():
+    kwargs = {'entities':[], 'dmg':10, 'radius':3, 'target_x': 0, 'target_y': 0}
+    with pytest.raises(KeyError):
+        item_functions.cast_fireball(**kwargs)
+
+
+def test_cast_fireball__no_dmg_raises_exception():
+    kwargs = {'entities':[], 'fov_map':None, 'radius':3, 'target_x': 0, 'target_y': 0}
+    with pytest.raises(KeyError):
+        item_functions.cast_fireball(**kwargs)
+
+
+def test_cast_fireball__no_radius_raises_exception():
+    kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'target_x': 0, 'target_y': 0}
+    with pytest.raises(KeyError):
+        item_functions.cast_fireball(**kwargs)
+
+
+def test_cast_fireball__no_target_x_raises_exception():
+    kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'radius':3, 'target_y': 0}
+    with pytest.raises(KeyError):
+        item_functions.cast_fireball(**kwargs)
+
+
+def test_cast_fireball__no_target_y_raises_exception():
+    kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'radius':3, 'target_x': 0}
+    with pytest.raises(KeyError):
+        item_functions.cast_fireball(**kwargs)
+
+
+def test_cast_fireball__outside_fov__consumed_False(open_map, hero):
+    orc = factory.mk_entity('orc', 9, 9)
+    open_map.entities.extend([hero, orc])
+
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
+
+    results = item_functions.cast_fireball(hero, **kwargs)
+    assert results[0]['consumed'] is False
+
+
+def test_cast_fireball__outside_fov__msg(open_map, hero):
+    orc = factory.mk_entity('orc', 9, 9)
+    open_map.entities.extend([hero, orc])
+
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
+
+    results = item_functions.cast_fireball(hero, **kwargs)
+    assert results[0]['msg'] == 'You cannot target a tile outside your field of view.'
+
+
+def test_cast_fireball__in_fov__consumed_True(open_map, hero):
+    open_map.entities.append(hero)
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    radius = 3
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
+
+    results = item_functions.cast_fireball(hero, **kwargs)
+    assert results[0]['consumed']
+
+
+def test_cast_fireball__in_fov__msg(open_map, hero):
+    open_map.entities.append(hero)
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    radius = 3
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
+
+    results = item_functions.cast_fireball(hero, **kwargs)
+    assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+
+
+def test_cast_fireball__close_to_hero__msg(open_map, hero):
+    open_map.entities.append(hero)
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    radius = 3
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
+
+    results = item_functions.cast_fireball(hero, **kwargs)
+    assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+    assert results[1]['msg'] == 'The Player gets burned for 25 hit points!'
+
+
+def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_map, hero):
+    open_map.entities.append(hero)
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    radius = 3
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
+
+    mocker.patch.object(hero.fighter, 'take_dmg')
+
+    item_functions.cast_fireball(hero, **kwargs)
+    hero.fighter.take_dmg.assert_called_once_with(25)
+
+
+def test_cast_fireball__orc_mob__hits_5_orcs(test_map, hero):
+    test_map.entities.append(hero)
+    fov_map = fov.initialize_fov(test_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=3)
+
+    orc_xp = test_map.entities[0].fighter.xp
+    radius = 1
+    kwargs = {'entities':test_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 2, 'target_y': 2}
+
+    results = item_functions.cast_fireball(hero, **kwargs)
+    assert len(results) == 11
+
+    assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+    assert results[0]['consumed']
+    assert results[1]['msg'] == 'The Orc gets burned for 25 hit points!'
+    assert results[2]['dead']
+    assert results[2]['xp'] == orc_xp
+    assert results[3]['msg'] == 'The Orc gets burned for 25 hit points!'
+    assert results[4]['dead']
+    assert results[4]['xp'] == orc_xp
+    assert results[5]['msg'] == 'The Orc gets burned for 25 hit points!'
+    assert results[6]['dead']
+    assert results[6]['xp'] == orc_xp
+    assert results[7]['msg'] == 'The Orc gets burned for 25 hit points!'
+    assert results[8]['dead']
+    assert results[8]['xp'] == orc_xp
+    assert results[9]['msg'] == 'The Orc gets burned for 25 hit points!'
+    assert results[10]['dead']
+    assert results[10]['xp'] == orc_xp
+
+
+""" Tests for cast_confuse() """
 
 # def cast_confuse(*args, **kwargs):
     # kwargs: entities
