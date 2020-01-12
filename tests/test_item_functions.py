@@ -4,6 +4,7 @@ from .test_death_functions import orc
 # todo: Revise with monster generator
 
 def test_heal(*args, **kwargs):
+    pass
 
     # amt keyword is required
     # entity comes from args[0]

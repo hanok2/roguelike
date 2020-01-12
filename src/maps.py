@@ -1,11 +1,9 @@
 import random
 import tcod
 from . import config
-from . import item_factory
-from . import monster_factory
+from . import factory
 from . import stairs
 from .entity import Entity
-from .random_utils import from_dungeon_lvl
 from .render_functions import RenderOrder
 from .rect import Rect
 from .tile import Tile
@@ -295,7 +293,7 @@ class Map(object):
             x, y = self.get_random_non_wall_loc()
 
             if not self.is_occupied(x, y):
-                monster = monster_factory.get_random_monster(x, y)
+                monster = factory.get_random_monster(x, y)
                 self.entities.append(monster)
 
     def place_items(self, room):
@@ -306,13 +304,12 @@ class Map(object):
         max_items_per_room = 5
 
         num_items = random.randint(0, max_items_per_room)
-        item_chances = item_factory.item_chances(self.dungeon_lvl)
 
-        for i in range(num_items):
+        for _ in range(num_items):
             x, y = self.get_random_room_loc(room)
 
             if not self.is_occupied(x, y):
-                item = item_factory.get_rnd_item(x, y, item_chances)
+                item = factory.get_random_item(x, y)
                 self.entities.append(item)
 
     def place_stairs_down(self, x, y):
