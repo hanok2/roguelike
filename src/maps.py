@@ -287,8 +287,6 @@ class Map(object):
         # todo: Create a table for monster generation that increases difficulty
         # max_monsters_per_map = from_dungeon_lvl(config.max_monsters_weights, self.dungeon_lvl)
 
-        monster_chances = monster_factory.monster_chances(self.dungeon_lvl)
-
         # Make sure there are value tiles
         if not self.get_random_non_wall_loc():
             return None
@@ -297,7 +295,7 @@ class Map(object):
             x, y = self.get_random_non_wall_loc()
 
             if not self.is_occupied(x, y):
-                monster = monster_factory.get_random_monster(x, y, monster_chances)
+                monster = monster_factory.get_random_monster(x, y)
                 self.entities.append(monster)
 
     def place_items(self, room):
