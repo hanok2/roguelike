@@ -5,16 +5,6 @@ from ..src import monster_factory
 # def monster_chances(dungeon_lvl):
 
 
-def test_get_random_monster__negative_x_raises_exception():
-    with pytest.raises(ValueError):
-        monster_factory.get_random_monster(x=-1, y=0)
-
-
-def test_get_random_monster__negative_y_raises_exception():
-    with pytest.raises(ValueError):
-         monster_factory.get_random_monster(x=0, y=-1)
-
-
 def test_get_random_monster__monster_in_monster_chances():
     x, y = 1, 2
     m = monster_factory.get_random_monster(x=x, y=y)
@@ -28,4 +18,15 @@ def test_get_random_monster__monster_matches_x_y():
     assert m.y == y
 
 
-# def mk_monster(monster_type, x, y):
+def test_mk_monster__negative_x_raises_exception():
+    with pytest.raises(ValueError):
+        monster_factory.mk_monster('orc', x=-1, y=0)
+
+
+def test_mk_monster__negative_y_raises_exception():
+    with pytest.raises(ValueError):
+         monster_factory.mk_monster('orc', x=0, y=-1)
+
+
+# def test_mk_monster():
+# def test_mk_monster():

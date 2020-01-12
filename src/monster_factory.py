@@ -11,7 +11,6 @@ from .render_functions import RenderOrder
         3. Have an external JSON file which contains the data for all monsters.
 """
 
-
 monster_chances = {
     'spider': 80,
     'orc': 80,
@@ -21,15 +20,14 @@ monster_chances = {
 
 
 def get_random_monster(x, y):
-    if x < 0 or y < 0:
-        raise ValueError('x and y coordinates must be 0 or greater!')
-
     monster_choice = rnd_choice_from_dict(monster_chances)
-
     return mk_monster(monster_choice, x, y)
 
 
 def mk_monster(monster, x, y):
+    if x < 0 or y < 0:
+        raise ValueError('x and y coordinates must be 0 or greater!')
+
     if monster == 'spider':
         return Entity(
             x, y,
