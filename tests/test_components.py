@@ -1,14 +1,8 @@
 import pytest
-import tcod
 from ..src import components
 from ..src import config
 from ..src import entity
-from ..src import equipment_slots
-from ..src import render_functions
-
-POW_BONUS = 100
-DEF_BONUS = 500
-HPX_BONUS = 1000
+from ..src import factory
 
 @pytest.fixture
 def hero():
@@ -25,36 +19,7 @@ def hero():
 
 @pytest.fixture
 def orc():
-    fighter_comp = components.Fighter(hp=10, defense=1, power=3, xp=35)
-    ai_comp = components.ApproachingBehavior()
-    return entity.Entity(
-        x=0, y=0,
-        char='o',
-        color=tcod.desaturated_green,
-        name='Orc',
-        blocks=True,
-        render_order=render_functions.RenderOrder.ACTOR,
-        fighter=fighter_comp,
-        ai=ai_comp
-    )
-
-@pytest.fixture
-def ring_of_power():
-    equippable_comp = components.Equippable(
-        equipment_slots.EquipmentSlots.OFF_HAND,
-        power_bonus=POW_BONUS,
-        defense_bonus=DEF_BONUS,
-        max_hp_bonus=HPX_BONUS
-    )
-
-    return entity.Entity(
-        x=2, y=3,
-        char='o',
-        color=tcod.white,
-        name='Ring of Power',
-        equippable=equippable_comp
-    )
-
+    return factory.mk_entity('orc', 0, 0)
 
 """ Tests for class Fighter(object): """
 
@@ -326,22 +291,22 @@ def test_Equipment_max_hp_bonus__nothing_equipped_returns_0():
     assert e.max_hp_bonus == 0
 
 
-def test_Equipment_max_hp_bonus__main_hand_bonus(ring_of_power):
-    e = components.Equipment(main_hand=ring_of_power)
-    result = e.max_hp_bonus
-    assert result == HPX_BONUS
+def test_Equipment_max_hp_bonus__main_hand_bonus():
+    ring = factory.mk_entity('ring of hp', 0, 0)
+    e = components.Equipment(main_hand=ring)
+    assert e.max_hp_bonus == ring.equippable.max_hp_bonus
 
 
-def test_Equipment_max_hp_bonus__off_hand_bonus(ring_of_power):
-    e = components.Equipment(off_hand=ring_of_power)
-    result = e.max_hp_bonus
-    assert result == HPX_BONUS
+def test_Equipment_max_hp_bonus__off_hand_bonus():
+    ring = factory.mk_entity('ring of hp', 0, 0)
+    e = components.Equipment(off_hand=ring)
+    assert e.max_hp_bonus == ring.equippable.max_hp_bonus
 
 
-def test_Equipment_max_hp_bonus__both_hands_bonus(ring_of_power):
-    e = components.Equipment(main_hand=ring_of_power, off_hand=ring_of_power)
-    result = e.max_hp_bonus
-    assert result == HPX_BONUS * 2
+def test_Equipment_max_hp_bonus__both_hands_bonus():
+    ring = factory.mk_entity('ring of hp', 0, 0)
+    e = components.Equipment(main_hand=ring, off_hand=ring)
+    assert e.max_hp_bonus == ring.equippable.max_hp_bonus * 2
 
 
 def test_Equipment_power_bonus__nothing_equipped_returns_0():
@@ -349,22 +314,22 @@ def test_Equipment_power_bonus__nothing_equipped_returns_0():
     assert e.power_bonus == 0
 
 
-def test_Equipment_power_bonus__main_hand_bonus(ring_of_power):
-    e = components.Equipment(main_hand=ring_of_power)
-    result = e.power_bonus
-    assert result == POW_BONUS
+def test_Equipment_power_bonus__main_hand_bonus():
+    sword = factory.mk_entity('sword', 0, 0)
+    e = components.Equipment(main_hand=sword)
+    assert e.power_bonus == sword.equippable.power_bonus
 
 
-def test_Equipment_power_bonus__off_hand_bonus(ring_of_power):
-    e = components.Equipment(off_hand=ring_of_power)
-    result = e.power_bonus
-    assert result == POW_BONUS
+def test_Equipment_power_bonus__off_hand_bonus():
+    sword = factory.mk_entity('sword', 0, 0)
+    e = components.Equipment(off_hand=sword)
+    assert e.power_bonus == sword.equippable.power_bonus
 
 
-def test_Equipment_power_bonus__both_hands_bonus(ring_of_power):
-    e = components.Equipment(main_hand=ring_of_power, off_hand=ring_of_power)
-    result = e.power_bonus
-    assert result == POW_BONUS * 2
+def test_Equipment_power_bonus__both_hands_bonus():
+    sword = factory.mk_entity('sword', 0, 0)
+    e = components.Equipment(main_hand=sword, off_hand=sword)
+    assert e.power_bonus == sword.equippable.power_bonus * 2
 
 
 def test_Equipment_defense_bonus__nothing_equipped_returns_0():
@@ -372,35 +337,37 @@ def test_Equipment_defense_bonus__nothing_equipped_returns_0():
     assert e.defense_bonus == 0
 
 
-def test_Equipment_defense_bonus__main_hand_bonus(ring_of_power):
-    e = components.Equipment(main_hand=ring_of_power)
-    result = e.defense_bonus
-    assert result == DEF_BONUS
+def test_Equipment_defense_bonus__main_hand_bonus():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment(main_hand=shield)
+    assert e.defense_bonus == shield.equippable.defense_bonus
 
 
-def test_Equipment_defense_bonus__off_hand_bonus(ring_of_power):
-    e = components.Equipment(off_hand=ring_of_power)
-    result = e.defense_bonus
-    assert result == DEF_BONUS
+def test_Equipment_defense_bonus__off_hand_bonus():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment(off_hand=shield)
+    assert e.defense_bonus == shield.equippable.defense_bonus
 
 
-def test_Equipment_defense_bonus__both_hands_bonus(ring_of_power):
-    e = components.Equipment(main_hand=ring_of_power, off_hand=ring_of_power)
-    result = e.defense_bonus
-    assert result == DEF_BONUS * 2
+def test_Equipment_defense_bonus__both_hands_bonus():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment(main_hand=shield, off_hand=shield)
+    assert e.defense_bonus == shield.equippable.defense_bonus * 2
 
 
-def test_Equipment_toggle_equip__nothing_equipped(ring_of_power):
+def test_Equipment_toggle_equip__nothing_equipped():
+    shield = factory.mk_entity('shield', 0, 0)
     e = components.Equipment()
-    results = e.toggle_equip(ring_of_power)
+    results = e.toggle_equip(shield)
 
     # Nothing equipped - equipping returns the slot
     assert results == [{'equipped': e.off_hand}]
 
 
-def test_Equipment_toggle_equip__unequips_item(ring_of_power):
-    e = components.Equipment(off_hand=ring_of_power)
-    results = e.toggle_equip(ring_of_power)
+def test_Equipment_toggle_equip__unequips_item():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment(off_hand=shield)
+    results = e.toggle_equip(shield)
 
     # Dequipping an item returns the item
-    assert results == [{'dequipped': ring_of_power}]
+    assert results == [{'dequipped': shield}]

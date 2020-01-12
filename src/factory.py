@@ -105,7 +105,14 @@ def mk_entity(entity_name, x, y):
             'Shield',
             equippable=Equippable(EquipmentSlots.OFF_HAND, defense_bonus=2)
         )
-
+    elif entity_name == 'ring of hp':
+        return Entity(
+            x, y,
+            '=',
+            tcod.blue,
+            'Ring of HP',
+            equippable=Equippable(EquipmentSlots.OFF_HAND, max_hp_bonus=50)
+        )
     elif entity_name == 'fireball_scroll':
         item_comp = Item(
             use_func=cast_fireball,
