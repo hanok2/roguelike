@@ -1,9 +1,6 @@
 import pytest
 from ..src import monster_factory
 
-# This one depends on from_dungeon_lvl - test later?
-# def monster_chances(dungeon_lvl):
-
 
 def test_get_random_monster__monster_in_monster_chances():
     x, y = 1, 2
@@ -25,8 +22,16 @@ def test_mk_monster__negative_x_raises_exception():
 
 def test_mk_monster__negative_y_raises_exception():
     with pytest.raises(ValueError):
-         monster_factory.mk_monster('orc', x=0, y=-1)
+        monster_factory.mk_monster('orc', x=0, y=-1)
 
 
-# def test_mk_monster():
-# def test_mk_monster():
+def test_mk_monster__valid_monster():
+    orc = monster_factory.mk_monster('orc', x=0, y=1)
+    assert orc.name == 'Orc'
+    assert orc.x == 0
+    assert orc.y == 1
+
+
+def test_mk_monster__invalid_monster():
+    with pytest.raises(ValueError):
+        monster_factory.mk_monster('barbie doll', x=0, y=1)
