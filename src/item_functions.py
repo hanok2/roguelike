@@ -10,7 +10,7 @@ def heal(*args, **kwargs):
     # 'amt' is required in kwargs
 
     entity = args[0]
-    amt = kwargs.get('amt')
+    amt = kwargs['amt']
     results = []
 
     if entity.fighter.hp == entity.fighter.max_hp:

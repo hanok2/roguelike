@@ -1,24 +1,58 @@
+import pytest
 from ..src import item_functions
-from .test_death_functions import orc
+from ..src import player
 
-# todo: Revise with monster generator
 
-def test_heal(*args, **kwargs):
-    pass
+@pytest.fixture
+def hero():
+    return player.get_hero()
 
-    # amt keyword is required
+
+def test_heal__using_dict_for_kwargs(hero):
     # entity comes from args[0]
+    kwargs = {'amt':40}
+    assert item_functions.heal(hero, **kwargs)  # Should return something
 
-    # if hp is already at max:
-        # Results return 'consumed': False,
-        # Results return 'cancel_inv': True,
-        # Results return 'msg': 'You are already at full health'
 
-    # if consumed:
-        # entity.fighter.heal is called
-        # Results returns:'consumed': True,
-        # Results returns:'msg': 'You drink the healing potion and start to feel better!'
+def test_heal__no_entity_raises_exception():
+    # entity comes from args[0]
+    with pytest.raises(IndexError):
+        item_functions.heal(amt=40)
 
+
+def test_heal__no_amt_raises_exception(hero):
+    with pytest.raises(KeyError):
+        item_functions.heal(hero)
+
+
+def test_heal__at_max_hp__consumed_is_False(hero):
+    assert hero.fighter.hp == hero.fighter.max_hp
+    results = item_functions.heal(hero, amt=40)
+    assert results[0]['consumed'] is False
+
+
+def test_heal__at_max_hp__cancel_inv_is_True(hero):
+    assert hero.fighter.hp == hero.fighter.max_hp
+    results = item_functions.heal(hero, amt=40)
+    assert results[0]['cancel_inv']
+
+
+def test_heal__at_max_hp__msg(hero):
+    assert hero.fighter.hp == hero.fighter.max_hp
+    results = item_functions.heal(hero, amt=40)
+    assert results[0]['msg'] == 'You are already at full health'
+
+
+def test_heal__below_max_hp__consumed_is_True(hero):
+    hero.fighter.hp = 5
+    results = item_functions.heal(hero, amt=40)
+    assert results[0]['consumed']
+
+
+def test_heal__below_max_hp__msg(hero):
+    hero.fighter.hp = 5
+    results = item_functions.heal(hero, amt=40)
+    assert results[0]['msg'] == 'You drink the healing potion and start to feel better!'
 
 
 # def cast_lightning(*args, **kwargs):
