@@ -1,27 +1,19 @@
 import pytest
-from ..src import components
-from ..src import entity
 from ..src import factory
 from ..src import inventory
+from ..src import player
 
 """ Tests for Inventory """
 
-# todo: Replace this with player generator!!!!!!!!!!!!!!!!!!
 @pytest.fixture
 def hero():
-    return entity.Entity(
-        x=0, y=0,
-        char='@',
-        color=None,
-        name='Player',
-        human=True,
-        equipment=components.Equipment(),
-        inv=inventory.Inventory(26)
-    )
+    return player.get_hero()
+
 
 @pytest.fixture
 def potion():
     return factory.mk_entity('healing_potion', 0, 0)
+
 
 @pytest.fixture
 def sword():

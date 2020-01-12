@@ -4,65 +4,66 @@ from pytest_mock import mocker
 from ..src import entity
 from ..src import maps
 from ..src import config
+from ..src import player
 from ..src import rect
 
 DEFAULT_LENGTH = 50
 INVALID_LENGTH = 2
 
 @pytest.fixture
-def basic_hero():
-    return entity.Entity(0, 0, '@', None, 'Player', human=True)
+def hero():
+    return player.get_hero()
 
 
 """Tests for class Dungeon(object):"""
 
-def test_dungeon_init__beginning_variables(basic_hero):
-    d = maps.Dungeon(basic_hero)
-    assert d.hero is basic_hero
+def test_dungeon_init__beginning_variables(hero):
+    d = maps.Dungeon(hero)
+    assert d.hero is hero
     assert d.current_lvl == 0
 
 
-def test_dungeon_init__1_level_exists(basic_hero):
+def test_dungeon_init__1_level_exists(hero):
     # Make sure 1 level is generated on init
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     assert len(d.levels) == 1
 
 
 @pytest.mark.skip(reason='Cannot implement yet because mocking causes problem with hero access to levels list.')
-def test_dungeon_init__generate_next_lvl_called(mocker, basic_hero):
+def test_dungeon_init__generate_next_lvl_called(mocker, hero):
     mocker.patch.object(maps.Dungeon, 'generate_next_level')
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     d.generate_next_level.assert_called_once()
 
 
-def test_dungeon_init__hero_exists_on_map(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_dungeon_init__hero_exists_on_map(hero):
+    d = maps.Dungeon(hero)
     m = d.current_map()
     assert any([True for e in m.entities if e.human])
 
 
-def test_dungeon_init__move_hero_called(mocker, basic_hero):
+def test_dungeon_init__move_hero_called(mocker, hero):
     mocker.patch.object(maps.Dungeon, 'move_hero')
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     d.move_hero.assert_called_once()
 
 
-def test_dungeon_init__populate_called(mocker, basic_hero):
+def test_dungeon_init__populate_called(mocker, hero):
     mocker.patch.object(maps.Map, 'populate')
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     m = d.current_map()
 
     m.populate.assert_called_once()
 
 
-def test_current_map__1_level(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_current_map__1_level(hero):
+    d = maps.Dungeon(hero)
     m = d.current_map()
     assert m.dungeon_lvl == d.current_lvl + 1
 
 
-def test_current_map__2_levels(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_current_map__2_levels(hero):
+    d = maps.Dungeon(hero)
     d.generate_next_level()
 
     m = d.current_map()
@@ -77,50 +78,50 @@ def test_current_map__2_levels(basic_hero):
     # Should this take the hero as a parameter?
     # Test that the hero is put somewhere
 
-def test_generate_next_level__levels_increases(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_generate_next_level__levels_increases(hero):
+    d = maps.Dungeon(hero)
     assert len(d.levels) == 1
     d.generate_next_level()
 
     assert len(d.levels) == 2
 
 
-def test_generate_next_level__maps_are_numbered_correctly(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_generate_next_level__maps_are_numbered_correctly(hero):
+    d = maps.Dungeon(hero)
     assert d.levels[0].dungeon_lvl == 1
     d.generate_next_level()
 
     assert d.levels[1].dungeon_lvl == 2
 
 
-def test_hero_at_stairs__valid_returns_True(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_hero_at_stairs__valid_returns_True(hero):
+    d = maps.Dungeon(hero)
     down_stair = d.current_map().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
     assert d.hero_at_stairs('>')
 
 
-def test_hero_at_stairs__invalid_returns_False(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_hero_at_stairs__invalid_returns_False(hero):
+    d = maps.Dungeon(hero)
     assert d.hero_at_stairs('>') is False
 
 
-def test_hero_at_stairs__starting_upstair_returns_True(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_hero_at_stairs__starting_upstair_returns_True(hero):
+    d = maps.Dungeon(hero)
     # Hero starts on an upstair, so this should be True.
     assert d.hero_at_stairs('<')
 
 
-def test_move_downstairs__not_on_down_stair_returns_False(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_downstairs__not_on_down_stair_returns_False(hero):
+    d = maps.Dungeon(hero)
     d.generate_next_level()
 
     result = d.move_downstairs()
     assert result is False
 
 
-def test_move_downstairs__hero_moved_to_next_upstair(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_downstairs__hero_moved_to_next_upstair(hero):
+    d = maps.Dungeon(hero)
     down_stair = d.current_map().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
     d.generate_next_level()
@@ -132,8 +133,8 @@ def test_move_downstairs__hero_moved_to_next_upstair(basic_hero):
     assert d.hero.y == up_stair.y
 
 
-def test_move_downstairs__dungeon_lvl_incremented(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_downstairs__dungeon_lvl_incremented(hero):
+    d = maps.Dungeon(hero)
     prev_lvl = d.current_lvl
     down_stair = d.current_map().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
@@ -143,8 +144,8 @@ def test_move_downstairs__dungeon_lvl_incremented(basic_hero):
 
     assert d.current_lvl == prev_lvl + 1
 
-def test_move_downstairs__success_returns_True(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_downstairs__success_returns_True(hero):
+    d = maps.Dungeon(hero)
     prev_lvl = d.current_lvl
     down_stair = d.current_map().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
@@ -153,8 +154,8 @@ def test_move_downstairs__success_returns_True(basic_hero):
     assert d.move_downstairs()
 
 
-def test_move_upstairs__not_on_up_stair_returns_False(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_upstairs__not_on_up_stair_returns_False(hero):
+    d = maps.Dungeon(hero)
     down_stair = d.current_map().find_stair('>')
 
     # Move hero to downstair (won't be on upstair)
@@ -162,8 +163,8 @@ def test_move_upstairs__not_on_up_stair_returns_False(basic_hero):
     assert d.move_upstairs() is False
 
 
-def test_move_upstairs__hero_moved_to_prev_downstair(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_upstairs__hero_moved_to_prev_downstair(hero):
+    d = maps.Dungeon(hero)
     down_stair = d.current_map().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
     d.generate_next_level()
@@ -177,8 +178,8 @@ def test_move_upstairs__hero_moved_to_prev_downstair(basic_hero):
     assert d.hero.y == down_stair.y
 
 
-def test_move_upstairs__success_returns_True(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_upstairs__success_returns_True(hero):
+    d = maps.Dungeon(hero)
     down_stair = d.current_map().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
     d.generate_next_level()
@@ -191,58 +192,58 @@ def test_move_upstairs__success_returns_True(basic_hero):
     # Return False?
 
 # Wait on this test - might want to remove some calls from Dungeon init
-# def test_move_hero__hero_not_placed_yet(basic_hero):
-    # d = maps.Dungeon(basic_hero)
+# def test_move_hero__hero_not_placed_yet(hero):
+    # d = maps.Dungeon(hero)
 
-def test_move_hero__to_wall_returns_False(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_hero__to_wall_returns_False(hero):
+    d = maps.Dungeon(hero)
     m = maps.Map(10, 10, 2)
     d.levels.append(m)
     assert d.move_hero(dest_lvl=1, dest_x=0, dest_y=0) is False
 
 
-def test_move_hero__to_occupied_spot_returns_False(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_hero__to_occupied_spot_returns_False(hero):
+    d = maps.Dungeon(hero)
     rnd_monster = [e for e in d.current_map().entities if e.ai].pop()
     dest_x = rnd_monster.x
     dest_y = rnd_monster.y
     assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y) is False
 
 
-def test_move_hero__same_floor_returns_True(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_hero__same_floor_returns_True(hero):
+    d = maps.Dungeon(hero)
     dest_x, dest_y = d.current_map().get_random_open_spot()
     assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
 
 
-def test_move_hero__same_floor_hero_xy_updated(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_hero__same_floor_hero_xy_updated(hero):
+    d = maps.Dungeon(hero)
     dest_x, dest_y = d.current_map().get_random_open_spot()
     d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
     assert d.hero.x == dest_x
     assert d.hero.y == dest_y
 
 
-def test_move_hero__same_floor_lvl_remains_same(basic_hero):
-    d = maps.Dungeon(basic_hero)
+def test_move_hero__same_floor_lvl_remains_same(hero):
+    d = maps.Dungeon(hero)
     d_lvl = d.current_lvl
     dest_x, dest_y = d.current_map().get_random_open_spot()
     d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
     assert d.current_lvl == d_lvl
 
 
-def test_move_hero__diff_floor_returns_True(basic_hero):
+def test_move_hero__diff_floor_returns_True(hero):
     dest_lvl = 1
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     d.generate_next_level()
 
     dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
     assert d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
 
 
-def test_move_hero__diff_floor_hero_xy_updated(basic_hero):
+def test_move_hero__diff_floor_hero_xy_updated(hero):
     dest_lvl = 1
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     d.generate_next_level()
 
     dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
@@ -251,9 +252,9 @@ def test_move_hero__diff_floor_hero_xy_updated(basic_hero):
     assert d.hero.y == dest_y
 
 
-def test_move_hero__diff_floor_dungeon_lvl_updated(basic_hero):
+def test_move_hero__diff_floor_dungeon_lvl_updated(hero):
     dest_lvl = 1
-    d = maps.Dungeon(basic_hero)
+    d = maps.Dungeon(hero)
     d.generate_next_level()
 
     dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
@@ -289,13 +290,13 @@ def test_map_rm_hero_if_absent_returns_False():
     # Should be False because the map is not initialized with the hero in it.
     assert result is False
 
-def test_map_rm_hero_if_present_returns_True(basic_hero):
+def test_map_rm_hero_if_present_returns_True(hero):
     m = maps.Map(width=3, height=3)
-    m.entities.append(basic_hero)
+    m.entities.append(hero)
     result = m.rm_hero()
     assert result is True
     # Also check there is no hero in the entities
-    assert basic_hero not in m.entities
+    assert hero not in m.entities
 
 
 def test_map_find_stair__down_stair_returns_entity():
@@ -529,11 +530,11 @@ def test_map_is_occupied__not_occupied_returns_False():
     result = m.is_occupied(0, 0)
     assert result is False
 
-def test_map_is_occupied__occupied_return_True(basic_hero):
+def test_map_is_occupied__occupied_return_True(hero):
     # Test if there are any entities at the coordinates
     m = maps.Map(width=10, height=10)
     x, y = 0, 0
-    m.entities.append(basic_hero)
+    m.entities.append(hero)
     assert m.is_occupied(x, y) is True
 
 

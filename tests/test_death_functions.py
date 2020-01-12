@@ -2,36 +2,20 @@ import pytest
 import tcod
 from ..src import components
 from ..src import death_functions
-from ..src import entity
+from ..src import factory
+from ..src import player
 from ..src import render_functions
 from ..src import states
 
 
 @pytest.fixture
 def basic_hero():
-    return entity.Entity(
-        x=0, y=0,
-        char='@',
-        color=None,
-        name='Player',
-        human=True
-    )
+    return player.get_hero()
 
 
 @pytest.fixture
 def orc():
-    fighter_comp = components.Fighter(hp=10, defense=1, power=3, xp=35)
-    ai_comp = components.ApproachingBehavior()
-    return entity.Entity(
-        x=0, y=0,
-        char='o',
-        color=tcod.desaturated_green,
-        name='Orc',
-        blocks=True,
-        render_order=render_functions.RenderOrder.ACTOR,
-        fighter=fighter_comp,
-        ai=ai_comp
-    )
+    return factory.mk_entity('orc', 0, 0)
 
 
 def test_kill_hero__char_is_corpse(basic_hero):

@@ -1,27 +1,20 @@
 import pytest
 from ..src import components
 from ..src import config
-from ..src import entity
 from ..src import factory
+from ..src import player
 
 @pytest.fixture
 def hero():
-    fighter_comp = components.Fighter(hp=100, defense=1, power=2)
-    return entity.Entity(
-        x=0, y=0,
-        char='@',
-        color=None,
-        name='Player',
-        human=True,
-        equipment=None,
-        fighter=fighter_comp
-    )
+    return player.get_hero()
 
 @pytest.fixture
 def orc():
     return factory.mk_entity('orc', 0, 0)
 
+
 """ Tests for class Fighter(object): """
+
 
 def test_Fighter_init():
     f = components.Fighter(hp=1, defense=2, power=3, xp=0)
@@ -113,6 +106,9 @@ def test_Fighter_heal__negative_amt_raises_exception():
         f.heal(-1)
 
 def test_Fighter_attack__target_takes_dmg(hero, orc):
+    # unequip hero dagger
+    hero.equipment.toggle_equip(hero.inv.items[0])
+
     dmg = hero.fighter.power - orc.fighter.defense
     expected_hp = orc.fighter.hp - dmg
     hero.fighter.attack(orc)
@@ -127,6 +123,9 @@ def test_Fighter_attack__dmg_returns_results(hero, orc):
 
 
 def test_Fighter_attack__target_doesnt_take_dmg(hero, orc):
+    # unequip hero dagger
+    hero.equipment.toggle_equip(hero.inv.items[0])
+
     hero.fighter.base_power = 1
     dmg = hero.fighter.power - orc.fighter.defense
     assert dmg == 0
@@ -137,6 +136,9 @@ def test_Fighter_attack__target_doesnt_take_dmg(hero, orc):
 
 
 def test_Fighter_attack__no_dmg_returns_results(hero, orc):
+    # unequip hero dagger
+    hero.equipment.toggle_equip(hero.inv.items[0])
+
     hero.fighter.base_power = 1
     results = hero.fighter.attack(orc)
     results = results.pop()  # Get the dict from the list
