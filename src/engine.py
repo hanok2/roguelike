@@ -32,6 +32,8 @@ def main():
     mouse = tcod.Mouse()
 
     while True:
+        # todo: This runs all the time! Make it wait...
+
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         tcod.sys_check_for_event(
             mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
@@ -120,14 +122,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
     log.debug('Entering game loop...')
     while True:
-        # Capture new user input
-        # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
-        tcod.sys_check_for_event(
-            mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
-            k=key,
-            m=mouse
-        )
-
         if fov_recompute:
             log.debug('fov_recompute...')
             recompute_fov(
@@ -157,6 +151,28 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         # Clear all entities
         render_eng.clear_all(current_map.entities)
+
+        # Capture new user input
+        # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
+        # tcod.sys_check_for_event(
+            # mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            # k=key,
+            # m=mouse
+        # )
+
+        # Flush False - returns 2 key events
+        # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
+        # tcod.Key(pressed=True, vk=tcod.KEY_TEXT, text='h')
+
+        # Flush True: returns just this
+        # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
+
+        tcod.sys_wait_for_event(
+            mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            k=key,
+            m=mouse,
+            flush=True
+        )
 
         # Get keyboard/mouse input
         action = handle_keys(key, state)
