@@ -25,6 +25,7 @@ def handle_keys(key, state):
         return handle_char_scr(key)
 
     return {}
+    # Raise exception instead?
 
 
 def handle_hero_turn_keys(key):
