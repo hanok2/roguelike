@@ -1,5 +1,6 @@
 import pytest
 from pytest_mock import mocker
+from ..src import components
 from ..src import factory
 from ..src import fov
 from ..src import item_functions
@@ -404,21 +405,116 @@ def test_cast_fireball__orc_mob__hits_5_orcs(test_map, hero):
 
 """ Tests for cast_confuse() """
 
-# def cast_confuse(*args, **kwargs):
-    # kwargs: entities
-    # kwargs: fov_map
-    # kwargs: target_x
-    # kwargs: target_y
 
-    # if outside FOV:
-        # 'consumed': False,
-        # 'msg': 'You cannot target a tile outside your field of view.'
+def test_cast_confuse__no_entities_raises_exception():
+    kwargs = {'fov_map':None, 'target_x':0, 'target_y':0}
+    with pytest.raises(KeyError):
+        item_functions.cast_confuse(**kwargs)
 
-    # if successful:
-        # enemy ai is replaced with ConfusedBehavior
-        # 'consumed': True,
-        # 'msg': 'The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
 
-    # if unsuccess:
-        # 'consumed': False,
-        # 'msg': 'There is no targetable enemy at that location.'
+def test_cast_confuse__no_fov_map_raises_exception():
+    kwargs = {'entities':[], 'target_x':0, 'target_y':0}
+    with pytest.raises(KeyError):
+        item_functions.cast_confuse(**kwargs)
+
+
+def test_cast_confuse__no_target_x_raises_exception():
+    kwargs = {'entities':[], 'fov_map':None, 'target_y':0}
+    with pytest.raises(KeyError):
+        item_functions.cast_confuse(**kwargs)
+
+
+def test_cast_confuse__no_target_y_raises_exception():
+    kwargs = {'entities':[], 'fov_map':None, 'target_x':0}
+    with pytest.raises(KeyError):
+        item_functions.cast_confuse(**kwargs)
+
+
+def test_cast_confuse__outside_fov__consumed_False(open_map, hero):
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
+    results = item_functions.cast_confuse(hero, **kwargs)
+    assert results[0]['consumed'] is False
+
+
+def test_cast_confuse__outside_fov__msg(open_map, hero):
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
+    results = item_functions.cast_confuse(hero, **kwargs)
+    assert results[0]['msg'] == 'You cannot target a tile outside your field of view.'
+
+
+def test_cast_confuse__in_fov_but_not_entity__consumed_False(open_map, hero):
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    results = item_functions.cast_confuse(hero, **kwargs)
+    assert results[0]['consumed'] is False
+
+
+def test_cast_confuse__in_fov_but_not_entity__msg(open_map, hero):
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    results = item_functions.cast_confuse(hero, **kwargs)
+    assert results[0]['msg'] == 'There is no targetable enemy at that location.'
+
+
+# if successful:
+    # enemy ai is replaced with ConfusedBehavior
+    # 'consumed': True,
+    # 'msg': 'The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
+
+
+def test_cast_confuse__success__replaced_ai(open_map, hero):
+    orc = factory.mk_entity('orc', 1, 1)
+    open_map.entities.extend([hero, orc])
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    item_functions.cast_confuse(hero, **kwargs)
+
+    assert isinstance(orc.ai, components.ConfusedBehavior)
+
+
+def test_cast_confuse__success__consumed_True(open_map, hero):
+    orc = factory.mk_entity('orc', 1, 1)
+    open_map.entities.extend([hero, orc])
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    results = item_functions.cast_confuse(hero, **kwargs)
+
+    assert results[0]['consumed']
+
+
+def test_cast_confuse__success__msg(open_map, hero):
+    orc = factory.mk_entity('orc', 1, 1)
+    open_map.entities.extend([hero, orc])
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    results = item_functions.cast_confuse(hero, **kwargs)
+
+    assert results[0]['msg'] == 'The eyes of the Orc look vacant, as he starts to stumble around!'
+
+
+def test_cast_confuse__on_hero__not_successful(open_map, hero):
+    open_map.entities.append(hero)
+    fov_map = fov.initialize_fov(open_map)
+    fov.recompute_fov(fov_map, x=0, y=0, radius=5)
+
+    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':0, 'target_y':0}
+    results = item_functions.cast_confuse(hero, **kwargs)
+
+    assert results[0]['consumed'] is False
+    assert results[0]['msg'] == 'There is no targetable enemy at that location.'

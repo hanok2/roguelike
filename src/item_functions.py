@@ -97,11 +97,13 @@ def cast_fireball(*args, **kwargs):
 
 
 def cast_confuse(*args, **kwargs):
-    # Convert to [] notation
-    entities = kwargs.get('entities')
-    fov_map = kwargs.get('fov_map')
-    target_x = kwargs.get('target_x')
-    target_y = kwargs.get('target_y')
+    # todo: Add ability to target player - right now cannot because player
+    # doesn't have ai.
+
+    entities = kwargs['entities']
+    fov_map = kwargs['fov_map']
+    target_x = kwargs['target_x']
+    target_y = kwargs['target_y']
 
     results = []
 
@@ -113,9 +115,10 @@ def cast_confuse(*args, **kwargs):
         return results
 
     for entity in entities:
-        if entity.x == target_x and entity.y == target_y and entity.ai:
-            confused_ai = ConfusedBehavior(prev_ai=entity.ai, num_turns=10)
+        matches_coordinates = entity.x == target_x and entity.y == target_y
 
+        if matches_coordinates and entity.ai:
+            confused_ai = ConfusedBehavior(prev_ai=entity.ai, num_turns=10)
             confused_ai.owner = entity
             entity.ai = confused_ai
 
