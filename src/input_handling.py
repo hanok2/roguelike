@@ -200,7 +200,6 @@ def handle_lvl_up_menu(key):
     if key:
         key_char = chr(key.c)
 
-
         if key_char == 'c':                 # Constitution
             return {'lvl_up': 'hp'}
         elif key_char == 's':               # Strength
@@ -215,3 +214,19 @@ def handle_char_scr(key):
     if key.vk == tcod.KEY_ESCAPE:
         return {'exit': True}
     return {}
+
+
+def process_tcod_input(key):
+    if key.vk == tcod.KEY_ESCAPE:
+        return 'esc'
+
+    key_char = chr(key.c)
+
+    if key.lctrl:
+        return '^' + key_char
+
+    if key.shift and key_char == '.':
+        return '>'
+
+
+    return key_char

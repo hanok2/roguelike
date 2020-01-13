@@ -1,7 +1,14 @@
 from pytest_mock import mocker
+import tcod
 from ..src import input_handling
 from ..src import states
 
+""" Shorthand:
+    # = Windows Key
+    ! = Alt
+    ^ = Control
+    + = Shift
+"""
 States = states.States
 
 
@@ -69,3 +76,45 @@ def test_handle_keys__SHOW_STATS__calls_handle_char_scr(mocker):
 # def test_handle_mouse(mouse):
 # def test_handle_lvl_up_menu(key):
 # def test_handle_char_scr(key):
+
+
+def test_process_tcod_input__h_returns_h():
+    key = tcod.Key()
+    key.c = ord('h')
+    assert  input_handling.process_tcod_input(key) == 'h'
+
+
+def test_process_tcod_input__ESC_returns_esc():
+    esc_key = tcod.Key(pressed=True, vk=tcod.KEY_ESCAPE, c=ord('\x1b'))
+    assert input_handling.process_tcod_input(esc_key) == 'esc'
+
+
+def test_process_tcod_input__control_x_returns_carrot_x():
+    ctrl_x = tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('x'), lctrl=True)
+    assert input_handling.process_tcod_input(ctrl_x) == '^x'
+
+
+def test_process_tcod_input__H_returns_H():
+    # Check that capslock is not on??
+    H_key = tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('H'))
+    assert input_handling.process_tcod_input(H_key) == 'H'
+
+
+def test_process_tcod_input_ranglebracket():
+    rangle_bracket = tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('>'))
+    assert input_handling.process_tcod_input(rangle_bracket) == '>'
+
+
+def test_process_tcod_input__shift_dot_returns_ranglebracket():
+    shift_dot = tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('.'), shift=True)
+    assert input_handling.process_tcod_input(shift_dot) == '>'
+
+
+
+# <
+# ,
+# .
+# \
+# Numpad keys
+# Arrow keys
+# Numbers?
