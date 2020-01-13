@@ -6,6 +6,8 @@ from .states import States
 
 
 def handle_keys(key, state):
+    print(key)
+
     if state == States.HERO_TURN:
         return handle_hero_turn_keys(key)
 
@@ -225,8 +227,41 @@ def process_tcod_input(key):
     if key.lctrl:
         return '^' + key_char
 
-    if key.shift and key_char == '.':
-        return '>'
+    if key.shift:
+        if key_char == '.':
+            return '>'
+        elif key_char == ',':
+            return '<'
+
+    # Arrow keys
+    if key.vk == tcod.KEY_LEFT:
+        return 'h'
+    elif key.vk == tcod.KEY_RIGHT:
+        return 'l'
+    elif key.vk == tcod.KEY_UP:
+        return 'k'
+    elif key.vk == tcod.KEY_DOWN:
+        return 'j'
+
+    # NumPad Keys
+    if key.vk == tcod.KEY_KP1:
+        return 'b'
+    elif key.vk == tcod.KEY_KP2:
+        return 'j'
+    elif key.vk == tcod.KEY_KP3:
+        return 'n'
+    elif key.vk == tcod.KEY_KP4:
+        return 'h'
+    elif key.vk == tcod.KEY_KP5:
+        return '.'
+    elif key.vk == tcod.KEY_KP6:
+        return 'l'
+    elif key.vk == tcod.KEY_KP7:
+        return 'y'
+    elif key.vk == tcod.KEY_KP8:
+        return 'k'
+    elif key.vk == tcod.KEY_KP9:
+        return 'u'
 
 
     return key_char
