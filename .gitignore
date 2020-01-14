@@ -8,4 +8,4 @@ todo.txt
 Steampunk stuff
 
 *.pyc
-
+.env
