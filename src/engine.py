@@ -50,8 +50,8 @@ def main():
             # Update the display to represent the root consoles current state.
             tcod.console_flush()
 
-            key = process_tcod_input(key)
-            action = handle_main_menu(key)
+            key_char = process_tcod_input(key)
+            action = handle_main_menu(key_char)
 
             new_game = action.get('new_game')
             load_saved_game = action.get('load_game')
@@ -176,8 +176,9 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         )
 
         # Get keyboard/mouse input
-        key = process_tcod_input(key)
-        action = handle_keys(key, state)
+        key_char = process_tcod_input(key)
+        action = handle_keys(key_char, state)
+
         mouse_action = handle_mouse(mouse)
 
         move = action.get('move')
