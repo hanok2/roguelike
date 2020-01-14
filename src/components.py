@@ -1,6 +1,6 @@
 from random import randint
 from . import config
-from .equipment_slots import EquipmentSlots
+from .config import EquipmentSlots
 
 
 class Fighter(object):

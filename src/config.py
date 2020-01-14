@@ -1,11 +1,17 @@
 from enum import Enum, auto
 import tcod
 
+class EquipmentSlots(Enum):
+    MAIN_HAND = 1
+    OFF_HAND = 2
+
+
 class RenderOrder(Enum):
     STAIRS = auto()
     CORPSE = auto()
     ITEM = auto()
     ACTOR = auto()
+
 
 VERSION = 1.2
 window_title = 'Infinity Dronez'

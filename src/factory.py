@@ -1,10 +1,11 @@
 import tcod
 from . import config
-from .config import RenderOrder
-from .components import Fighter, ApproachingBehavior, Item, EquipmentSlots, Equippable
+from .config import RenderOrder, EquipmentSlots
+from .components import Fighter, ApproachingBehavior, Item, Equippable
 from .entity import Entity
 from .item_functions import heal, cast_confuse, cast_lightning, cast_fireball
 from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
+
 
 # Update to take the level
 item_chances = {
