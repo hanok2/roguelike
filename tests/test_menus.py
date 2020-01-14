@@ -2,9 +2,9 @@ import pytest
 from ..src import menus
 from ..src import player
 from ..src import factory
-from ..src import states
+from ..src import config
 
-States = states.States
+States = config.States
 
 @pytest.fixture
 def hero():

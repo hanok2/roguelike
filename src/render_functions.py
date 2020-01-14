@@ -1,6 +1,6 @@
 import tcod
 from . import config
-from .states import States
+from .config import States
 from . import menus
 
 

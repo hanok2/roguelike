@@ -3,10 +3,10 @@ from . import config
 from . import game_init
 from . import logger
 from . import render_functions
+from .config import States
 from .data_loaders import load_game, save_game
 from .death_functions import kill_monster, kill_hero
 from .fov import initialize_fov, recompute_fov
-from .states import States
 from .input_handling import handle_keys, handle_mouse, handle_main_menu, process_tcod_input
 
 log = logger.setup_logger()

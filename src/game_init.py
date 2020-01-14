@@ -2,7 +2,6 @@ from . import config
 from . import maps
 from . import player
 from .messages import MsgLog
-from .states import States
 
 
 # todo: Convert to a Game object, tracking all game data....
@@ -22,7 +21,7 @@ def get_game_data():
     )
 
     # Set the initial game state
-    state = States.HERO_TURN
+    state = config.States.HERO_TURN
 
     # Set the turn counter to 0
     turn = 0

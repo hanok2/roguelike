@@ -4,8 +4,7 @@ from ..src import components
 from ..src import death_functions
 from ..src import factory
 from ..src import player
-from ..src.config import RenderOrder
-from ..src import states
+from ..src.config import RenderOrder, States
 
 
 @pytest.fixture
@@ -32,7 +31,7 @@ def test_kill_hero__returns_death_msg_and_dead_status(basic_hero):
     result = death_functions.kill_hero(basic_hero)
     assert result == (
         'You died!',
-        states.States.HERO_DEAD
+        States.HERO_DEAD
     )
 
 

@@ -2,9 +2,9 @@ import pytest
 import tcod
 from pytest_mock import mocker
 from ..src import input_handling
-from ..src import states
+from ..src import config
 
-States = states.States
+States = config.States
 
 
 def test_handle_keys__invalid_state():

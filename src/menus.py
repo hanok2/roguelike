@@ -1,4 +1,4 @@
-from .states import States
+from .config import States
 
 
 def default_lettering_dict(options):

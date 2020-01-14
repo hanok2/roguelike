@@ -1,7 +1,6 @@
 import tcod
 from . import components
-from .states import States
-from .config import RenderOrder
+from .config import RenderOrder, States
 
 
 def kill_hero(hero):

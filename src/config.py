@@ -5,13 +5,22 @@ class EquipmentSlots(Enum):
     MAIN_HAND = 1
     OFF_HAND = 2
 
-
 class RenderOrder(Enum):
     STAIRS = auto()
     CORPSE = auto()
     ITEM = auto()
     ACTOR = auto()
 
+class States(Enum):
+    # Note: In Python 3.6+, we can use "auto" feature to auto-increment
+    HERO_TURN = auto()
+    WORLD_TURN = auto()
+    HERO_DEAD = auto()
+    SHOW_INV = auto()
+    DROP_INV = auto()
+    TARGETING = auto()
+    LEVEL_UP = auto()
+    SHOW_STATS = auto()
 
 VERSION = 1.2
 window_title = 'Infinity Dronez'
