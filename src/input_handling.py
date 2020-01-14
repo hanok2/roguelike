@@ -137,33 +137,19 @@ def handle_targeting_keys(key):
     return {}
 
 
-def handle_mouse(mouse):
-    (x, y) = (mouse.cx, mouse.cy)
-
-    if mouse.lbutton_pressed:
-        return {'l_click': (x, y)}
-    elif mouse.rbutton_pressed:
-        return {'r_click': (x, y)}
-
-    return {}
-
-
 def handle_lvl_up_menu(key):
-    if key:
-        key_char = chr(key.c)
-
-        if key_char == 'c':                 # Constitution
-            return {'lvl_up': 'hp'}
-        elif key_char == 's':               # Strength
-            return {'lvl_up': 'str'}
-        elif key_char == 'd':               # Defense
-            return {'lvl_up': 'def'}
+    if key == 'c':                 # Constitution
+        return {'lvl_up': 'hp'}
+    elif key == 's':               # Strength
+        return {'lvl_up': 'str'}
+    elif key == 'd':               # Defense
+        return {'lvl_up': 'def'}
 
     return {}
 
 
 def handle_char_scr(key):
-    if key.vk == tcod.KEY_ESCAPE:
+    if key == 'esc':
         return {'exit': True}
     return {}
 
@@ -213,5 +199,16 @@ def process_tcod_input(key):
     elif key.vk == tcod.KEY_KP9:
         return 'u'
 
-
     return key_char
+
+
+def handle_mouse(mouse):
+    (x, y) = (mouse.cx, mouse.cy)
+
+    if mouse.lbutton_pressed:
+        return {'l_click': (x, y)}
+    elif mouse.rbutton_pressed:
+        return {'r_click': (x, y)}
+
+    return {}
+

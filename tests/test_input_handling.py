@@ -184,7 +184,6 @@ def test_handle_hero_dead_keys__nothing_press():
     assert result == {}
 
 
-
 """ Tests for handle_hero_dead_keys """
 
 
@@ -266,17 +265,43 @@ def test_handle_targeting_keys__non_valid():
     result = input_handling.handle_targeting_keys('z')
     assert result == {}
 
-
-
-
-""" Tests for test_handle_mouse(mouse)"""
-# def test_handle_mouse(mouse):
-
 """ Tests for test_handle_lvl_up_menu(key)"""
-# def test_handle_lvl_up_menu(key):
+
+
+def test_handle_lvl_up_menu__pick_constitution():
+    result = input_handling.handle_lvl_up_menu('c')
+    assert result == {'lvl_up': 'hp'}
+
+
+def test_handle_lvl_up_menu__pick_strength():
+    result = input_handling.handle_lvl_up_menu('s')
+    assert result == {'lvl_up': 'str'}
+
+
+def test_handle_lvl_up_menu__pick_defense():
+    result = input_handling.handle_lvl_up_menu('d')
+    assert result == {'lvl_up': 'def'}
+
+
+def test_handle_lvl_up_menu__invalid():
+    result = input_handling.handle_lvl_up_menu('z')
+    assert result == {}
+
 
 """ Tests for test_handle_char_scr(key):"""
-# def test_handle_char_scr(key):
+
+
+def test_handle_char_scr__esc__exits():
+    result = input_handling.handle_char_scr('esc')
+    assert result == {'exit': True}
+
+
+def test_handle_char_scr__invalid():
+    result = input_handling.handle_char_scr('z')
+    assert result == {}
+
+
+""" Tests for process_tcod_input"""
 
 
 def test_process_tcod_input__a_returns_a():
@@ -407,3 +432,11 @@ def test_process_tcod_input__numpad8__returns_k():
 def test_process_tcod_input__numpad9__returns_u():
     numpad9 = tcod.Key(pressed=True, vk=tcod.KEY_KP9)
     assert input_handling.process_tcod_input(numpad9) == 'u'
+
+
+""" Tests for test_handle_mouse(mouse)"""
+
+
+@pytest.mark.skip(reason='look into later - no idea how to test yet!')
+def test_handle_mouse(mouse):
+    pass
