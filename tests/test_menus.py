@@ -120,7 +120,18 @@ def test_inv_options__DROP_INV__both_hands_equipped(hero):
     }
 
 
-# def test_hero_info():
+def test_hero_info(hero):
+    results = menus.hero_info(hero)
+    assert results[0] == 'Character Information'
+    assert results[1] == 'Level: {}'.format(hero.lvl.current_lvl)
+    assert results[2] == 'Experience: {}'.format(hero.lvl.current_xp)
+    assert results[3] == 'Experience to Level: {}'.format(hero.lvl.xp_to_next_lvl)
+    assert results[4] == 'Maximum HP: {}'.format(hero.fighter.max_hp)
+    assert results[5] == 'Attack: {}'.format(hero.fighter.power)
+    assert results[6] == 'Defense: {}'.format(hero.fighter.defense)
+
+    assert len(results) == 7
+
 
 # def test_main_menu_options():
 
