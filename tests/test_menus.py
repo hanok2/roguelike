@@ -122,6 +122,8 @@ def test_inv_options__DROP_INV__both_hands_equipped(hero):
 
 def test_hero_info(hero):
     results = menus.hero_info(hero)
+
+    assert len(results) == 7
     assert results[0] == 'Character Information'
     assert results[1] == 'Level: {}'.format(hero.lvl.current_lvl)
     assert results[2] == 'Experience: {}'.format(hero.lvl.current_xp)
@@ -130,8 +132,12 @@ def test_hero_info(hero):
     assert results[5] == 'Attack: {}'.format(hero.fighter.power)
     assert results[6] == 'Defense: {}'.format(hero.fighter.defense)
 
-    assert len(results) == 7
 
+def test_main_menu_options():
+    result = menus.main_menu_options()
+    assert len(result) == 4
 
-# def test_main_menu_options():
-
+    assert result['n'] == 'New game'
+    assert result['c'] == 'Continue last game'
+    assert result['o'] == 'Options'
+    assert result['q'] == 'Quit'
