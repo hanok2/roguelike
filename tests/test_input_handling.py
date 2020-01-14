@@ -1,14 +1,9 @@
-from pytest_mock import mocker
+import pytest
 import tcod
+from pytest_mock import mocker
 from ..src import input_handling
 from ..src import states
 
-""" Shorthand:
-    # = Windows Key
-    ! = Alt
-    ^ = Control
-    + = Shift
-"""
 States = states.States
 
 
@@ -66,15 +61,209 @@ def test_handle_keys__SHOW_STATS__calls_handle_char_scr(mocker):
     input_handling.handle_char_scr.assert_called_with('a')
 
 
+""" Tests for handle_hero_turn_keys """
 
 
-# def test_handle_hero_turn_keys(key):
-# def test_handle_hero_dead_keys(key):
-# def test_handle_inv_keys(key):
-# def test_handle_main_menu(key):
+def test_handle_hero_turn_keys__stair_down():
+    result = input_handling.handle_hero_turn_keys('>')
+    assert result == {'stair_down': True}
+
+
+def test_handle_hero_turn_keys__stair_up():
+    result = input_handling.handle_hero_turn_keys('<')
+    assert result == {'stair_up': True}
+
+
+def test_handle_hero_turn_keys__pickup():
+    result = input_handling.handle_hero_turn_keys(',')
+    assert result == {'pickup': True}
+
+
+def test_handle_hero_turn_keys__inventory():
+    result = input_handling.handle_hero_turn_keys('i')
+    assert result == {'show_inv': True}
+
+
+def test_handle_hero_turn_keys__drop_inventory():
+    result = input_handling.handle_hero_turn_keys('d')
+    assert result == {'drop_inv': True}
+
+
+def test_handle_hero_turn_keys__char_screen():
+    result = input_handling.handle_hero_turn_keys('^x')
+    assert result == {'show_char_scr': True}
+
+
+def test_handle_hero_turn_keys__wait():
+    result = input_handling.handle_hero_turn_keys('.')
+    assert result == {'wait': True}
+
+
+def test_handle_hero_turn_keys__move_N():
+    result = input_handling.handle_hero_turn_keys('k')
+    assert result == {'move': (0, -1)}
+
+
+def test_handle_hero_turn_keys__move_S():
+    result = input_handling.handle_hero_turn_keys('j')
+    assert result == {'move': (0, 1)}
+
+
+def test_handle_hero_turn_keys__move_E():
+    result = input_handling.handle_hero_turn_keys('l')
+    assert result == {'move': (1, 0)}
+
+
+def test_handle_hero_turn_keys__move_W():
+    result = input_handling.handle_hero_turn_keys('h')
+    assert result == {'move': (-1, 0)}
+
+
+def test_handle_hero_turn_keys__move_NE():
+    result = input_handling.handle_hero_turn_keys('u')
+    assert result == {'move': (1, -1)}
+
+
+def test_handle_hero_turn_keys__move_NW():
+    result = input_handling.handle_hero_turn_keys('y')
+    assert result == {'move': (-1, -1)}
+
+
+def test_handle_hero_turn_keys__move_SE():
+    result = input_handling.handle_hero_turn_keys('n')
+    assert result == {'move': (1, 1)}
+
+
+def test_handle_hero_turn_keys__move_SW():
+    result = input_handling.handle_hero_turn_keys('b')
+    assert result == {'move': (-1, 1)}
+
+
+def test_handle_hero_turn_keys__fullscreen():
+    result = input_handling.handle_hero_turn_keys('!a')
+    assert result == {'full_scr': True}
+
+
+def test_handle_hero_turn_keys__escape():
+    result = input_handling.handle_hero_turn_keys('esc')
+    assert result == {'exit': True}
+
+
+@pytest.mark.skip(reason='look into later')
+def test_handle_hero_turn_keys__nothing_press():
+    result = input_handling.handle_hero_turn_keys(None)
+    assert result == {}
+
+
+""" Tests for handle_hero_dead_keys """
+
+
+def test_handle_hero_dead_keys__inventory():
+    result = input_handling.handle_hero_dead_keys('i')
+    assert result == {'show_inv': True}
+
+
+@pytest.mark.skip(reason='Fix Alt-Enter on tcod handling first')
+def test_handle_hero_dead_keys__fullscreen():
+    result = input_handling.handle_hero_dead_keys('!a')
+    assert result == {'full_scr': True}
+
+
+def test_handle_hero_dead_keys__char_scr():
+    result = input_handling.handle_hero_dead_keys('^x')
+    assert result == {'show_char_scr': True}
+
+
+def test_handle_hero_dead_keys__esc():
+    result = input_handling.handle_hero_dead_keys('esc')
+    assert result == {'exit': True}
+
+@pytest.mark.skip(reason='look into later')
+def test_handle_hero_dead_keys__nothing_press():
+    result = input_handling.handle_hero_dead_keys(None)
+    assert result == {}
+
+
+
+""" Tests for handle_hero_dead_keys """
+
+
+# def test_handle_inv_keys__A_equals_0():
+# def test_handle_inv_keys__Z_equals_26():
+
+
+def test_handle_inv_keys__a_equals_0():
+    result = input_handling.handle_inv_keys('a')
+    assert result == {'inv_index': 0}
+
+
+def test_handle_inv_keys__z_equals_26():
+    result = input_handling.handle_inv_keys('z')
+    assert result == {'inv_index': 25}
+
+
+@pytest.mark.skip(reason='Fix Alt-Enter on tcod handling first')
+def test_handle_inv_keys__fullscreen():
+    result = input_handling.handle_inv_keys('alt-enter')
+    assert result == {'full_scr': True}
+
+
+def test_handle_inv_keys__esc():
+    result = input_handling.handle_inv_keys('esc')
+    assert result == {'exit': True}
+
+
+@pytest.mark.skip(reason='look into later')
+def test_handle_inv_keys__nothing_press():
+    result = input_handling.handle_inv_keys(None)
+    assert result == {}
+
+
+""" Tests for test_handle_main_menu(key) """
+
+
+def test_handle_main_menu__new_game():
+    result = input_handling.handle_main_menu('n')
+    assert result == {'new_game': True}
+
+
+def test_handle_main_menu__load_game():
+    result = input_handling.handle_main_menu('c')
+    assert result == {'load_game': True}
+
+
+def test_handle_main_menu__options():
+    result = input_handling.handle_main_menu('o')
+    assert result == {'options': True}
+
+
+def test_handle_main_menu__exit():
+    result = input_handling.handle_main_menu('q')
+    assert result == {'exit': True}
+
+
+@pytest.mark.skip(reason='look into later')
+def test_handle_main_menu__esc__continues_game():
+    result = input_handling.handle_main_menu('esc')
+    assert result == {'exit': True}
+
+
+@pytest.mark.skip(reason='look into later')
+def test_handle_main_menu__not_valid_key():
+    result = input_handling.handle_main_menu(None)
+    assert result == {}
+
+
+""" Tests for test_handle_targeting_keys(key)"""
 # def test_handle_targeting_keys(key):
+
+""" Tests for test_handle_mouse(mouse)"""
 # def test_handle_mouse(mouse):
+
+""" Tests for test_handle_lvl_up_menu(key)"""
 # def test_handle_lvl_up_menu(key):
+
+""" Tests for test_handle_char_scr(key):"""
 # def test_handle_char_scr(key):
 
 

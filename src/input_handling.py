@@ -4,9 +4,17 @@ from .states import States
 # TCOD - EVENT CONSTANTS:
 # https://github.com/libtcod/python-tcod/blob/master/tcod/event_constants.py
 
+""" Shorthand:
+    # = Windows Key
+    ! = Alt
+    ^ = Control
+    + = Shift
+"""
+
 
 def handle_keys(key, state):
-    print(key)
+    # Put this here for now... move later when doing other ports
+    # key = process_tcod_input(key)
 
     if state == States.HERO_TURN:
         return handle_hero_turn_keys(key)
@@ -31,100 +39,47 @@ def handle_keys(key, state):
 
 
 def handle_hero_turn_keys(key):
-    key_char = chr(key.c)
-
     # Stairs
-    # key.shift is a boolean telling you whether Shift is down
-    if key.shift and key_char == '.':
+    if key == '>':
         return {'stair_down': True}
-    elif key.shift and key_char == ',':
+    elif key == '<':
         return {'stair_up': True}
 
     # Actions
-    if key_char == 'g' or key_char == ',':
+    if key == ',':
         return {'pickup': True}
-    elif key_char == 'i':
+    elif key == 'i':
         return {'show_inv': True}
-    elif key_char == 'd':
+    elif key == 'd':
         return {'drop_inv': True}
 
-    if key.lctrl and key_char == 'x':
-    # elif key.vk == tcod.KEY_CONTROL: and
-    # elif key_char == '\\':
+    if key == '^x':
         return {'show_char_scr': True}
 
-
-    # Wait
-    elif key_char == '.':
-        return {'wait': True}
-    elif key.vk == tcod.KEY_KP5:
+    elif key == '.':
         return {'wait': True}
 
-    # Move Up
-    if key_char == 'k':
-        return {'move': (0, -1)}
-    elif key.vk == tcod.KEY_UP:
-        return {'move': (0, -1)}
-    elif key.vk == tcod.KEY_KP8:
-        return {'move': (0, -1)}
+    # Movement
+    if key == 'k':
+        return {'move': (0, -1)}  # Move Up
+    elif key == 'j':
+        return {'move': (0, 1)}  # Move Down
+    elif key == 'h':
+        return {'move': (-1, 0)}  # Move Left
+    elif key == 'l':
+        return {'move': (1, 0)}  # Move Right
+    elif key == 'y':
+        return {'move': (-1, -1)}  # Move NW
+    elif key == 'u':
+        return {'move': (1, -1)}  # Move NE
+    elif key == 'b':
+        return {'move': (-1, 1)}  # Move SW
+    elif key == 'n':
+        return {'move': (1, 1)}  # Move SE
 
-    # Move Down
-    elif key_char == 'j':
-        return {'move': (0, 1)}
-    elif key.vk == tcod.KEY_DOWN:
-        return {'move': (0, 1)}
-    elif key.vk == tcod.KEY_KP2:
-        return {'move': (0, 1)}
-
-    # Move Left
-    elif key_char == 'h':
-        return {'move': (-1, 0)}
-    elif key.vk == tcod.KEY_LEFT:
-        return {'move': (-1, 0)}
-    elif key.vk == tcod.KEY_KP4:
-        return {'move': (-1, 0)}
-
-    # Move Right
-    elif key_char == 'l':
-        return {'move': (1, 0)}
-    elif key.vk == tcod.KEY_RIGHT:
-        return {'move': (1, 0)}
-    elif key.vk == tcod.KEY_KP6:
-        return {'move': (1, 0)}
-
-    # Move NW
-    elif key_char == 'y':
-        return {'move': (-1, -1)}
-    elif key.vk == tcod.KEY_KP7:
-        return {'move': (-1, -1)}
-
-    # Move NE
-    elif key_char == 'u':
-        return {'move': (1, -1)}
-    elif key.vk == tcod.KEY_KP9:
-        return {'move': (1, -1)}
-
-    # Move SW
-    elif key_char == 'b':
-        return {'move': (-1, 1)}
-    elif key.vk == tcod.KEY_KP1:
-        return {'move': (-1, 1)}
-
-    # Move SE
-    elif key_char == 'n':
-        return {'move': (1, 1)}
-    elif key.vk == tcod.KEY_KP3:
-        return {'move': (1, 1)}
-
-    # Note: Add support for number pad movement
-
-
-    if key.vk == tcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: Toggle full screen
+    if key == '!a':
         return {'full_scr': True}
-
-    elif key.vk == tcod.KEY_ESCAPE:
-        # Exit
+    elif key == 'esc':
         return {'exit': True}
 
     # No key was pressed
@@ -132,16 +87,13 @@ def handle_hero_turn_keys(key):
 
 
 def handle_hero_dead_keys(key):
-    key_char = chr(key.c)
-
-    # if key_char == 'i':
-        # return {'show_inv': True}
-
-    if key.vk == tcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: Toggle full screen
-        return {'full_scr': True}
-
-    elif key.vk == tcod.KEY_ESCAPE:
+    if key == 'i':
+        return {'show_inv': True}
+    elif key == 'alt-enter':
+        return {'full_scr': True}  # Alt+Enter: Toggle full screen
+    elif key == '^x':
+        return {'show_char_scr': True}
+    elif key == 'esc':
         return {'exit': True}
 
     return {}
@@ -149,32 +101,28 @@ def handle_hero_dead_keys(key):
 
 def handle_inv_keys(key):
     # Convert the key pressed to an index. a is 0, b is 1, etc.
-    index = key.c - ord('a')
+    if len(key) == 1:
+        index = ord(key) - ord('a')
 
-    if index >= 0:
-        return {'inv_index': index}
+        if index >= 0:
+            return {'inv_index': index}
 
-    if key.vk == tcod.KEY_ENTER and key.lalt:
-        # Alt+Enter: Toggle full screen
-        return {'full_scr': True}
-
-    elif key.vk == tcod.KEY_ESCAPE:
-        # Exit the menu
+    elif key == 'alt-enter':
+        return {'full_scr': True}  # Alt+Enter: Toggle full screen
+    elif key == 'esc':
         return {'exit': True}
 
     return {}
 
 
 def handle_main_menu(key):
-    key_char = chr(key.c)
-
-    if key_char == 'n':
+    if key == 'n':
         return {'new_game': True}
-    elif key_char == 'c':  # For "Continue"
+    elif key == 'c':  # For "Continue"
         return {'load_game': True}
-    elif key_char == 'o':
+    elif key == 'o':
         return {'options': True}
-    elif key_char == 'q':
+    elif key == 'q':
         return {'exit': True}
 
     return {}

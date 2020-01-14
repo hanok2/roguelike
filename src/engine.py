@@ -7,7 +7,7 @@ from .data_loaders import load_game, save_game
 from .death_functions import kill_monster, kill_hero
 from .fov import initialize_fov, recompute_fov
 from .states import States
-from .input_handling import handle_keys, handle_mouse, handle_main_menu
+from .input_handling import handle_keys, handle_mouse, handle_main_menu, process_tcod_input
 from .menus import main_menu, msg_box
 
 log = logger.setup_logger()
@@ -50,6 +50,7 @@ def main():
             # Update the display to represent the root consoles current state.
             tcod.console_flush()
 
+            key = process_tcod_input(key)
             action = handle_main_menu(key)
 
             new_game = action.get('new_game')
@@ -175,6 +176,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         )
 
         # Get keyboard/mouse input
+        key = process_tcod_input(key)
         action = handle_keys(key, state)
         mouse_action = handle_mouse(mouse)
 
