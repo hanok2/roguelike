@@ -32,7 +32,7 @@ class Player(entity.Entity):
             equipment=Equipment(),
             lvl=Level(),
             inv=Inventory(HERO_INV_CAPACITY),
-            fighter=Fighter(HERO_HP, HERO_DEF, HERO_POW),
             render_order=RenderOrder.ACTOR,
             blocks=True,
         )
+        self.fighter = Fighter(self, HERO_HP, HERO_DEF, HERO_POW)

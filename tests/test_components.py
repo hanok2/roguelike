@@ -17,7 +17,8 @@ def orc():
 
 
 def test_Fighter_init():
-    f = components.Fighter(hp=1, defense=2, power=3, xp=0)
+    f = components.Fighter(owner=None, hp=1, defense=2, power=3, xp=0)
+    assert f.owner is None
     assert f.base_max_hp == 1
     assert f.hp == 1
     assert f.base_defense == 2
@@ -27,22 +28,28 @@ def test_Fighter_init():
 
 def test_Fighter_init__hp_lt_1_raises_exception():
     with pytest.raises(ValueError):
-        components.Fighter(hp=0, defense=2, power=3, xp=0)
+        components.Fighter(owner=None, hp=0, defense=2, power=3, xp=0)
 
 
 def test_Fighter_init__defense_lt_0_raises_exception():
     with pytest.raises(ValueError):
-        components.Fighter(hp=1, defense=-1, power=3, xp=0)
+        components.Fighter(owner=None, hp=1, defense=-1, power=3, xp=0)
 
 
 def test_Fighter_init__power_lt_0_raises_exception():
     with pytest.raises(ValueError):
-        components.Fighter(hp=1, defense=2, power=-1, xp=0)
+        components.Fighter(owner=None, hp=1, defense=2, power=-1, xp=0)
 
 
 def test_Fighter_init__xp_lt_0_raises_exception():
     with pytest.raises(ValueError):
-        components.Fighter(hp=1, defense=2, power=3, xp=-1)
+        components.Fighter(owner=None, hp=1, defense=2, power=3, xp=-1)
+
+
+@pytest.mark.skip(reason='might be more trouble than its worth.')
+def test_Fighter_init__owner_must_be_Entity():
+    with pytest.raises(ValueError):
+        components.Fighter(owner=None, hp=1, defense=2, power=1, xp=0)
 
 
 # def test_Fighter_max_hp():
@@ -55,37 +62,36 @@ def test_Fighter_init__xp_lt_0_raises_exception():
 
 def test_Fighter_take_dmg__reduces_hp():
     hp = 10
-    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
     f.take_dmg(1)
     assert f.hp == 9
 
 
 def test_Fighter_take_dmg__negative_dmg_raises_exception():
-    f = components.Fighter(hp=10, defense=0, power=0, xp=0)
+    f = components.Fighter(owner=None, hp=10, defense=0, power=0, xp=0)
     with pytest.raises(ValueError):
         f.take_dmg(-1)
 
 
 def test_Fighter_take_dmg__returns_empty_results():
     hp = 10
-    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
     result = f.take_dmg(1)
     assert not result
 
 
 def test_Fighter_take_dmg__lethal_dmg_returns_dead_results():
     hp = 10
-    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
-    f.owner = 'owner'
+    f = components.Fighter(owner='bob', hp=hp, defense=0, power=0, xp=0)
     result = f.take_dmg(15)
     result = result.pop()  # get the dict from the list
     assert result['xp'] == 0
-    assert result['dead'] == 'owner'
+    assert result['dead'] == 'bob'
 
 
 def test_Fighter_heal__hp_is_recovered():
     hp = 10
-    f = components.Fighter(hp=hp, defense=0, power=0, xp=0)
+    f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
     f.owner = None
     f.take_dmg(1)
     f.heal(1)
@@ -93,14 +99,14 @@ def test_Fighter_heal__hp_is_recovered():
 
 
 def test_Fighter_heal__excess_hp_doesnt_go_over_max():
-    f = components.Fighter(hp=10, defense=0, power=0, xp=0)
+    f = components.Fighter(owner=None, hp=10, defense=0, power=0, xp=0)
     f.owner = None
     f.heal(100)
     assert f.hp == f.max_hp
 
 
 def test_Fighter_heal__negative_amt_raises_exception():
-    f = components.Fighter(hp=10, defense=0, power=0, xp=0)
+    f = components.Fighter(owner=None, hp=10, defense=0, power=0, xp=0)
     f.owner = None
     with pytest.raises(ValueError):
         f.heal(-1)

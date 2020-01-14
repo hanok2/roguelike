@@ -5,9 +5,14 @@ from .components import Item
 
 
 class Entity(object):
-    """ A generic object to represent players, enemies, items, etc."""
+    """ A generic object to represent players, enemies, items, etc.
+        Use a dictionary to track components.
+            Needs an set/add and rm methods.
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None, human=False):
+        Track a list of flags?
+    """
+
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, ai=None, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None, human=False):
         self.x = x
         self.y = y
         self.char = char
@@ -15,19 +20,15 @@ class Entity(object):
         self.name = name
         self.blocks = blocks
         self.render_order = render_order
-        self.fighter = fighter
-        self.ai = ai
-        self.item = item
-        self.inv = inv
-        self.stair_down = stair_down
-        self.stair_up = stair_up
-        self.lvl = lvl
-        self.equipment = equipment
-        self.equippable = equippable
-        self.human = human      # or player, hero, controlled?
-
-        if self.fighter:
-            self.fighter.owner = self
+        self.ai = ai                    # Needs owner
+        self.item = item                # Needs owner
+        self.inv = inv                  # Needs owner
+        self.stair_down = stair_down    # Needs owner
+        self.stair_up = stair_up        # Needs owner
+        self.lvl = lvl                  # Needs owner
+        self.equipment = equipment      # Needs owner
+        self.equippable = equippable    # Needs owner
+        self.human = human              # Flag
 
         if self.ai:
             self.ai.owner = self

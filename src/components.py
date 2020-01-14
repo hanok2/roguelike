@@ -4,7 +4,7 @@ from .config import EquipmentSlots
 
 
 class Fighter(object):
-    def __init__(self, hp, defense, power, xp=0):
+    def __init__(self, owner, hp, defense, power, xp=0):
         if hp <= 0:
             raise ValueError('Fighter hp must be greater than 0!')
         elif defense < 0:
@@ -14,6 +14,7 @@ class Fighter(object):
         elif xp < 0:
             raise ValueError('Fighter xp must be greater than or equal to 0!')
 
+        self.owner = owner
         self.base_max_hp = hp
         self.hp = hp
         self.base_defense = defense

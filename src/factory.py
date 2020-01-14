@@ -46,39 +46,43 @@ def mk_entity(entity_name, x, y):
         raise ValueError('x and y coordinates must be 0 or greater!')
 
     if entity_name == 'spider':
-        return Entity(
+        spider = Entity(
             x, y,
             's',
             tcod.desaturated_green,
             'Spider',
             blocks=True,
             render_order=RenderOrder.ACTOR,
-            fighter=Fighter(hp=5, defense=0, power=2, xp=5),
             ai=ApproachingBehavior()
         )
+        spider.fighter = Fighter(owner=spider, hp=5, defense=0, power=2, xp=5)
+        return spider
+
     elif entity_name == 'orc':
-        return Entity(
+        orc = Entity(
             x, y,
             'o',
             tcod.desaturated_green,
             'Orc',
             blocks=True,
             render_order=RenderOrder.ACTOR,
-            fighter=Fighter(hp=10, defense=1, power=3, xp=35),
             ai=ApproachingBehavior()
         )
+        orc.fighter = Fighter(owner=orc, hp=10, defense=1, power=3, xp=35)
+        return orc
+
     elif entity_name == 'troll':
-        return Entity(
+        troll = Entity(
             x, y,
             'T',
             tcod.darker_green,
             'Troll',
             blocks=True,
             render_order=RenderOrder.ACTOR,
-            fighter=Fighter(hp=10, defense=2, power=4, xp=100),
             ai=ApproachingBehavior()
         )
-
+        troll.fighter = Fighter(owner=troll, hp=10, defense=2, power=4, xp=100)
+        return troll
 
     if entity_name == 'healing_potion':
         return Entity(
