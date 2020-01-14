@@ -185,8 +185,13 @@ def test_ConfusedBehavior_init__negative_turns_raises_exception(orc):
 """ Tests for class Item(object): """
 
 
+@pytest.mark.skip(reason='lazy')
+def test_Item_init__owner_is_none_raises_exception():
+    pass
+
 def test_Item_init__no_args():
-    i = components.Item()
+    i = components.Item(owner=None)
+    assert i.owner is None
     assert i.use_func is None
     assert i.targeting is False
     assert i.targeting_msg is None
@@ -257,8 +262,16 @@ def test_Level_add_xp__below_lvl_increases_current_xp():
 
 """ Tests for class Equippable(object): """
 
+
+@pytest.mark.skip(reason='lazy')
+def test_Equippable_init__owner_is_none_raises_exception():
+    pass
+
+
 def test_Equippable_init__defaults():
-    eq = components.Equippable('slot')
+    eq = components.Equippable(owner=None, slot='slot')
+
+    assert eq.owner is None
     assert eq.slot == 'slot'
     assert eq.power_bonus == 0
     assert eq.defense_bonus == 0
@@ -267,22 +280,22 @@ def test_Equippable_init__defaults():
 
 def test_Equippable_init__None_slot_raises_exception():
     with pytest.raises(ValueError):
-        components.Equippable(None)
+        components.Equippable(owner=None, slot=None)
 
 
 def test_Equippable_init__negative_power_bonus_raises_exception():
     with pytest.raises(ValueError):
-        components.Equippable('slot', power_bonus=-1)
+        components.Equippable(owner=None, slot='slot', power_bonus=-1)
 
 
 def test_Equippable_init__negative_defense_bonus_raises_exception():
     with pytest.raises(ValueError):
-        components.Equippable('slot', defense_bonus=-1)
+        components.Equippable(owner=None, slot='slot', defense_bonus=-1)
 
 
 def test_Equippable_init__negative_max_hp_bonus_raises_exception():
     with pytest.raises(ValueError):
-        components.Equippable('slot', max_hp_bonus=-1)
+        components.Equippable(owner=None, slot='slot', max_hp_bonus=-1)
 
 
 """ Tests for class Equipment(object): """

@@ -45,7 +45,7 @@ def test_Entity_init__fighter():
     assert isinstance(e.fighter, Fighter)
 
 
-@pytest.mark.skip(reason='Removed the fighter parameter because it needs to be added after entity creation.')
+@pytest.mark.skip(reason='Removed the ai parameter because it needs to be added after entity creation.')
 def test_Entity_init__ai():
     ai = ApproachingBehavior()
     ai.owner = 'bob'
@@ -53,6 +53,7 @@ def test_Entity_init__ai():
     assert e.ai == ai
 
 
+@pytest.mark.skip(reason='Removed the item parameter because it needs to be added after entity creation.')
 def test_Entity_init__item():
     item_comp = Item()
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', item=item_comp)
@@ -89,6 +90,7 @@ def test_Entity_init__equipment():
     assert isinstance(e.equipment, Equipment)
 
 
+@pytest.mark.skip(reason='Removed the equippable parameter because it needs to be added after entity creation.')
 def test_Entity_init__equippable():
     equippable_comp = Equippable(1)
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', equippable=equippable_comp)

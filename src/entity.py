@@ -12,7 +12,7 @@ class Entity(object):
         Track a list of flags?
     """
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None, human=False):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, human=False):
         self.x = x
         self.y = y
         self.char = char
@@ -20,18 +20,16 @@ class Entity(object):
         self.name = name
         self.blocks = blocks
         self.render_order = render_order
-        self.item = item                # Needs owner
         self.inv = inv                  # Needs owner
         self.stair_down = stair_down    # Needs owner
         self.stair_up = stair_up        # Needs owner
         self.lvl = lvl                  # Needs owner
         self.equipment = equipment      # Needs owner
-        self.equippable = equippable    # Needs owner
         self.human = human              # Flag
-        self.ai = None                  # Improve this later.
 
-        if self.item:
-            self.item.owner = self
+        self.item = None                # Improve this later.
+        self.ai = None                  # Improve this later.
+        self.equippable = None          # Improve this later.
 
         if self.inv:
             self.inv.owner = self
@@ -47,18 +45,6 @@ class Entity(object):
 
         if self.equipment:
             self.equipment.owner = self
-
-        if self.equippable:
-            self.equippable.owner = self
-
-            # Note: Why is this needed?
-            # Notice that if the entity does not have an Item component, then we
-            # add one. This is because every piece of equipment is also an item
-            # by definition, because it gets added to the inventory, picked up, and dropped.
-            if not self.item:
-                item = Item()
-                self.item = item
-                self.item.owner = self
 
     def move(self, dx, dy):
         # Move the entity by a given amount

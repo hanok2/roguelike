@@ -18,7 +18,7 @@ def kill_monster(monster):
     monster.ai = None
 
     # Change to an item so we can pick it up!
-    monster.item = components.Item()
+    monster.item = components.Item(owner=monster)
 
     death_msg = 'The {} dies!'.format(monster.name.capitalize())
     monster.name = 'remains of ' + monster.name

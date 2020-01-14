@@ -85,91 +85,111 @@ def mk_entity(entity_name, x, y):
         return troll
 
     if entity_name == 'healing_potion':
-        return Entity(
+        item = Entity(
             x, y,
             '!',
             tcod.violet,
             "Healing potion",
             render_order=RenderOrder.ITEM,
-            item=Item(use_func=heal, amt=40),
         )
+        item.item = Item(item, use_func=heal, amt=40)
+        return item
 
     elif entity_name == 'sword':
-        return Entity(
+        item = Entity(
             x, y,
             '(',
             tcod.sky,
             'Sword',
-            equippable=Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
         )
+        item.item = Item(owner=item)
+        item.equippable = Equippable(owner=item, slot=EquipmentSlots.MAIN_HAND, power_bonus=3)
+        return item
+
     elif entity_name == 'dagger':
-        return Entity(
+        item = Entity(
             0, 0,
             '(',
             tcod.sky,
             'Dagger',
-            equippable=Equippable(EquipmentSlots.MAIN_HAND, power_bonus=2)
         )
+        item.item = Item(owner=item)
+        item.equippable = Equippable(owner=item, slot=EquipmentSlots.MAIN_HAND, power_bonus=2)
+        return item
+
     elif entity_name == 'shield':
-        return Entity(
+        item = Entity(
             x, y,
             '[',
             tcod.darker_orange,
             'Shield',
-            equippable=Equippable(EquipmentSlots.OFF_HAND, defense_bonus=2)
         )
+        item.item = Item(owner=item)
+        item.equippable = Equippable(owner=item, slot=EquipmentSlots.OFF_HAND, defense_bonus=2)
+        return item
+
     elif entity_name == 'ring of hp':
-        return Entity(
+        item = Entity(
             x, y,
             '=',
             tcod.blue,
             'Ring of HP',
-            equippable=Equippable(EquipmentSlots.OFF_HAND, max_hp_bonus=50)
         )
+        item.item = Item(owner=item)
+        item.equippable = Equippable(owner=item, slot=EquipmentSlots.OFF_HAND, max_hp_bonus=50)
+        return item
+
     elif entity_name == 'fireball_scroll':
-        item_comp = Item(
+        item = Entity(
+            x, y,
+            '?',
+            tcod.yellow,
+            "Fireball Scroll",
+            render_order=RenderOrder.ITEM,
+        )
+        item.item = Item(
+            owner=item,
             use_func=cast_fireball,
             targeting=True,
             targeting_msg='Left-click a target tile for the fireball, or right-click to cancel.',
             dmg=25,
             radius=3
         )
-
-        return Entity(
-            x, y,
-            '?',
-            tcod.yellow,
-            "Fireball Scroll",
-            render_order=RenderOrder.ITEM,
-            item=item_comp,
-        )
+        return item
 
     elif entity_name == 'confusion_scroll':
-        item_comp = Item(
-            use_func=cast_confuse,
-            targeting=True,
-            targeting_msg='Left-click an enemy to confuse it, or right-click to cancel.',
-        )
-
-        return Entity(
+        item = Entity(
             x, y,
             '?',
             tcod.yellow,
             "Confuse Scroll",
             render_order=RenderOrder.ITEM,
-            item=item_comp,
         )
+
+        item.item = Item(
+            owner=item,
+            use_func=cast_confuse,
+            targeting=True,
+            targeting_msg='Left-click an enemy to confuse it, or right-click to cancel.',
+        )
+        return item
 
     elif entity_name == 'lightning_scroll':
         # Scroll of lightning bolt
-        item_comp = Item(use_func=cast_lightning, dmg=40, max_range=5)
-        return Entity(
+        item = Entity(
             x, y,
             '?',
             tcod.yellow,
             "Lightning Scroll",
             render_order=RenderOrder.ITEM,
-            item=item_comp,
         )
+
+        item.item = Item(
+            owner=item,
+            use_func=cast_lightning,
+            dmg=40,
+            max_range=5
+        )
+        return item
 
     raise ValueError('Unknown entity selected: {}'.format(entity_name))

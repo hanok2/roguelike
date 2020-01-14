@@ -140,7 +140,8 @@ class ConfusedBehavior(object):
 
 
 class Item(object):
-    def __init__(self, use_func=None, targeting=False, targeting_msg=None, **kwargs):
+    def __init__(self, owner, use_func=None, targeting=False, targeting_msg=None, **kwargs):
+        self.owner = owner
         self.use_func = use_func
         self.targeting = targeting
         self.targeting_msg = targeting_msg
@@ -178,16 +179,25 @@ class Level(object):
 
 
 class Equippable(object):
-    def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0):
+    def __init__(self, owner, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0):
         if not slot:
             raise ValueError('slot must not be None!')
         elif power_bonus < 0 or defense_bonus < 0 or max_hp_bonus < 0:
             raise ValueError('bonus must not be less than 0!')
 
+        self.owner = owner
         self.slot = slot
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
         self.max_hp_bonus = max_hp_bonus
+
+        # If the entity does not have an Item component, then we  add one. This
+        # is because every piece of equipment is also an item by definition,
+        # because it gets added to the inventory, picked up, and dropped.
+        # if not owner.item:
+            # item = Item(owner)
+            # owner.item = item
+
 
 
 class Equipment(object):
