@@ -14,7 +14,7 @@ def default_lettering_dict(options):
     return option_dict
 
 
-# Move to player/entity class?
+# Move to Inventory class?
 def list_inv_items(hero):
     """ Returns a list of all items the hero currently has in inventory.
         If the hero has an item equipped, it will display the slot the item is
