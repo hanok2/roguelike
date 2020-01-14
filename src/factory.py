@@ -53,9 +53,9 @@ def mk_entity(entity_name, x, y):
             'Spider',
             blocks=True,
             render_order=RenderOrder.ACTOR,
-            ai=ApproachingBehavior()
         )
         spider.fighter = Fighter(owner=spider, hp=5, defense=0, power=2, xp=5)
+        spider.ai = ApproachingBehavior(spider)
         return spider
 
     elif entity_name == 'orc':
@@ -66,9 +66,9 @@ def mk_entity(entity_name, x, y):
             'Orc',
             blocks=True,
             render_order=RenderOrder.ACTOR,
-            ai=ApproachingBehavior()
         )
         orc.fighter = Fighter(owner=orc, hp=10, defense=1, power=3, xp=35)
+        orc.ai = ApproachingBehavior(orc)
         return orc
 
     elif entity_name == 'troll':
@@ -79,9 +79,9 @@ def mk_entity(entity_name, x, y):
             'Troll',
             blocks=True,
             render_order=RenderOrder.ACTOR,
-            ai=ApproachingBehavior()
         )
         troll.fighter = Fighter(owner=troll, hp=10, defense=2, power=4, xp=100)
+        troll.ai = ApproachingBehavior(troll)
         return troll
 
     if entity_name == 'healing_potion':

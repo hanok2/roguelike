@@ -12,7 +12,7 @@ class Entity(object):
         Track a list of flags?
     """
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, ai=None, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None, human=False):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, item=None, inv=None, stair_down=None, stair_up=None, lvl=None, equipment=None, equippable=None, human=False):
         self.x = x
         self.y = y
         self.char = char
@@ -20,7 +20,6 @@ class Entity(object):
         self.name = name
         self.blocks = blocks
         self.render_order = render_order
-        self.ai = ai                    # Needs owner
         self.item = item                # Needs owner
         self.inv = inv                  # Needs owner
         self.stair_down = stair_down    # Needs owner
@@ -29,9 +28,7 @@ class Entity(object):
         self.equipment = equipment      # Needs owner
         self.equippable = equippable    # Needs owner
         self.human = human              # Flag
-
-        if self.ai:
-            self.ai.owner = self
+        self.ai = None                  # Improve this later.
 
         if self.item:
             self.item.owner = self
