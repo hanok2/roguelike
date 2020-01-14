@@ -8,9 +8,9 @@ from .death_functions import kill_monster, kill_hero
 from .fov import initialize_fov, recompute_fov
 from .states import States
 from .input_handling import handle_keys, handle_mouse, handle_main_menu, process_tcod_input
-from .menus import main_menu, msg_box
 
 log = logger.setup_logger()
+
 
 def main():
     log.debug('Started new game.')
@@ -50,10 +50,10 @@ def main():
         # )
 
         if show_main_menu:
-            main_menu(render_eng, main_menu_bg_img)
+            render_eng.main_menu(main_menu_bg_img)
 
             if show_load_err_msg:
-                msg_box(render_eng, 'No save game to load', 50)
+                render_eng.msg_box(render_eng, 'No save game to load', 50)
 
             # Update the display to represent the root consoles current state.
             tcod.console_flush()

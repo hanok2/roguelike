@@ -1,63 +1,4 @@
-import tcod
-from . import config
-
-MAX_MENU_ITEMS = 26
-
-
-def menu(render_eng, header, options, width):
-    """ Display a menu of options. Each option has a letter to the left side."""
-    if len(options) > MAX_MENU_ITEMS:
-        raise ValueError('Cannot have a menu with more than 26 options.')
-
-    # Calculate total height for the header (after auto-wrap) and one line per option
-    header_height = tcod.console_get_height_rect(
-        con=render_eng.con,
-        x=0, y=0,
-        w=width,
-        h=config.scr_height,
-        fmt=header
-    )
-
-    height = len(options) + header_height
-
-    # Create an off-screen console that represents the menu's window
-    window = tcod.console.Console(width=width, height=height)
-
-    window.default_fg = tcod.white
-    window.default_bg = tcod.black
-
-    # Print a string constrained to a rectangle with blend and alignment.
-    window.print(
-        x=0, y=0,
-        string=header,
-        alignment=tcod.LEFT
-    )
-
-    # Print all the options
-    y = header_height
-
-    for k, v in options.items():
-        text = '({}) {}'.format(k, v)
-
-        window.print(
-            x=0, y=y,
-            string=text,
-            # bg=tcod.BKGND_NONE,
-            alignment=tcod.LEFT
-        )
-        y += 1
-
-    x = int(config.scr_width / 2 - width / 2)
-    y = 5
-
-    # Blit the contents of "window" to the root console
-    window.blit(
-        dest=render_eng.root,
-        dest_x=x, dest_y=y,
-        src_x=0, src_y=0,
-        width=width,
-        height=height,
-    )
+from .states import States
 
 
 def default_lettering_dict(options):
@@ -73,12 +14,12 @@ def default_lettering_dict(options):
     return option_dict
 
 
-def list_all_inv_items(hero):
+# Move to player/entity class?
+def list_inv_items(hero):
     """ Returns a list of all items the hero currently has in inventory.
         If the hero has an item equipped, it will display the slot the item is
         equipped in parentheses.
     """
-
     options = []
 
     for item in hero.inv.items:
@@ -92,87 +33,37 @@ def list_all_inv_items(hero):
     return options
 
 
-def inv_menu(render_eng, header, hero, inv_width):
-    """ Show a menu with each item of the inventory as an option """
-
-    if len(hero.inv.items) == 0:
-        options = ['Inventory is empty.']
-    else:
-        options = list_all_inv_items(hero)
-        options = default_lettering_dict(options)
-
-        menu(render_eng, header, options, inv_width)
-
-
-def main_menu(render_eng, menu_img):
-    """ Displays the main menu for the game."""
-
-    tcod.image_blit_2x(
-        image=menu_img,
-        console=render_eng.root,
-        dx=0,
-        dy=0
-    )
-
-    render_eng.root.default_fg=tcod.light_yellow
-
-    # Display game title
-    title_x = int(config.scr_width / 2)
-    title_y = 3
-
-    render_eng.root.print(
-        x=title_x, y=title_y,
-        string=config.game_title,
-        alignment=tcod.CENTER
-    )
-
-    # Display author
-    author_x = int(config.scr_width / 2)
-    author_y = int(config.scr_height - 2)
-
-    render_eng.root.print(
-        x=author_x, y=author_y,
-        string='By {}'.format(config.author),
-        alignment=tcod.CENTER,
-    )
-
-    # Display main menu options
-    options = {
-        'n': 'New game',
-        'c': 'Continue last game',
-        'o': 'Options',
-        'q': 'Quit'
-    }
-
-    menu(render_eng, '', options, 24)
-
-
-def msg_box(render_eng, header, width):
-    menu(render_eng.con, header, [], width, config.scr_width, config.scr_height)
-
-
-def lvl_up_menu(render_eng, header, hero, menu_width):
+def lvl_up_options(hero):
     """Displays a menu for the player when they reach a level-up. Gives them
         choice of different stat boosts to pick from.
     """
+    header = 'Level up! Choose a stat to raise:'
+
     options = {
         'c': 'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
         's': 'Strength (+1 attack, from {})'.format(hero.fighter.power),
         'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
     }
+    return header, options
 
-    menu(render_eng, header, options, menu_width)
+
+def inv_options(hero, state):
+    """ Show a menu with each item of the inventory as an option """
+    if state == States.SHOW_INV:
+        header = 'Press the key next to an item to use it, or ESC to cancel.\n'
+    else:
+        header = 'Press the key next to an item to drop it, or ESC to cancel.\n'
+
+    if len(hero.inv.items) == 0:
+        options = ['Inventory is empty.']
+    else:
+        options = list_inv_items(hero)
+        options = default_lettering_dict(options)
+
+    return header, options
 
 
-def char_scr(render_eng, hero):
-    """ Displays a windows showing the hero's current stats and experience."""
-    window = tcod.console.Console(
-        width=config.char_scr_width,
-        height=config.char_scr_height
-    )
-
-    window.default_fg = tcod.white
-
+def hero_options(hero):
     info = [
         'Character Information',
         'Level: {}'.format(hero.lvl.current_lvl),
@@ -182,26 +73,12 @@ def char_scr(render_eng, hero):
         'Attack: {}'.format(hero.fighter.power),
         'Defense: {}'.format(hero.fighter.defense),
     ]
+    return info
 
-    for i, row in enumerate(info):
-        window.print_box(
-            x=0, y=i+1,
-            width=config.char_scr_width,
-            height=config.char_scr_height,
-            string=row,
-            bg=tcod.black,
-            alignment=tcod.LEFT,
-        )
-
-    x = config.scr_width // 2 - config.char_scr_width // 2
-    y = 5
-
-    window.blit(
-        dest=render_eng.root,
-        dest_x=x, dest_y=y,
-        src_x=0, src_y=0,
-        width=config.char_scr_width,
-        height=config.char_scr_height,
-        # fg_alpha=1.0,
-        # bg_alpha=0.7
-    )
+def main_menu_options():
+    return {
+        'n': 'New game',
+        'c': 'Continue last game',
+        'o': 'Options',
+        'q': 'Quit'
+    }

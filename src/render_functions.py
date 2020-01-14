@@ -2,7 +2,7 @@ from enum import Enum, auto
 import tcod
 from . import config
 from .states import States
-from .menus import inv_menu, lvl_up_menu, char_scr
+from . import menus
 
 
 class RenderOrder(Enum):
@@ -59,23 +59,16 @@ class RenderEngine(object):
 
         # Display inventory menu if necessary
         if state in (States.SHOW_INV, States.DROP_INV):
-            if state == States.SHOW_INV:
-                inv_title = 'Press the key next to an item to use it, or ESC to cancel.\n'
-            else:
-                inv_title = 'Press the key next to an item to drop it, or ESC to cancel.\n'
-
-            inv_menu(self, inv_title, dungeon.hero, 50)
+            header, options = menus.inv_options(dungeon.hero, state)
+            self.menu(header, options, width=50)
 
         elif state == States.LEVEL_UP:
-            lvl_up_menu(
-                self,
-                'Level up! Choose a stat to raise:',
-                dungeon.hero,
-                40,
-            )
+            # Render the level-up menu
+            header, options = menus.lvl_up_options(dungeon.hero)
+            self.menu(header, options, width=40)
 
         elif state == States.SHOW_STATS:
-            char_scr(self, dungeon.hero)
+            self.char_scr(dungeon.hero)
 
         self.panel.default_bg = tcod.black
         self.panel.clear()
@@ -85,7 +78,6 @@ class RenderEngine(object):
 
         self.render_status_bar(dungeon, fov_map, mouse, turns)
         self.render_console_messages(msg_log)
-
 
     def render_map_tiles(self, game_map, fov_map):
         # visible = fov_map.fov[:]
@@ -234,7 +226,7 @@ class RenderEngine(object):
             tcod.darker_red
         )
 
-        # todo: Display XP bar
+        # Display XP bar
         self.render_bar(
             1, 4,
             config.bar_width,
@@ -245,29 +237,20 @@ class RenderEngine(object):
             tcod.darker_blue
         )
 
-        # todo: Display level
+        # Display level
         self.panel.print(
             x=22, y=2,
             string='Lvl:{}'.format(hero.lvl.current_lvl),
         )
 
-        # todo: Display power
-        self.panel.print(
-            x=29, y=2,
-            string='Pow:{}'.format(hero.fighter.power),
-        )
+        # Display power
+        self.panel.print(x=29, y=2, string='Pow:{}'.format(hero.fighter.power))
 
-        # todo: Display defense
-        self.panel.print(
-            x=36, y=2,
-            string='Def:{}'.format(hero.fighter.defense),
-        )
+        # Display defense
+        self.panel.print(x=36, y=2, string='Def:{}'.format(hero.fighter.defense))
 
         # todo: Display turns
-        self.panel.print(
-            x=55, y=2,
-            string='Turn: {}'.format(turns),
-        )
+        self.panel.print(x=55, y=2, string='Turn: {}'.format(turns))
 
         # Display entity under mouse
         self.panel.print(
@@ -284,6 +267,117 @@ class RenderEngine(object):
             src_x=0, src_y=0,
             width=config.scr_width,
             height=config.panel_height,
+        )
+
+    def menu(self, header, options, width):
+        """ Display a menu of options. Each option has a letter to the left side."""
+        if len(options) > config.MAX_MENU_ITEMS:
+            raise ValueError('Cannot have a menu with more than 26 options.')
+
+        # Calculate total height for the header (after auto-wrap) and one line per option
+        header_height = tcod.console_get_height_rect(
+            con=self.con,
+            x=0, y=0,
+            w=width,
+            h=config.scr_height,
+            fmt=header
+        )
+
+        height = len(options) + header_height
+
+        # Create an off-screen console that represents the menu's window
+        window = tcod.console.Console(width=width, height=height)
+
+        window.default_fg = tcod.white
+        window.default_bg = tcod.black
+
+        # Print a string constrained to a rectangle with blend and alignment.
+        window.print(
+            x=0, y=0,
+            string=header,
+            alignment=tcod.LEFT
+        )
+
+        # Print all the options
+        y = header_height
+
+        for k, v in options.items():
+            text = '({}) {}'.format(k, v)
+
+            window.print(
+                x=0, y=y,
+                string=text,
+                alignment=tcod.LEFT
+            )
+            y += 1
+
+        x = int(config.scr_width / 2 - width / 2)
+        y = 5
+
+        # Blit the contents of "window" to the root console
+        window.blit(
+            dest=self.root,
+            dest_x=x, dest_y=y,
+            src_x=0, src_y=0,
+            width=width,
+            height=height,
+        )
+
+    def main_menu(self, menu_img):
+        """ Displays the main menu for the game."""
+
+        tcod.image_blit_2x(image=menu_img, console=self.root, dx=0, dy=0)
+
+        self.root.default_fg=tcod.light_yellow
+
+        # Display game title
+        title_x = int(config.scr_width / 2)
+        title_y = 3
+
+        self.root.print(x=title_x, y=title_y, string=config.game_title, alignment=tcod.CENTER)
+
+        # Display author
+        author_x = int(config.scr_width / 2)
+        author_y = int(config.scr_height - 2)
+
+        self.root.print(x=author_x, y=author_y, string='By {}'.format(config.author), alignment=tcod.CENTER)
+
+        # Display main menu options
+        options = menus.main_menu_options()
+        self.menu('', options, 24)
+
+    def msg_box(self, header, width):
+        self.menu(self.con, header, [], width, config.scr_width, config.scr_height)
+
+    def char_scr(self, hero):
+        """ Displays a windows showing the hero's current stats and experience."""
+        window = tcod.console.Console(
+            width=config.char_scr_width,
+            height=config.char_scr_height
+        )
+
+        window.default_fg = tcod.white
+        info = menus.hero_options(hero)
+
+        for i, row in enumerate(info):
+            window.print_box(
+                x=0, y=i+1,
+                width=config.char_scr_width,
+                height=config.char_scr_height,
+                string=row,
+                bg=tcod.black,
+                alignment=tcod.LEFT,
+            )
+
+        x = config.scr_width // 2 - config.char_scr_width // 2
+        y = 5
+
+        window.blit(
+            dest=self.root,
+            dest_x=x, dest_y=y,
+            src_x=0, src_y=0,
+            width=config.char_scr_width,
+            height=config.char_scr_height,
         )
 
 

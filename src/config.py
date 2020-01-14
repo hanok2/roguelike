@@ -16,6 +16,7 @@ scr_height = 50
 bar_width = 20
 panel_height = 7
 panel_y = scr_height - panel_height
+MAX_MENU_ITEMS = 26
 
 msg_x = bar_width + 2
 # msg_width = scr_width - bar_width - 2  # Same as scr_width
