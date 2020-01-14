@@ -41,6 +41,14 @@ def main():
             m=mouse
         )
 
+        # When I can re-arrange input after rendering - re-enable this...
+        # tcod.sys_wait_for_event(
+            # mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            # k=key,
+            # m=mouse,
+            # flush=True
+        # )
+
         if show_main_menu:
             main_menu(render_eng, main_menu_bg_img)
 

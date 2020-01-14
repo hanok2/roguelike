@@ -203,12 +203,24 @@ def process_tcod_input(key):
 
 
 def handle_mouse(mouse):
+    """ Takes in the mouse object from tcod and returns appropriate info.
+
+        x,y: Absolute position of the mouse cursor in pixels relative to the window
+            top-left corner.
+        dx, dy: Movement of the mouse cursor since the last call in pixels.
+        cx,	cy: Coordinates of the console cell under the mouse cursor
+            (pixel coordinates divided by the font size).
+        lbutton_pressed: true if the left button was pressed and released.
+        rbutton_pressed: true if the right button was pressed and released.
+        mbutton_pressed: true if the middle button was pressed and released.
+    """
     (x, y) = (mouse.cx, mouse.cy)
 
     if mouse.lbutton_pressed:
         return {'l_click': (x, y)}
     elif mouse.rbutton_pressed:
         return {'r_click': (x, y)}
+    elif mouse.mbutton_pressed:
+        return {'m_click': (x, y)}
 
     return {}
-

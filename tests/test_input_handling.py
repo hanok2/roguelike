@@ -434,9 +434,28 @@ def test_process_tcod_input__numpad9__returns_u():
     assert input_handling.process_tcod_input(numpad9) == 'u'
 
 
-""" Tests for test_handle_mouse(mouse)"""
+""" Tests for test_handle_mouse()"""
 
 
-@pytest.mark.skip(reason='look into later - no idea how to test yet!')
-def test_handle_mouse(mouse):
-    pass
+def test_handle_mouse__rclick():
+    rclick = tcod.Mouse(x=202, y=116, cx=16, cy=9, rbutton_pressed=True)
+    result = input_handling.handle_mouse(rclick)
+
+    # Test cx/cy because that is the cell the cursor is over in the console
+    assert result == {'r_click': (16, 9)}
+
+
+def test_handle_mouse__lclick():
+    mclick = tcod.Mouse(x=202, y=116, cx=16, cy=9, lbutton_pressed=True)
+    result = input_handling.handle_mouse(mclick)
+
+    # Test cx/cy because that is the cell the cursor is over in the console
+    assert result == {'l_click': (16, 9)}
+
+
+def test_handle_mouse__mclick():
+    mclick = tcod.Mouse(x=191, y=102, cx=15, cy=8, mbutton_pressed=True)
+    result = input_handling.handle_mouse(mclick)
+
+    # Test cx/cy because that is the cell the cursor is over in the console
+    assert result == {'m_click': (15, 8)}
