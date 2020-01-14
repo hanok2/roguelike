@@ -60,15 +60,15 @@ class RenderEngine(object):
         # Display inventory menu if necessary
         if state in (States.SHOW_INV, States.DROP_INV):
             header, options = menus.inv_options(dungeon.hero, state)
-            self.menu(header, options, width=50)
+            self.render_menu(header, options, width=50)
 
         elif state == States.LEVEL_UP:
             # Render the level-up menu
             header, options = menus.lvl_up_options(dungeon.hero)
-            self.menu(header, options, width=40)
+            self.render_menu(header, options, width=40)
 
         elif state == States.SHOW_STATS:
-            self.char_scr(dungeon.hero)
+            self.render_char_scr(dungeon.hero)
 
         self.panel.default_bg = tcod.black
         self.panel.clear()
@@ -269,7 +269,7 @@ class RenderEngine(object):
             height=config.panel_height,
         )
 
-    def menu(self, header, options, width):
+    def render_menu(self, header, options, width):
         """ Display a menu of options. Each option has a letter to the left side."""
         if len(options) > config.MAX_MENU_ITEMS:
             raise ValueError('Cannot have a menu with more than 26 options.')
@@ -323,7 +323,7 @@ class RenderEngine(object):
             height=height,
         )
 
-    def main_menu(self, menu_img):
+    def render_main_menu(self, menu_img):
         """ Displays the main menu for the game."""
 
         tcod.image_blit_2x(image=menu_img, console=self.root, dx=0, dy=0)
@@ -344,12 +344,12 @@ class RenderEngine(object):
 
         # Display main menu options
         options = menus.main_menu_options()
-        self.menu('', options, 24)
+        self.render_menu('', options, 24)
 
-    def msg_box(self, header, width):
-        self.menu(self.con, header, [], width, config.scr_width, config.scr_height)
+    def render_msg_box(self, header, width):
+        self.render_menu(self.con, header, [], width, config.scr_width, config.scr_height)
 
-    def char_scr(self, hero):
+    def render_char_scr(self, hero):
         """ Displays a windows showing the hero's current stats and experience."""
         window = tcod.console.Console(
             width=config.char_scr_width,

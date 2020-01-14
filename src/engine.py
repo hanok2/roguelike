@@ -50,10 +50,10 @@ def main():
         # )
 
         if show_main_menu:
-            render_eng.main_menu(main_menu_bg_img)
+            render_eng.render_main_menu(main_menu_bg_img)
 
             if show_load_err_msg:
-                render_eng.msg_box(render_eng, 'No save game to load', 50)
+                render_eng.render_msg_box(render_eng, 'No save game to load', 50)
 
             # Update the display to represent the root consoles current state.
             tcod.console_flush()
