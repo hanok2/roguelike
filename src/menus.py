@@ -33,16 +33,16 @@ def list_inv_items(hero):
     return options
 
 
-def lvl_up_options(hero):
+def lvl_up_options():
     """Displays a menu for the player when they reach a level-up. Gives them
         choice of different stat boosts to pick from.
     """
     header = 'Level up! Choose a stat to raise:'
 
     options = {
-        'c': 'Constitution (+20 HP, from {})'.format(hero.fighter.max_hp),
-        's': 'Strength (+1 attack, from {})'.format(hero.fighter.power),
-        'a': 'Agility (+1 defense, from {})'.format(hero.fighter.defense)
+        'd': 'Defense (+1 defense)',
+        'h': 'Hit Points (+20 HP)',
+        's': 'Strength (+1 attack)',
     }
     return header, options
 

@@ -64,7 +64,7 @@ class RenderEngine(object):
 
         elif state == States.LEVEL_UP:
             # Render the level-up menu
-            header, options = menus.lvl_up_options(dungeon.hero)
+            header, options = menus.lvl_up_options()
             self.render_menu(header, options, width=40)
 
         elif state == States.SHOW_STATS:
