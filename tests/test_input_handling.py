@@ -255,7 +255,19 @@ def test_handle_main_menu__not_valid_key():
 
 
 """ Tests for test_handle_targeting_keys(key)"""
-# def test_handle_targeting_keys(key):
+
+
+def test_handle_targeting_keys__esc__exits_targeting():
+    result = input_handling.handle_targeting_keys('esc')
+    assert result == {'exit': True}
+
+
+def test_handle_targeting_keys__non_valid():
+    result = input_handling.handle_targeting_keys('z')
+    assert result == {}
+
+
+
 
 """ Tests for test_handle_mouse(mouse)"""
 # def test_handle_mouse(mouse):

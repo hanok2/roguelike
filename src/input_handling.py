@@ -129,7 +129,9 @@ def handle_main_menu(key):
 
 
 def handle_targeting_keys(key):
-    if key.vk == tcod.KEY_ESCAPE:
+    # todo: Add ability to move a cursor to target.
+
+    if key == 'esc':
         return {'exit': True}
 
     return {}
