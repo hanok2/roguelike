@@ -63,7 +63,7 @@ def inv_options(hero, state):
     return header, options
 
 
-def hero_options(hero):
+def hero_info(hero):
     info = [
         'Character Information',
         'Level: {}'.format(hero.lvl.current_lvl),

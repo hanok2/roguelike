@@ -357,7 +357,7 @@ class RenderEngine(object):
         )
 
         window.default_fg = tcod.white
-        info = menus.hero_options(hero)
+        info = menus.hero_info(hero)
 
         for i, row in enumerate(info):
             window.print_box(
