@@ -1,7 +1,7 @@
 import pytest
 import tcod
 from ..src import player
-from ..src import render_functions
+from ..src.config import RenderOrder
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def test_get_hero__blocks(hero):
 
 
 def test_get_hero__renderorder(hero):
-    assert hero.render_order is render_functions.RenderOrder.ACTOR
+    assert hero.render_order is RenderOrder.ACTOR
 
 
 def test_get_hero__Fighter(hero):

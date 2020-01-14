@@ -1,9 +1,17 @@
+from enum import Enum, auto
 import tcod
 
-VERSION = 1.1
+class RenderOrder(Enum):
+    STAIRS = auto()
+    CORPSE = auto()
+    ITEM = auto()
+    ACTOR = auto()
+
+VERSION = 1.2
 window_title = 'Infinity Dronez'
 game_title = 'Infinity Dronez Version {}'.format(VERSION)
 author = 'hackemslashem'
+
 
 savefile = 'savegame.dat'
 tileset_file = 'images/arial12x12.png'

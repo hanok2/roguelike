@@ -3,8 +3,8 @@ import tcod
 from . import config
 from . import factory
 from . import stairs
+from .config import RenderOrder
 from .entity import Entity
-from .render_functions import RenderOrder
 from .rect import Rect
 from .tile import Tile
 

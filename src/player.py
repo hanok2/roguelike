@@ -2,8 +2,8 @@ import tcod
 from . import factory
 from .entity import Entity
 from .components import Fighter, Level, Equipment
+from .config import RenderOrder
 from .inventory import Inventory
-from .render_functions import RenderOrder
 
 HERO_HP = 100
 HERO_DEF = 1

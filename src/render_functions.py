@@ -1,15 +1,7 @@
-from enum import Enum, auto
 import tcod
 from . import config
 from .states import States
 from . import menus
-
-
-class RenderOrder(Enum):
-    STAIRS = auto()
-    CORPSE = auto()
-    ITEM = auto()
-    ACTOR = auto()
 
 
 class RenderEngine(object):

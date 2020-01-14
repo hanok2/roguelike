@@ -4,7 +4,7 @@ from ..src import entity
 from ..src import maps
 from ..src import tile
 from .test_death_functions import orc
-from ..src.render_functions import RenderOrder
+from ..src.config import RenderOrder
 from ..src.components import Fighter, Item, Level, Equipment, Equippable, ApproachingBehavior
 from ..src.inventory import Inventory
 from ..src.stairs import Stairs

@@ -1,6 +1,6 @@
 import math
 import tcod
-from .render_functions import RenderOrder
+from .config import RenderOrder
 from .components import Item
 
 

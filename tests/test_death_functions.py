@@ -4,7 +4,7 @@ from ..src import components
 from ..src import death_functions
 from ..src import factory
 from ..src import player
-from ..src import render_functions
+from ..src.config import RenderOrder
 from ..src import states
 
 
@@ -58,7 +58,7 @@ def test_kill_monster__blocks_is_False(orc):
 
 def test_kill_monster__renderorder_is_corpse(orc):
     death_functions.kill_monster(orc)
-    assert orc.render_order == render_functions.RenderOrder.CORPSE
+    assert orc.render_order == RenderOrder.CORPSE
 
 
 def test_kill_monster__fighter_is_None(orc):
