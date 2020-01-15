@@ -118,8 +118,7 @@ def cast_confuse(*args, **kwargs):
         matches_coordinates = entity.x == target_x and entity.y == target_y
 
         if matches_coordinates and entity.ai:
-            confused_ai = ConfusedBehavior(prev_ai=entity.ai, num_turns=10)
-            confused_ai.owner = entity
+            confused_ai = ConfusedBehavior(owner=entity, prev_ai=entity.ai, num_turns=10)
             entity.ai = confused_ai
 
             results.append({

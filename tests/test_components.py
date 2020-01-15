@@ -164,14 +164,14 @@ def test_Fighter_attack__no_dmg_returns_results(hero, orc):
 
 def test_ConfusedBehavior_init__(orc):
     prev_ai = orc.ai
-    cb = components.ConfusedBehavior(prev_ai)
+    cb = components.ConfusedBehavior(owner=None, prev_ai=prev_ai)
     assert cb.prev_ai == prev_ai
     assert cb.num_turns == 10
 
 
 def test_ConfusedBehavior_init__negative_turns_raises_exception(orc):
     with pytest.raises(ValueError):
-        components.ConfusedBehavior(orc.ai, num_turns=-1)
+        components.ConfusedBehavior(owner=None, prev_ai=orc.ai, num_turns=-1)
 
 
 # Requires some major mocking or testing...

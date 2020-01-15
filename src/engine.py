@@ -346,6 +346,9 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             if l_click:
                 target_x, target_y = l_click
 
+                # note: Due to the message console - we have to offset the y.
+                target_y -= config.msg_height
+
                 item_use_results = hero.inv.use(
                     targeting_item,
                     entities=current_map.entities,

@@ -27,6 +27,7 @@ class Entity(object):
         self.equipment = equipment      # Needs owner
         self.human = human              # Flag
 
+        self.fighter = None
         self.item = None                # Improve this later.
         self.ai = None                  # Improve this later.
         self.equippable = None          # Improve this later.

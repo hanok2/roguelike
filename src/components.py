@@ -110,14 +110,15 @@ class ApproachingBehavior(object):
 
 class ConfusedBehavior(object):
     """AI for an entity/monster to move randomly for a set number of turns."""
-    def __init__(self, prev_ai, num_turns=10):
+    def __init__(self, owner, prev_ai, num_turns=10):
         if num_turns < 0:
             raise ValueError('num_turns needs to be 0 or greater!')
 
+        self.owner = owner
         self.prev_ai = prev_ai
         self.num_turns = num_turns
 
-    def take_turn(self, target, fov_map, game_map, entities):
+    def take_turn(self, target, fov_map, game_map):
         results = []
 
         if self.num_turns > 0:
@@ -125,7 +126,7 @@ class ConfusedBehavior(object):
             random_y = self.owner.y + randint(0, 2) - 1
 
             if random_x != self.owner.x and random_y != self.owner.y:
-                self.owner.move_towards(random_x, random_y, game_map, entities)
+                self.owner.move_towards(random_x, random_y, game_map)
 
             self.num_turns -= 1
 
