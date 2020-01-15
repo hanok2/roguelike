@@ -22,47 +22,47 @@ def sword():
 
 def test_Inventory_init__negative_capacity_raises_exception():
     with pytest.raises(ValueError):
-        inventory.Inventory(-1)
+        inventory.Inventory(owner=None, capacity=-1)
 
 
 def test_Inventory_init__0_capacity_raises_exception():
     with pytest.raises(ValueError):
-        inventory.Inventory(0)
+        inventory.Inventory(owner=None, capacity=0)
 
 
 def test_Inventory_init():
-    i = inventory.Inventory(10)
+    i = inventory.Inventory(owner=None, capacity=10)
     assert i.capacity == 10
     assert i.items == []
 
 
 def test_Inventory_add_item_within_capacity_items_increases(potion):
-    i = inventory.Inventory(10)
+    i = inventory.Inventory(owner=None, capacity=10)
     prev_items = len(i.items)
     i.add_item(potion)
     assert len(i.items) == prev_items + 1
 
 
 def test_Inventory_add_item_within_capacity_item_in_inv(potion):
-    i = inventory.Inventory(10)
+    i = inventory.Inventory(owner=None, capacity=10)
     i.add_item(potion)
     assert potion in i.items
 
 
 def test_Inventory_add_item_within_capacity_results_item_added(potion):
-    i = inventory.Inventory(10)
+    i = inventory.Inventory(owner=None, capacity=10)
     result = i.add_item(potion).pop()
     assert result['item_added'] == potion
 
 
 def test_Inventory_add_item_within_capacity_results_msg(potion):
-    i = inventory.Inventory(10)
+    i = inventory.Inventory(owner=None, capacity=10)
     result = i.add_item(potion).pop()
     assert result['msg'] == 'You pick up the Healing potion.'
 
 
 def test_Inventory_add_item_outside_capacity_items_same(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.add_item(potion)
     prev_items = len(i.items)
 
@@ -76,14 +76,14 @@ def test_Inventory_add_item_outside_capacity_item_in_inv():
 
 
 def test_Inventory_add_item_outside_capacity_results_msg(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.add_item(potion)
     result = i.add_item(potion).pop()
     assert result['msg'] == inventory.INV_FULL_MSG
 
 
 def test_Inventory_add_item_outside_capacity_results_item_added(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.add_item(potion)
     result = i.add_item(potion).pop()
     assert result['item_added'] is None
@@ -101,7 +101,7 @@ def test_Inventory_use():
 
 # todo: Add multiple items to inventory for this test
 def test_Inventory_rm_item__in_inv_items_decreases(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.add_item(potion)
     i.rm_item(potion)
     assert i.items == []
@@ -109,7 +109,7 @@ def test_Inventory_rm_item__in_inv_items_decreases(potion):
 
 # todo: Add multiple items to inventory for this test
 def test_Inventory_rm_item__in_inv_removes_item(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.add_item(potion)
     i.rm_item(potion)
     assert potion not in i.items
@@ -117,21 +117,21 @@ def test_Inventory_rm_item__in_inv_removes_item(potion):
 
 # todo: Add multiple items to inventory for this test
 def test_Inventory_rm_item__in_inv_returns_True(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.add_item(potion)
     assert i.rm_item(potion)
 
 
 # todo: Add multiple items to inventory for this test
 def test_Inventory_rm_item__DNE_items_remains_same(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     i.rm_item(potion)
     assert i.items == []
 
 
 # todo: Add multiple items to inventory for this test
 def test_Inventory_rm_item__DNE_returns_False(potion):
-    i = inventory.Inventory(1)
+    i = inventory.Inventory(owner=None, capacity=1)
     assert i.rm_item(potion) is False
 
 

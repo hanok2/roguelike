@@ -1,10 +1,11 @@
 INV_FULL_MSG = 'You cannot carry any more, your inventory is full.'
 
 class Inventory(object):
-    def __init__(self, capacity):
+    def __init__(self, owner, capacity):
         if capacity <= 0:
             raise ValueError('capacity needs to be a positive number!')
 
+        self.owner = owner
         self.capacity = capacity
         self.items = []
 

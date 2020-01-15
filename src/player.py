@@ -31,8 +31,8 @@ class Player(entity.Entity):
             human=True,
             equipment=Equipment(),
             lvl=Level(),
-            inv=Inventory(HERO_INV_CAPACITY),
             render_order=RenderOrder.ACTOR,
             blocks=True,
         )
         self.fighter = Fighter(self, HERO_HP, HERO_DEF, HERO_POW)
+        self.inv = Inventory(owner=self, capacity=HERO_INV_CAPACITY)

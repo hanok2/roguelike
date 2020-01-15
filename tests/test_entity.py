@@ -60,6 +60,7 @@ def test_Entity_init__item():
     assert isinstance(e.item, Item)
 
 
+@pytest.mark.skip(reason='Removed the inv parameter because it needs to be added after entity creation.')
 def test_Entity_init__inv():
     inv_comp = Inventory(26)
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', inv=inv_comp)
