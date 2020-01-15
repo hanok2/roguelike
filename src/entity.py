@@ -22,11 +22,11 @@ class Entity(object):
         self.render_order = render_order
         self.stair_down = stair_down    # Needs owner
         self.stair_up = stair_up        # Needs owner
-        self.equipment = equipment      # Needs owner
 
         self.human = human              # Flag
 
         self.lvl = lvl                  # Doesn't need owner, but was setting one.
+        self.equipment = equipment      # Doesn't need owner, but was setting one.
 
         self.fighter = None             # Improve this later.
         self.item = None                # Improve this later.
