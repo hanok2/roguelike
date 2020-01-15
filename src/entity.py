@@ -40,9 +40,6 @@ class Entity(object):
         if self.stair_up:
             self.stair_up.owner = self
 
-        if self.equipment:
-            self.equipment.owner = self
-
     def move(self, dx, dy):
         # Move the entity by a given amount
         dest_x = self.x + dx

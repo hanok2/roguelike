@@ -202,7 +202,6 @@ class Equippable(object):
             # owner.item = item
 
 
-
 class Equipment(object):
     """Since we're using properties, these values can be accessed like a regular
         variable, which will come in handy soon enough. If the player has equipment
