@@ -25,6 +25,67 @@ def test_Entity_init__defaults():
     assert e.color is None
     assert e.name == 'Player'
 
+
+def test_Entity_init__components_dict():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    assert e.components == {}
+
+
+@pytest.mark.skip(reason='implement after ecs is mostly done.')
+def test_Entity_init__kwargs_become_components():
+    pass
+
+
+def test_Entity_init__add_comp__1_kwarg():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.add_comp(a=1)
+    assert e.components['a'] == 1
+
+
+def test_Entity_init__add_comp__2_kwargs():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.add_comp(a=1, b=2)
+    assert e.components['a'] == 1
+    assert e.components['b'] == 2
+
+
+def test_Entity_init__add_comp__already_exists_and_replaces():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.add_comp(a=1)
+    e.add_comp(a=2)
+    assert e.components['a'] == 2
+
+
+def test_Entity_init__rm_comp__success_removes_component():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.add_comp(a=1)
+    e.rm_comp('a')
+    assert 'a' not in e.components
+
+
+def test_Entity_init__rm_comp__success_returns_True():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.add_comp(a=1)
+    result = e.rm_comp('a')
+    assert result
+
+
+def test_Entity_init__rm_comp__fail_returns_False():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    result = e.rm_comp('z')
+
+
+def test_Entity_init__get_comp__returns_component_value():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    e.add_comp(a=1)
+    assert e.get_comp('a') == 1
+
+
+def test_Entity_init__get_comp__DNE_returns_None():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    assert e.get_comp('a') is None
+
+
 def test_Entity_init__blocks():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', blocks=True)
     assert e.blocks
