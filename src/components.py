@@ -23,7 +23,7 @@ class Fighter(object):
 
     @property
     def max_hp(self):
-        if self.owner and self.owner.equipment:
+        if self.owner.has_comp('equipment'):
             # Take into account what equipment is equipped
             bonus = self.owner.equipment.max_hp_bonus
         else:
@@ -32,7 +32,7 @@ class Fighter(object):
 
     @property
     def power(self):
-        if self.owner and self.owner.equipment:
+        if self.owner.has_comp('equipment'):
             # Take into account what equipment is equipped
             bonus = self.owner.equipment.power_bonus
         else:
@@ -41,7 +41,7 @@ class Fighter(object):
 
     @property
     def defense(self):
-        if self.owner and self.owner.equipment:
+        if self.owner.has_comp('equipment'):
             # Take into account what equipment is equipped
             bonus = self.owner.equipment.defense_bonus
         else:

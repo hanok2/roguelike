@@ -41,7 +41,10 @@ def cast_lightning(*args, **kwargs):
 
     # Export to map? Instead of importing entities/fov_map, just import game_map
     for entity in entities:
-        if entity.fighter and entity != caster and fov_map.fov[entity.y, entity.x]:
+
+        # todo: Break into better boolean
+        if entity.has_comp('fighter') and entity != caster and fov_map.fov[entity.y, entity.x]:
+
             distance = caster.distance_to_entity(entity)
 
             if distance < closest_distance:
@@ -117,7 +120,7 @@ def cast_confuse(*args, **kwargs):
     for entity in entities:
         matches_coordinates = entity.x == target_x and entity.y == target_y
 
-        if matches_coordinates and entity.ai:
+        if matches_coordinates and entity.has_comp('ai'):
             confused_ai = ConfusedBehavior(owner=entity, prev_ai=entity.ai, num_turns=10)
             entity.ai = confused_ai
 

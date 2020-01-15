@@ -92,6 +92,7 @@ def mk_entity(entity_name, x, y):
             name="Healing potion",
             x=x,
             y=y,
+            blocks=False,
             char='!',
             color=tcod.violet,
             render_order=RenderOrder.ITEM,
@@ -104,6 +105,7 @@ def mk_entity(entity_name, x, y):
             name='Sword',
             x=x,
             y=y,
+            blocks=False,
             char='(',
             color=tcod.sky,
             render_order=RenderOrder.ITEM,
@@ -116,6 +118,7 @@ def mk_entity(entity_name, x, y):
         item = Entity(
             name='Dagger',
             x=0, y=0,
+            blocks=False,
             char='(',
             color=tcod.sky,
             render_order=RenderOrder.ITEM,
@@ -128,6 +131,7 @@ def mk_entity(entity_name, x, y):
         item = Entity(
             name='Shield',
             x=x, y=y,
+            blocks=False,
             char='[',
             color=tcod.darker_orange,
             render_order=RenderOrder.ITEM,
@@ -140,6 +144,7 @@ def mk_entity(entity_name, x, y):
         item = Entity(
             name='Ring of HP',
             x=x, y=y,
+            blocks=False,
             char='=',
             color=tcod.blue,
             render_order=RenderOrder.ITEM,
@@ -153,6 +158,7 @@ def mk_entity(entity_name, x, y):
             name="Fireball Scroll",
             x=x,
             y=y,
+            blocks=False,
             char='?',
             color=tcod.yellow,
             render_order=RenderOrder.ITEM,
@@ -171,6 +177,7 @@ def mk_entity(entity_name, x, y):
         item = Entity(
             name="Confuse Scroll",
             x=x, y=y,
+            blocks=False,
             char='?',
             color=tcod.yellow,
             render_order=RenderOrder.ITEM,
@@ -189,6 +196,7 @@ def mk_entity(entity_name, x, y):
         item = Entity(
             name="Lightning Scroll",
             x=x, y=y,
+            blocks=False,
             char='?',
             color=tcod.yellow,
             render_order=RenderOrder.ITEM,

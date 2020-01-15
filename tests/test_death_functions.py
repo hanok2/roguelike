@@ -62,12 +62,12 @@ def test_kill_monster__renderorder_is_corpse(orc):
 
 def test_kill_monster__fighter_is_None(orc):
     death_functions.kill_monster(orc)
-    assert orc.fighter is None
+    assert orc.has_comp('fighter') is False
 
 
 def test_kill_monster__ai_is_none(orc):
     death_functions.kill_monster(orc)
-    assert orc.ai is None
+    assert orc.has_comp('ai') is False
 
 
 def test_kill_monster__item_comp_is_True(orc):

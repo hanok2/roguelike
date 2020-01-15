@@ -1,6 +1,7 @@
 import pytest
 from ..src import components
 from ..src import config
+from ..src import entity
 from ..src import factory
 from ..src import player
 
@@ -90,17 +91,17 @@ def test_Fighter_take_dmg__lethal_dmg_returns_dead_results():
 
 
 def test_Fighter_heal__hp_is_recovered():
+    e = entity.Entity()
     hp = 10
-    f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
-    f.owner = None
+    f = components.Fighter(owner=e, hp=hp, defense=0, power=0, xp=0)
     f.take_dmg(1)
     f.heal(1)
     assert f.hp == hp
 
 
 def test_Fighter_heal__excess_hp_doesnt_go_over_max():
-    f = components.Fighter(owner=None, hp=10, defense=0, power=0, xp=0)
-    f.owner = None
+    e = entity.Entity()
+    f = components.Fighter(owner=e, hp=10, defense=0, power=0, xp=0)
     f.heal(100)
     assert f.hp == f.max_hp
 

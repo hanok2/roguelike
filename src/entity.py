@@ -6,46 +6,53 @@ from .components import Item
 
 class Entity(object):
     """ A generic object to represent players, enemies, items, etc.
-        How do we add a component?
-            add_comp(component)
-
-        How do we remove a component?
-            rm_comp(component)
-
-        How do we access a component?
-            entity.components['desired_component']
-
-            Better: entity.get_comp(component)
-
-            Much better: entity.desired_component
-            But may have strange side-effects and problems.
-
-        How do we test if a component exists?
-            Use the get_comp method
-
+        We use a dictionary to manage the entity's Components.
     """
-    def __getattr__(self, name):
-
-        return self.components.get(name)
-
-        # for c in self.components:
-            # if name == c:
-                # return self.components[name]
-        # raise AttributeError('Entity has no component with attribute {}'.format(name))
 
     def __init__(self, **kwargs):
-        # The components dict
         self.components = kwargs
+
+    def __getattr__(self, name):
+        if name in self.components:
+            return self.components[name]
+
+        raise AttributeError('Entity has no component with attribute {}'.format(name))
+
+    def __setattr__(self, key, value):
+        if key == 'components':
+            # self.components = value
+            super().__setattr__('components', value)
+        else:
+            self.components[key] = value
+
+    def __getstate__(self):
+        """But if we try to pickle our d instance, we get RecursionError because
+            of that __getattr__ which does the magic conversion of attribute
+            access to key lookup. We can overcome that by providing the class
+            with __getstate__ and __setstate__ methods.
+            https://stackoverflow.com/questions/50156118/recursionerror-maximum-recursion-depth-exceeded-while-calling-a-python-object-w/50158865#50158865
+        """
+        return self.components
+
+    def __setstate__(self, state):
+        """See comment for __getstate__"""
+        self.components = state
 
     def add_comp(self, **kwargs):
         for k, v in kwargs.items():
             self.components[k] = v
+
+    def has_comp(self, component):
+        if component in self.components:
+            return True
+        return False
 
     def rm_comp(self, component):
         if component in self.components:
             self.components.pop(component)
             return True
         return False
+
 
     def move(self, dx, dy):
         # Move the entity by a given amount

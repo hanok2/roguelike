@@ -14,8 +14,8 @@ def kill_monster(monster):
     monster.color = tcod.dark_red
     monster.blocks = False
     monster.render_order = RenderOrder.CORPSE
-    monster.fighter = None
-    monster.ai = None
+    monster.rm_comp('fighter')
+    monster.rm_comp('ai')
 
     # Change to an item so we can pick it up!
     monster.item = components.Item(owner=monster)

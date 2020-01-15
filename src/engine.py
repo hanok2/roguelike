@@ -77,7 +77,7 @@ def main():
             elif load_saved_game:
                 log.debug('Load game selected.')
                 try:
-                    dungeon, msg_log, state, turns = load_game()
+                    dungeon, msg_log, state, turns = load_game(config.savefile)
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_err_msg = True
@@ -240,7 +240,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             for entity in current_map.entities:
                 item_pos_at_our_pos = entity.x == hero.x and entity.y == hero.y
 
-                if entity.item and item_pos_at_our_pos:
+                if entity.has_comp('item') and item_pos_at_our_pos:
                     pickup_results = hero.inv.add_item(entity)
                     hero_turn_results.extend(pickup_results)
 
@@ -276,7 +276,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         if stair_down and state == States.HERO_TURN:
             log.debug('Attempting stair down.')
             for entity in current_map.entities:
-                if entity.stair_down:
+                if entity.has_comp('stair_down'):
                     hero_at_stairs = entity.x == hero.x and entity.y == hero.y
                     if hero_at_stairs:
                         dungeon.generate_next_level()
@@ -299,7 +299,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         if stair_up and state == States.HERO_TURN:
             log.debug('Attempting stair up.')
             for entity in current_map.entities:
-                if entity.stair_up:
+                if entity.has_comp('stair_up'):
                     hero_at_stairs = entity.x == hero.x and entity.y == hero.y
                     if hero_at_stairs:
 
@@ -368,7 +368,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             elif state == States.TARGETING:
                 hero_turn_results.append({'cancel_target': True})
             else:
-                save_game(dungeon, msg_log, state, turns)
+                save_game(config.savefile, dungeon, msg_log, state, turns)
                 return True
 
         if full_scr:
@@ -468,7 +468,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
             for entity in current_map.entities:
 
-                if entity.ai:
+                if entity.has_comp('ai'):
                     turn_results = entity.ai.take_turn(
                         hero,
                         fov_map,

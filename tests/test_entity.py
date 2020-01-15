@@ -57,6 +57,12 @@ def test_Entity_init__add_comp__already_exists_and_replaces():
     assert e.components['a'] == 2
 
 
+def test_Entity_init__has_comp():
+    e = entity.Entity(x=0, y=0)
+    assert e.has_comp('x')
+    assert e.has_comp('y')
+
+
 def test_Entity_init__rm_comp__success_removes_component():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
     e.add_comp(a=1)
@@ -85,7 +91,8 @@ def test_Entity_init__getattr__returns_component_value():
 
 def test_Entity_init__getattr__DNE_returns_None():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    assert e.a is None
+    with pytest.raises(AttributeError):
+        result = e.a
 
 
 def test_Entity_init__blocks_component():

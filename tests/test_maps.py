@@ -39,7 +39,7 @@ def test_dungeon_init__generate_next_lvl_called(mocker, hero):
 def test_dungeon_init__hero_exists_on_map(hero):
     d = maps.Dungeon(hero)
     m = d.current_map()
-    assert any([True for e in m.entities if e.human])
+    assert any([True for e in m.entities if e.has_comp('human')])
 
 
 def test_dungeon_init__move_hero_called(mocker, hero):
@@ -204,7 +204,7 @@ def test_move_hero__to_wall_returns_False(hero):
 
 def test_move_hero__to_occupied_spot_returns_False(hero):
     d = maps.Dungeon(hero)
-    rnd_monster = [e for e in d.current_map().entities if e.ai].pop()
+    rnd_monster = [e for e in d.current_map().entities if e.has_comp('ai')].pop()
     dest_x = rnd_monster.x
     dest_y = rnd_monster.y
     assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y) is False
@@ -302,14 +302,14 @@ def test_map_rm_hero_if_present_returns_True(hero):
 def test_map_find_stair__down_stair_returns_entity():
     m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     m.make_map()
-    stair = [e for e in m.entities if e.stair_down].pop()
+    stair = [e for e in m.entities if e.has_comp('stair_down')].pop()
     result = m.find_stair('>')
     assert result == stair
 
 def test_map_find_stair__up_stair_returns_entity():
     m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     m.make_map()
-    stair = [e for e in m.entities if e.stair_up].pop()
+    stair = [e for e in m.entities if e.has_comp('stair_up')].pop()
     result = m.find_stair('<')
     assert result == stair
 
@@ -474,28 +474,27 @@ def test_map_make_map__has_at_least_2_rooms():
 def test_map_make_map__has_up_stair():
     m = maps.Map(width=50, height=50)
     m.make_map()
-    assert any(True for e in m.entities if e.stair_up)
+    assert  m.find_stair('<')
 
 
 def test_map_make_map__has_down_stair():
     m = maps.Map(width=50, height=50)
     m.make_map()
-    assert any(True for e in m.entities if e.stair_down)
+    assert m.find_stair('>')
 
 
 def test_map_make_map__up_and_down_stairs_in_diff_rooms():
     m = maps.Map(width=50, height=50)
     m.make_map()
-    stair_up = [e for e in m.entities if e.stair_up].pop()
-    stair_down = [e for e in m.entities if e.stair_down].pop()
+    stair_up = m.find_stair('<')
+    stair_down = m.find_stair('>')
 
     stair_up_room = None
     for room in m.rooms:
         if room.within(stair_up.x, stair_up.y):
             stair_up_room = room
             break
-    # The coordinates of stair_down should not be within the same room as
-    # stair_up
+    # The coordinates of stair_down should not be within the same room as stair_up
     assert not stair_up_room.within(stair_down.x, stair_down.y)
 
 

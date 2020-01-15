@@ -87,7 +87,7 @@ class Inventory(object):
             raise ValueError('Cannot drop an item that is not in inventory!')
 
         # Dequip equipped items before dropping
-        if item.equippable:
+        if item.has_comp('equippable'):
             results.extend(self.chk_equipped(item))
 
         item.x = self.owner.x

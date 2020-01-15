@@ -139,7 +139,9 @@ class RenderEngine(object):
     def draw_entity(self, entity, fov_map, game_map):
         # Draw an entity on the console
         entity_in_fov = fov_map.fov[entity.y, entity.x]
-        stair_entity = ((entity.stair_down or entity.stair_up) and game_map.tiles[entity.x][entity.y].explored)
+
+        # todo: Break into nicer booleans
+        stair_entity = ((entity.has_comp('stair_down') or entity.has_comp('stair_up')) and game_map.tiles[entity.x][entity.y].explored)
 
         if entity_in_fov or stair_entity:
             self.con.default_fg = entity.color

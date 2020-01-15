@@ -13,6 +13,7 @@ class StairUp(entity.Entity):
         super().__init__(
             x=x,
             y=y,
+            blocks=False,
             char='<',
             color=tcod.white,
             name='Stairs Up',
@@ -27,6 +28,7 @@ class StairDown(entity.Entity):
         super().__init__(
             x=x,
             y=y,
+            blocks=False,
             char='>',
             color=tcod.white,
             name='Stairs Down',
