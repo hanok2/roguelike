@@ -150,10 +150,12 @@ class Item(object):
 
 
 class Level(object):
-    def __init__(self, current_lvl=config.default_lvl,
+    def __init__(self,
+                 current_lvl=config.default_lvl,
                  current_xp=config.starting_xp,
                  lvl_up_base=config.lvl_up_base,
                  lvl_up_factor=config.lvl_up_factor):
+
         self.current_lvl = current_lvl
         self.current_xp = current_xp
         self.lvl_up_base = lvl_up_base
