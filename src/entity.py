@@ -20,25 +20,19 @@ class Entity(object):
         self.name = name
         self.blocks = blocks
         self.render_order = render_order
-        self.stair_down = stair_down    # Needs owner
-        self.stair_up = stair_up        # Needs owner
 
         self.human = human              # Flag
 
         self.lvl = lvl                  # Doesn't need owner, but was setting one.
         self.equipment = equipment      # Doesn't need owner, but was setting one.
+        self.stair_down = stair_down    # Doesn't need owner, but was setting one.
+        self.stair_up = stair_up        # Doesn't need owner, but was setting one.
 
         self.fighter = None             # Improve this later.
         self.item = None                # Improve this later.
         self.ai = None                  # Improve this later.
         self.equippable = None          # Improve this later.
         self.inv = None                 # Improve this later.
-
-        if self.stair_down:
-            self.stair_down.owner = self
-
-        if self.stair_up:
-            self.stair_up.owner = self
 
     def move(self, dx, dy):
         # Move the entity by a given amount
