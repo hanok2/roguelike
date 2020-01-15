@@ -24,45 +24,28 @@ class Entity(object):
             Use the get_comp method
 
     """
+    def __getattr__(self, name):
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, stair_down=None, stair_up=None, lvl=None, equipment=None, human=False):
+        return self.components.get(name)
+
+        # for c in self.components:
+            # if name == c:
+                # return self.components[name]
+        # raise AttributeError('Entity has no component with attribute {}'.format(name))
+
+    def __init__(self, **kwargs):
         # The components dict
-        self.components = {}
-
-        self.x = x
-        self.y = y
-        self.char = char
-        self.color = color
-        self.name = name
-        self.blocks = blocks
-        self.render_order = render_order
-
-        self.human = human              # Flag
-
-        self.lvl = lvl                  # Doesn't need owner, but was setting one.
-        self.equipment = equipment      # Doesn't need owner, but was setting one.
-        self.stair_down = stair_down    # Doesn't need owner, but was setting one.
-        self.stair_up = stair_up        # Doesn't need owner, but was setting one.
-
-        self.fighter = None             # Improve this later.
-        self.item = None                # Improve this later.
-        self.ai = None                  # Improve this later.
-        self.equippable = None          # Improve this later.
-        self.inv = None                 # Improve this later.
+        self.components = kwargs
 
     def add_comp(self, **kwargs):
         for k, v in kwargs.items():
             self.components[k] = v
-
 
     def rm_comp(self, component):
         if component in self.components:
             self.components.pop(component)
             return True
         return False
-
-    def get_comp(self, component):
-        return self.components.get(component)
 
     def move(self, dx, dy):
         # Move the entity by a given amount

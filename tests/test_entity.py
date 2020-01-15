@@ -9,6 +9,7 @@ from ..src.components import Fighter, Item, Level, Equipment, Equippable, Approa
 from ..src.inventory import Inventory
 from ..src.stairs import Stairs
 
+
 @pytest.fixture
 def open_map():
     # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
@@ -27,8 +28,8 @@ def test_Entity_init__defaults():
 
 
 def test_Entity_init__components_dict():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    assert e.components == {}
+    e = entity.Entity(x=0, y=0)
+    assert e.components == {'x': 0, 'y': 0}
 
 
 @pytest.mark.skip(reason='implement after ecs is mostly done.')
@@ -73,95 +74,25 @@ def test_Entity_init__rm_comp__success_returns_True():
 def test_Entity_init__rm_comp__fail_returns_False():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
     result = e.rm_comp('z')
+    # Raise exception?
 
 
-def test_Entity_init__get_comp__returns_component_value():
+def test_Entity_init__getattr__returns_component_value():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
     e.add_comp(a=1)
-    assert e.get_comp('a') == 1
+    assert e.a == 1
 
 
-def test_Entity_init__get_comp__DNE_returns_None():
+def test_Entity_init__getattr__DNE_returns_None():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    assert e.get_comp('a') is None
+    assert e.a is None
 
 
-def test_Entity_init__blocks():
+def test_Entity_init__blocks_component():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', blocks=True)
+
     assert e.blocks
-
-
-def test_Entity_init__render_order():
-    r_order = RenderOrder.CORPSE
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', render_order=r_order)
-    assert e.render_order == r_order
-    assert e.render_order in RenderOrder
-
-
-@pytest.mark.skip(reason='Removed the fighter parameter because it needs to be added after entity creation.')
-def test_Entity_init__fighter():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    fighter_comp = Fighter(owner=e, hp=100, defense=1, power=2)
-    e.fighter = fighter_comp
-    assert isinstance(e.fighter, Fighter)
-
-
-@pytest.mark.skip(reason='Removed the ai parameter because it needs to be added after entity creation.')
-def test_Entity_init__ai():
-    ai = ApproachingBehavior()
-    ai.owner = 'bob'
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', ai=ai)
-    assert e.ai == ai
-
-
-@pytest.mark.skip(reason='Removed the item parameter because it needs to be added after entity creation.')
-def test_Entity_init__item():
-    item_comp = Item()
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', item=item_comp)
-    assert isinstance(e.item, Item)
-
-
-@pytest.mark.skip(reason='Removed the inv parameter because it needs to be added after entity creation.')
-def test_Entity_init__inv():
-    inv_comp = Inventory(26)
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', inv=inv_comp)
-    assert isinstance(e.inv, Inventory)
-
-
-def test_Entity_init__stair_down():
-    stair_comp = Stairs(floor=0)
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', stair_down=stair_comp)
-    assert isinstance(e.stair_down, Stairs)
-
-
-def test_Entity_init__stair_up():
-    stair_comp = Stairs(floor=0)
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', stair_up=stair_comp)
-    assert isinstance(e.stair_up, Stairs)
-
-
-def test_Entity_init__lvl():
-    lvl_comp = Level()
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', lvl=lvl_comp)
-    assert isinstance(e.lvl, Level)
-
-
-def test_Entity_init__equipment():
-    equipment_comp = Equipment()
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', equipment=equipment_comp)
-    assert isinstance(e.equipment, Equipment)
-
-
-@pytest.mark.skip(reason='Removed the equippable parameter because it needs to be added after entity creation.')
-def test_Entity_init__equippable():
-    equippable_comp = Equippable(1)
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', equippable=equippable_comp)
-    assert isinstance(e.equippable, Equippable)
-
-
-def test_Entity_init__human():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player', human=True)
-    assert e.human
+    assert 'blocks' in e.components
 
 
 def test_Entity_move__to_a_negative_x():

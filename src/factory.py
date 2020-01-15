@@ -47,10 +47,11 @@ def mk_entity(entity_name, x, y):
 
     if entity_name == 'spider':
         spider = Entity(
-            x, y,
-            's',
-            tcod.desaturated_green,
-            'Spider',
+            name='Spider',
+            x=x,
+            y=y,
+            char='s',
+            color=tcod.desaturated_green,
             blocks=True,
             render_order=RenderOrder.ACTOR,
         )
@@ -60,10 +61,11 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'orc':
         orc = Entity(
-            x, y,
-            'o',
-            tcod.desaturated_green,
-            'Orc',
+            name='Orc',
+            x=x,
+            y=y,
+            char='o',
+            color=tcod.desaturated_green,
             blocks=True,
             render_order=RenderOrder.ACTOR,
         )
@@ -73,10 +75,11 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'troll':
         troll = Entity(
-            x, y,
-            'T',
-            tcod.darker_green,
-            'Troll',
+            name='Troll',
+            x=x,
+            y=y,
+            char='T',
+            color=tcod.darker_green,
             blocks=True,
             render_order=RenderOrder.ACTOR,
         )
@@ -86,10 +89,11 @@ def mk_entity(entity_name, x, y):
 
     if entity_name == 'healing_potion':
         item = Entity(
-            x, y,
-            '!',
-            tcod.violet,
-            "Healing potion",
+            name="Healing potion",
+            x=x,
+            y=y,
+            char='!',
+            color=tcod.violet,
             render_order=RenderOrder.ITEM,
         )
         item.item = Item(item, use_func=heal, amt=40)
@@ -97,10 +101,12 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'sword':
         item = Entity(
-            x, y,
-            '(',
-            tcod.sky,
-            'Sword',
+            name='Sword',
+            x=x,
+            y=y,
+            char='(',
+            color=tcod.sky,
+            render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
         item.equippable = Equippable(owner=item, slot=EquipmentSlots.MAIN_HAND, power_bonus=3)
@@ -108,10 +114,11 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'dagger':
         item = Entity(
-            0, 0,
-            '(',
-            tcod.sky,
-            'Dagger',
+            name='Dagger',
+            x=0, y=0,
+            char='(',
+            color=tcod.sky,
+            render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
         item.equippable = Equippable(owner=item, slot=EquipmentSlots.MAIN_HAND, power_bonus=2)
@@ -119,10 +126,11 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'shield':
         item = Entity(
-            x, y,
-            '[',
-            tcod.darker_orange,
-            'Shield',
+            name='Shield',
+            x=x, y=y,
+            char='[',
+            color=tcod.darker_orange,
+            render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
         item.equippable = Equippable(owner=item, slot=EquipmentSlots.OFF_HAND, defense_bonus=2)
@@ -130,10 +138,11 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'ring of hp':
         item = Entity(
-            x, y,
-            '=',
-            tcod.blue,
-            'Ring of HP',
+            name='Ring of HP',
+            x=x, y=y,
+            char='=',
+            color=tcod.blue,
+            render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
         item.equippable = Equippable(owner=item, slot=EquipmentSlots.OFF_HAND, max_hp_bonus=50)
@@ -141,10 +150,11 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'fireball_scroll':
         item = Entity(
-            x, y,
-            '?',
-            tcod.yellow,
-            "Fireball Scroll",
+            name="Fireball Scroll",
+            x=x,
+            y=y,
+            char='?',
+            color=tcod.yellow,
             render_order=RenderOrder.ITEM,
         )
         item.item = Item(
@@ -159,10 +169,10 @@ def mk_entity(entity_name, x, y):
 
     elif entity_name == 'confusion_scroll':
         item = Entity(
-            x, y,
-            '?',
-            tcod.yellow,
-            "Confuse Scroll",
+            name="Confuse Scroll",
+            x=x, y=y,
+            char='?',
+            color=tcod.yellow,
             render_order=RenderOrder.ITEM,
         )
 
@@ -177,10 +187,10 @@ def mk_entity(entity_name, x, y):
     elif entity_name == 'lightning_scroll':
         # Scroll of lightning bolt
         item = Entity(
-            x, y,
-            '?',
-            tcod.yellow,
-            "Lightning Scroll",
+            name="Lightning Scroll",
+            x=x, y=y,
+            char='?',
+            color=tcod.yellow,
             render_order=RenderOrder.ITEM,
         )
 
