@@ -201,7 +201,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         show_char_scr = action.get('show_char_scr')
         gameexit = action.get('exit')
         full_scr = action.get('fullscreen')
-
         l_click = mouse_action.get('l_click')
         r_click = mouse_action.get('r_click')
 

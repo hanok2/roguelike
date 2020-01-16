@@ -1,6 +1,5 @@
-from .components import ConfusedBehavior
 from abc import ABC, abstractmethod
-
+from .components import ConfusedBehavior
 
 
 class Use(ABC):
