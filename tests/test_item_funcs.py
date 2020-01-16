@@ -12,7 +12,6 @@ from ..src import tile
 def hero():
     return player.get_hero()
 
-
 @pytest.fixture
 def open_stage():
     # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
@@ -42,87 +41,97 @@ def orc_stage():
 
     return m
 
-
 """ Tests for heal() """
 
-def test_heal__using_dict_for_kwargs(hero):
-    # entity comes from args[0]
+
+@pytest.fixture
+def heal():
+    return item_funcs.UseHeal()
+
+
+def test_heal__using_dict_for_kwargs(hero, heal):
     kwargs = {'amt':40}
-    assert item_funcs.heal(hero, **kwargs)  # Should return something
+    # entity comes from args[0]
+    assert heal.use(hero, **kwargs)  # Should return something
 
 
-def test_heal__no_entity_raises_exception():
+def test_heal__no_entity_raises_exception(heal):
     # entity comes from args[0]
     with pytest.raises(IndexError):
-        item_funcs.heal(amt=40)
+        heal.use(amt=40)
 
 
-def test_heal__no_amt_raises_exception(hero):
+def test_heal__no_amt_raises_exception(hero, heal):
     with pytest.raises(KeyError):
-        item_funcs.heal(hero)
+        heal.use(hero)
 
 
-def test_heal__at_max_hp__consumed_is_False(hero):
+def test_heal__at_max_hp__consumed_is_False(hero, heal):
     assert hero.fighter.hp == hero.fighter.max_hp
-    results = item_funcs.heal(hero, amt=40)
+    results = heal.use(hero, amt=40)
     assert results[0]['consumed'] is False
 
 
-def test_heal__at_max_hp__cancel_inv_is_True(hero):
+def test_heal__at_max_hp__cancel_inv_is_True(hero, heal):
     assert hero.fighter.hp == hero.fighter.max_hp
-    results = item_funcs.heal(hero, amt=40)
+    results = heal.use(hero, amt=40)
     assert results[0]['cancel_inv']
 
 
-def test_heal__at_max_hp__msg(hero):
+def test_heal__at_max_hp__msg(hero, heal):
     assert hero.fighter.hp == hero.fighter.max_hp
-    results = item_funcs.heal(hero, amt=40)
+    results = heal.use(hero, amt=40)
     assert results[0]['msg'] == 'You are already at full health'
 
 
-def test_heal__below_max_hp__consumed_is_True(hero):
+def test_heal__below_max_hp__consumed_is_True(hero, heal):
     hero.fighter.hp = 5
-    results = item_funcs.heal(hero, amt=40)
+    results = heal.use(hero, amt=40)
     assert results[0]['consumed']
 
 
-def test_heal__below_max_hp__msg(hero):
+def test_heal__below_max_hp__msg(hero, heal):
     hero.fighter.hp = 5
-    results = item_funcs.heal(hero, amt=40)
+    results = heal.use(hero, amt=40)
     assert results[0]['msg'] == 'You drink the healing potion and start to feel better!'
 
 
 """ Tests for cast_lightning() """
 
 
-def test_cast_lightning__no_entity_raises_exception():
+@pytest.fixture
+def lightning():
+    return item_funcs.UseLightning()
+
+
+def test_cast_lightning__no_entity_raises_exception(lightning):
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'max_range':3}
     with pytest.raises(IndexError):
-        item_funcs.cast_lightning(**kwargs)
+        lightning.use(**kwargs)
 
 
-def test_cast_lightning__no_entities_raises_exception():
+def test_cast_lightning__no_entities_raises_exception(lightning):
     kwargs = {'fov_map':None, 'dmg':10, 'max_range':3}
     with pytest.raises(KeyError):
-        item_funcs.cast_lightning(hero, **kwargs)
+        lightning.use(hero, **kwargs)
 
 
-def test_cast_lightning__no_fov_map_raises_exception():
+def test_cast_lightning__no_fov_map_raises_exception(lightning):
     kwargs = {'entities':[], 'dmg':10, 'max_range':3}
     with pytest.raises(KeyError):
-        item_funcs.cast_lightning(hero, **kwargs)
+        lightning.use(hero, **kwargs)
 
 
-def test_cast_lightning__no_dmg_raises_exception():
+def test_cast_lightning__no_dmg_raises_exception(lightning):
     kwargs = {'entities':[], 'fov_map':None, 'max_range':3}
     with pytest.raises(KeyError):
-        item_funcs.cast_lightning(hero, **kwargs)
+        lightning.use(hero, **kwargs)
 
 
-def test_cast_lightning__no_max_range_raises_exception():
+def test_cast_lightning__no_max_range_raises_exception(lightning):
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10}
     with pytest.raises(KeyError):
-        item_funcs.cast_lightning(hero, **kwargs)
+        lightning.use(hero, **kwargs)
 
 
     # Need empty stage, hero, and entities that are in and out of FOV
@@ -131,38 +140,38 @@ def test_cast_lightning__no_max_range_raises_exception():
     # if successful cast:
 
 
-def test_cast_lightning__valid_target_returns_consumed_True(orc_stage, hero):
+def test_cast_lightning__valid_target_returns_consumed_True(orc_stage, hero, lightning):
     orc_stage.entities.append(hero)
     fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
     kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['consumed']
 
 
-def test_cast_lightning__valid_target_returns_entity(orc_stage, hero):
+def test_cast_lightning__valid_target_returns_entity(orc_stage, hero, lightning):
     orc_stage.entities.append(hero)
     fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
     kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['target'].x == 1
     assert results[0]['target'].y == 0
 
 
-def test_cast_lightning__valid_target_returns_msg(orc_stage, hero):
+def test_cast_lightning__valid_target_returns_msg(orc_stage, hero, lightning):
     orc_stage.entities.append(hero)
     fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
     kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['msg'] == 'A lighting bolt strikes the Orc with a loud thunder! The damage is 10'
 
 
-def test_cast_lightning__valid_target__take_dmg_called(mocker, orc_stage, hero):
+def test_cast_lightning__valid_target__take_dmg_called(mocker, orc_stage, hero, lightning):
     orc_stage.entities.append(hero)
     fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
@@ -173,42 +182,42 @@ def test_cast_lightning__valid_target__take_dmg_called(mocker, orc_stage, hero):
 
     mocker.patch.object(orc.fighter, 'take_dmg')
 
-    item_funcs.cast_lightning(hero, **kwargs)
+    lightning.use(hero, **kwargs)
 
     orc.fighter.take_dmg.assert_called_once_with(10)
 
 
-def test_cast_lightning__no_target_returns_consumed_False(open_stage, hero):
+def test_cast_lightning__no_target_returns_consumed_False(open_stage, hero, lightning):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_lightning__no_target_returns_target_None(open_stage, hero):
+def test_cast_lightning__no_target_returns_target_None(open_stage, hero, lightning):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['target'] is None
 
 
-def test_cast_lightning__no_target_returns_msg(open_stage, hero):
+def test_cast_lightning__no_target_returns_msg(open_stage, hero, lightning):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['msg'] == 'No enemy is close enough to strike.'
 
 
-def test_cast_lightning__out_of_range__consumed_False(open_stage, hero):
+def test_cast_lightning__out_of_range__consumed_False(open_stage, hero, lightning):
     orc = factory.mk_entity('orc', 4, 4)
     open_stage.entities.append(hero)
     open_stage.entities.append(orc)
@@ -217,11 +226,11 @@ def test_cast_lightning__out_of_range__consumed_False(open_stage, hero):
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_lightning__out_of_range__target_None(open_stage, hero):
+def test_cast_lightning__out_of_range__target_None(open_stage, hero, lightning):
     orc = factory.mk_entity('orc', 4, 4)
     open_stage.entities.append(hero)
     open_stage.entities.append(orc)
@@ -230,11 +239,11 @@ def test_cast_lightning__out_of_range__target_None(open_stage, hero):
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['target'] is None
 
 
-def test_cast_lightning__out_of_range__returns_msg(open_stage, hero):
+def test_cast_lightning__out_of_range__returns_msg(open_stage, hero, lightning):
     orc = factory.mk_entity('orc', 4, 4)
     open_stage.entities.append(hero)
     open_stage.entities.append(orc)
@@ -243,65 +252,69 @@ def test_cast_lightning__out_of_range__returns_msg(open_stage, hero):
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
-    results = item_funcs.cast_lightning(hero, **kwargs)
+    results = lightning.use(hero, **kwargs)
     assert results[0]['msg'] == 'No enemy is close enough to strike.'
 
 
 @pytest.mark.skip(reason='need Boulder entity to block FOV')
-def test_cast_lightning__out_of_fov__consumed_False(open_stage, hero):
+def test_cast_lightning__out_of_fov__consumed_False(open_stage, hero, lightning):
     pass
 
 
 @pytest.mark.skip(reason='need Boulder entity to block FOV')
-def test_cast_lightning__out_of_fov__target_None(open_stage, hero):
+def test_cast_lightning__out_of_fov__target_None(open_stage, hero, lightning):
     pass
 
 
 @pytest.mark.skip(reason='need Boulder entity to block FOV')
-def test_cast_lightning__out_of_fov__returns_msg(open_stage, hero):
+def test_cast_lightning__out_of_fov__returns_msg(open_stage, hero, lightning):
     pass
 
 
 """ Tests for cast_fireball() """
 
+@pytest.fixture
+def fireball():
+    return item_funcs.UseFireball()
 
-def test_cast_fireball__no_entities_raises_exception():
+
+def test_cast_fireball__no_entities_raises_exception(fireball):
     kwargs = {'fov_map':None, 'dmg':10, 'radius':3, 'target_x': 0, 'target_y': 0}
     with pytest.raises(KeyError):
-        item_funcs.cast_fireball(**kwargs)
+        fireball.use(**kwargs)
 
 
-def test_cast_fireball__no_fov_map_raises_exception():
+def test_cast_fireball__no_fov_map_raises_exception(fireball):
     kwargs = {'entities':[], 'dmg':10, 'radius':3, 'target_x': 0, 'target_y': 0}
     with pytest.raises(KeyError):
-        item_funcs.cast_fireball(**kwargs)
+        fireball.use(**kwargs)
 
 
-def test_cast_fireball__no_dmg_raises_exception():
+def test_cast_fireball__no_dmg_raises_exception(fireball):
     kwargs = {'entities':[], 'fov_map':None, 'radius':3, 'target_x': 0, 'target_y': 0}
     with pytest.raises(KeyError):
-        item_funcs.cast_fireball(**kwargs)
+        fireball.use(**kwargs)
 
 
-def test_cast_fireball__no_radius_raises_exception():
+def test_cast_fireball__no_radius_raises_exception(fireball):
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'target_x': 0, 'target_y': 0}
     with pytest.raises(KeyError):
-        item_funcs.cast_fireball(**kwargs)
+        fireball.use(**kwargs)
 
 
-def test_cast_fireball__no_target_x_raises_exception():
+def test_cast_fireball__no_target_x_raises_exception(fireball):
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'radius':3, 'target_y': 0}
     with pytest.raises(KeyError):
-        item_funcs.cast_fireball(**kwargs)
+        fireball.use(**kwargs)
 
 
-def test_cast_fireball__no_target_y_raises_exception():
+def test_cast_fireball__no_target_y_raises_exception(fireball):
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'radius':3, 'target_x': 0}
     with pytest.raises(KeyError):
-        item_funcs.cast_fireball(**kwargs)
+        fireball.use(**kwargs)
 
 
-def test_cast_fireball__outside_fov__consumed_False(open_stage, hero):
+def test_cast_fireball__outside_fov__consumed_False(open_stage, hero, fireball):
     orc = factory.mk_entity('orc', 9, 9)
     open_stage.entities.extend([hero, orc])
 
@@ -309,11 +322,11 @@ def test_cast_fireball__outside_fov__consumed_False(open_stage, hero):
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
 
-    results = item_funcs.cast_fireball(hero, **kwargs)
+    results = fireball.use(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_fireball__outside_fov__msg(open_stage, hero):
+def test_cast_fireball__outside_fov__msg(open_stage, hero, fireball):
     orc = factory.mk_entity('orc', 9, 9)
     open_stage.entities.extend([hero, orc])
 
@@ -321,11 +334,11 @@ def test_cast_fireball__outside_fov__msg(open_stage, hero):
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
 
-    results = item_funcs.cast_fireball(hero, **kwargs)
+    results = fireball.use(hero, **kwargs)
     assert results[0]['msg'] == 'You cannot target a tile outside your field of view.'
 
 
-def test_cast_fireball__in_fov__consumed_True(open_stage, hero):
+def test_cast_fireball__in_fov__consumed_True(open_stage, hero, fireball):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
@@ -333,11 +346,11 @@ def test_cast_fireball__in_fov__consumed_True(open_stage, hero):
     radius = 3
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
 
-    results = item_funcs.cast_fireball(hero, **kwargs)
+    results = fireball.use(hero, **kwargs)
     assert results[0]['consumed']
 
 
-def test_cast_fireball__in_fov__msg(open_stage, hero):
+def test_cast_fireball__in_fov__msg(open_stage, hero, fireball):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
@@ -345,11 +358,11 @@ def test_cast_fireball__in_fov__msg(open_stage, hero):
     radius = 3
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
 
-    results = item_funcs.cast_fireball(hero, **kwargs)
+    results = fireball.use(hero, **kwargs)
     assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
 
 
-def test_cast_fireball__close_to_hero__msg(open_stage, hero):
+def test_cast_fireball__close_to_hero__msg(open_stage, hero, fireball):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
@@ -357,12 +370,12 @@ def test_cast_fireball__close_to_hero__msg(open_stage, hero):
     radius = 3
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
 
-    results = item_funcs.cast_fireball(hero, **kwargs)
+    results = fireball.use(hero, **kwargs)
     assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
     assert results[1]['msg'] == 'The Player gets burned for 25 hit points!'
 
 
-def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_stage, hero):
+def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_stage, hero, fireball):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
@@ -372,11 +385,11 @@ def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_stage, hero)
 
     mocker.patch.object(hero.fighter, 'take_dmg')
 
-    item_funcs.cast_fireball(hero, **kwargs)
+    fireball.use(hero, **kwargs)
     hero.fighter.take_dmg.assert_called_once_with(25)
 
 
-def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero):
+def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero, fireball):
     orc_stage.entities.append(hero)
     fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
@@ -385,7 +398,7 @@ def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero):
     radius = 1
     kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 2, 'target_y': 2}
 
-    results = item_funcs.cast_fireball(hero, **kwargs)
+    results = fireball.use(hero, **kwargs)
     assert len(results) == 9
 
     assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
@@ -410,63 +423,68 @@ def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero):
 """ Tests for cast_confuse() """
 
 
-def test_cast_confuse__no_entities_raises_exception():
+@pytest.fixture
+def confuse():
+    return item_funcs.UseConfuse()
+
+
+def test_cast_confuse__no_entities_raises_exception(confuse):
     kwargs = {'fov_map':None, 'target_x':0, 'target_y':0}
     with pytest.raises(KeyError):
-        item_funcs.cast_confuse(**kwargs)
+        confuse.use(**kwargs)
 
 
-def test_cast_confuse__no_fov_map_raises_exception():
+def test_cast_confuse__no_fov_map_raises_exception(confuse):
     kwargs = {'entities':[], 'target_x':0, 'target_y':0}
     with pytest.raises(KeyError):
-        item_funcs.cast_confuse(**kwargs)
+        confuse.use(**kwargs)
 
 
-def test_cast_confuse__no_target_x_raises_exception():
+def test_cast_confuse__no_target_x_raises_exception(confuse):
     kwargs = {'entities':[], 'fov_map':None, 'target_y':0}
     with pytest.raises(KeyError):
-        item_funcs.cast_confuse(**kwargs)
+        confuse.use(**kwargs)
 
 
-def test_cast_confuse__no_target_y_raises_exception():
+def test_cast_confuse__no_target_y_raises_exception(confuse):
     kwargs = {'entities':[], 'fov_map':None, 'target_x':0}
     with pytest.raises(KeyError):
-        item_funcs.cast_confuse(**kwargs)
+        confuse.use(**kwargs)
 
 
-def test_cast_confuse__outside_fov__consumed_False(open_stage, hero):
+def test_cast_confuse__outside_fov__consumed_False(open_stage, hero, confuse):
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_confuse__outside_fov__msg(open_stage, hero):
+def test_cast_confuse__outside_fov__msg(open_stage, hero, confuse):
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
     assert results[0]['msg'] == 'You cannot target a tile outside your field of view.'
 
 
-def test_cast_confuse__in_fov_but_not_entity__consumed_False(open_stage, hero):
+def test_cast_confuse__in_fov_but_not_entity__consumed_False(open_stage, hero, confuse):
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_confuse__in_fov_but_not_entity__msg(open_stage, hero):
+def test_cast_confuse__in_fov_but_not_entity__msg(open_stage, hero, confuse):
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
     assert results[0]['msg'] == 'There is no targetable enemy at that location.'
 
 
@@ -476,49 +494,49 @@ def test_cast_confuse__in_fov_but_not_entity__msg(open_stage, hero):
     # 'msg': 'The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
 
 
-def test_cast_confuse__success__replaced_ai(open_stage, hero):
+def test_cast_confuse__success__replaced_ai(open_stage, hero, confuse):
     orc = factory.mk_entity('orc', 1, 1)
     open_stage.entities.extend([hero, orc])
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
-    item_funcs.cast_confuse(hero, **kwargs)
+    confuse.use(hero, **kwargs)
 
     assert isinstance(orc.ai, components.ConfusedBehavior)
 
 
-def test_cast_confuse__success__consumed_True(open_stage, hero):
+def test_cast_confuse__success__consumed_True(open_stage, hero, confuse):
     orc = factory.mk_entity('orc', 1, 1)
     open_stage.entities.extend([hero, orc])
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
 
     assert results[0]['consumed']
 
 
-def test_cast_confuse__success__msg(open_stage, hero):
+def test_cast_confuse__success__msg(open_stage, hero, confuse):
     orc = factory.mk_entity('orc', 1, 1)
     open_stage.entities.extend([hero, orc])
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
 
     assert results[0]['msg'] == 'The eyes of the Orc look vacant, as he starts to stumble around!'
 
 
-def test_cast_confuse__on_hero__not_successful(open_stage, hero):
+def test_cast_confuse__on_hero__not_successful(open_stage, hero, confuse):
     open_stage.entities.append(hero)
     fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':0, 'target_y':0}
-    results = item_funcs.cast_confuse(hero, **kwargs)
+    results = confuse.use(hero, **kwargs)
 
     assert results[0]['consumed'] is False
     assert results[0]['msg'] == 'There is no targetable enemy at that location.'

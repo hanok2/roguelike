@@ -59,7 +59,7 @@ class Inventory(object):
             else:
                 kwargs.update(item_comp.func_kwargs)
 
-                item_use_results = item_comp.use_func(self.owner, **kwargs)
+                item_use_results = item_comp.use_func.use(self.owner, **kwargs)
 
                 for result in item_use_results:
                     if result.get('consumed'):

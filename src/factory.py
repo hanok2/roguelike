@@ -1,9 +1,9 @@
 import tcod
 from . import config
+from . import item_funcs
 from .config import RenderOrder, EquipmentSlots
 from .components import Fighter, ApproachAI, Item, Equippable
 from .entity import Entity
-from .item_funcs import heal, cast_confuse, cast_lightning, cast_fireball
 from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
 
 
@@ -97,7 +97,7 @@ def mk_entity(entity_name, x, y):
             color=tcod.violet,
             render_order=RenderOrder.ITEM,
         )
-        item.item = Item(item, use_func=heal, amt=40)
+        item.item = Item(item, use_func=item_funcs.UseHeal(), amt=40)
         return item
 
     elif entity_name == 'sword':
@@ -165,7 +165,7 @@ def mk_entity(entity_name, x, y):
         )
         item.item = Item(
             owner=item,
-            use_func=cast_fireball,
+            use_func=item_funcs.UseFireball(),
             targeting=True,
             targeting_msg='Left-click a target tile for the fireball, or right-click to cancel.',
             dmg=25,
@@ -185,7 +185,7 @@ def mk_entity(entity_name, x, y):
 
         item.item = Item(
             owner=item,
-            use_func=cast_confuse,
+            use_func=item_funcs.UseConfuse(),
             targeting=True,
             targeting_msg='Left-click an enemy to confuse it, or right-click to cancel.',
         )
@@ -204,7 +204,7 @@ def mk_entity(entity_name, x, y):
 
         item.item = Item(
             owner=item,
-            use_func=cast_lightning,
+            use_func=item_funcs.UseLightning(),
             dmg=40,
             max_range=5
         )
