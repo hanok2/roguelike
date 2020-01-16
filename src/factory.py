@@ -31,12 +31,12 @@ monster_chances = {
 }
 
 
-def get_random_monster(x, y):
+def rnd_monster(x, y):
     monster_choice = rnd_choice_from_dict(monster_chances)
     return mk_entity(monster_choice, x, y)
 
 
-def get_random_item(x, y):
+def rnd_item(x, y):
     item_choice = rnd_choice_from_dict(item_chances)
     return mk_entity(item_choice, x, y)
 

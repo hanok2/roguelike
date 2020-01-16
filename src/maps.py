@@ -293,7 +293,7 @@ class Map(object):
             x, y = self.get_random_non_wall_loc()
 
             if not self.is_occupied(x, y):
-                monster = factory.get_random_monster(x, y)
+                monster = factory.rnd_monster(x, y)
                 self.entities.append(monster)
 
     def place_items(self, room):
@@ -309,7 +309,7 @@ class Map(object):
             x, y = self.get_random_room_loc(room)
 
             if not self.is_occupied(x, y):
-                item = factory.get_random_item(x, y)
+                item = factory.rnd_item(x, y)
                 self.entities.append(item)
 
     def place_stairs_down(self, x, y):

@@ -2,28 +2,28 @@ import pytest
 from ..src import factory
 
 
-def test_get_random_monster__monster_in_monster_chances():
+def test_rnd_monster__monster_in_monster_chances():
     x, y = 1, 2
-    m = factory.get_random_monster(x=x, y=y)
+    m = factory.rnd_monster(x=x, y=y)
     assert m.name not in factory.monster_chances
 
 
-def test_get_random_monster__monster_matches_x_y():
+def test_rnd_monster__monster_matches_x_y():
     x, y = 1, 2
-    m = factory.get_random_monster(x=x, y=y)
+    m = factory.rnd_monster(x=x, y=y)
     assert m.x == x
     assert m.y == y
 
 
-def test_get_random_item__item_in_item_chances():
+def test_rnd_item__item_in_item_chances():
     x, y = 1, 2
-    i = factory.get_random_item(x=x, y=y)
+    i = factory.rnd_item(x=x, y=y)
     assert i.name not in factory.item_chances
 
 
-def test_get_random_item__item_matches_x_y():
+def test_rnd_item__item_matches_x_y():
     x, y = 1, 2
-    i = factory.get_random_item(x=x, y=y)
+    i = factory.rnd_item(x=x, y=y)
     assert i.x == x
     assert i.y == y
 
