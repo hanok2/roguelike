@@ -109,12 +109,12 @@ def main():
 def play_game(dungeon, msg_log, state, turns, render_eng):
     log.debug('Calling play_game...')
     hero = dungeon.hero
-    current_map = dungeon.current_map()
+    stage = dungeon.get_stage()
 
     fov_recompute = True
 
     # Initialize fov
-    fov_map = initialize_fov(current_map)
+    fov_map = initialize_fov(stage)
 
     key = tcod.Key()
     mouse = tcod.Mouse()
@@ -159,7 +159,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         tcod.console_flush()
 
         # Clear all entities
-        render_eng.clear_all(current_map.entities)
+        render_eng.clear_all(stage.entities)
 
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
@@ -213,8 +213,8 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             dest_x = hero.x + dx
             dest_y = hero.y + dy
 
-            if not current_map.is_blocked(dest_x, dest_y):
-                target = current_map.get_blocker_at_loc(dest_x, dest_y)
+            if not stage.is_blocked(dest_x, dest_y):
+                target = stage.get_blocker_at_loc(dest_x, dest_y)
 
                 if target:
                     log.debug('Attacking.')
@@ -237,7 +237,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         elif pickup and state == States.HERO_TURN:
             log.debug('Attempting pickup.')
-            for entity in current_map.entities:
+            for entity in stage.entities:
                 item_pos_at_our_pos = entity.x == hero.x and entity.y == hero.y
 
                 if entity.has_comp('item') and item_pos_at_our_pos:
@@ -266,7 +266,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             if state == States.SHOW_INV:
                 hero_turn_results.extend(
                     hero.inv.use(
-                        item, entities=current_map.entities, fov_map=fov_map
+                        item, entities=stage.entities, fov_map=fov_map
                     )
                 )
 
@@ -275,18 +275,18 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         if stair_down and state == States.HERO_TURN:
             log.debug('Attempting stair down.')
-            for entity in current_map.entities:
+            for entity in stage.entities:
                 if entity.has_comp('stair_down'):
                     hero_at_stairs = entity.x == hero.x and entity.y == hero.y
                     if hero_at_stairs:
-                        dungeon.generate_next_level()
+                        dungeon.mk_next_stage()
 
                         if dungeon.move_downstairs():
-                            current_map = dungeon.current_map()
-                            current_map.populate()
+                            stage = dungeon.get_stage()
+                            stage.populate()
                             msg_log.add('You carefully descend the stairs down.')
 
-                            fov_map = initialize_fov(current_map)
+                            fov_map = initialize_fov(stage)
                             fov_recompute = True
                             render_eng.con.clear()
                             break
@@ -298,22 +298,22 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         if stair_up and state == States.HERO_TURN:
             log.debug('Attempting stair up.')
-            for entity in current_map.entities:
+            for entity in stage.entities:
                 if entity.has_comp('stair_up'):
                     hero_at_stairs = entity.x == hero.x and entity.y == hero.y
                     if hero_at_stairs:
 
-                        if dungeon.current_lvl == 0:
+                        if dungeon.current_stage == 0:
                             msg_log.add('You go up the stairs and leave the dungeon forever...')
                             state = States.HERO_DEAD
                             # gameexit = True
                             break
 
                         elif dungeon.move_upstairs():
-                            current_map = dungeon.current_map()
+                            stage = dungeon.get_stage()
                             msg_log.add('You ascend the stairs up.')
 
-                            fov_map = initialize_fov(current_map)
+                            fov_map = initialize_fov(stage)
                             fov_recompute = True
                             render_eng.con.clear()
                             break
@@ -351,7 +351,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
                 item_use_results = hero.inv.use(
                     targeting_item,
-                    entities=current_map.entities,
+                    entities=stage.entities,
                     fov_map=fov_map,
                     target_x=target_x,
                     target_y=target_y
@@ -424,7 +424,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
             if item_added:
                 log.debug('Item added.')
-                current_map.entities.remove(item_added)
+                stage.entities.remove(item_added)
                 state = States.WORLD_TURN
 
             if item_consumed:
@@ -441,7 +441,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
             if item_dropped:
                 log.debug('Item dropped.')
-                current_map.entities.append(item_dropped)
+                stage.entities.append(item_dropped)
                 state = States.WORLD_TURN
 
             if equip:
@@ -466,13 +466,13 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             # This *may* go elsewhere, but we'll try it here first.
             turns += 1
 
-            for entity in current_map.entities:
+            for entity in stage.entities:
 
                 if entity.has_comp('ai'):
                     turn_results = entity.ai.take_turn(
                         hero,
                         fov_map,
-                        current_map,
+                        stage,
                     )
 
                     for result in turn_results:

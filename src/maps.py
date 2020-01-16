@@ -12,40 +12,41 @@ from .tile import Tile
 class Dungeon(object):
     def __init__(self, hero):
         self.hero = hero
-        self.levels = []
+        self.stages = []
 
-        # Note: Can we fix this with a property? To match up with Maps?
-        self.current_lvl = 0
+        # Note: Can we fix this with a property? To match up with Stages?
+        self.current_stage = 0
 
         # Generate the first level on initialization
-        self.generate_next_level()
+        self.mk_next_stage()
 
-        hero_start_x, hero_start_y = self.levels[0].rooms[0].center()
+        hero_start_x, hero_start_y = self.stages[0].rooms[0].center()
         self.move_hero(0, hero_start_x, hero_start_y)
 
-        self.current_map().populate()
+        self.get_stage().populate()
 
     # def current_lvl(self):
         # Find the hero and return the level the hero is on.
 
-    def current_map(self):
-        return self.levels[self.current_lvl]
+    def get_stage(self):
+        # todo: Returns the specified stage, otherwise returns the stage the
+        # hero is currently on
+        return self.stages[self.current_stage]
 
-    def generate_next_level(self):
+    def mk_next_stage(self):
         # Generate next dungeon level
-        level_depth = len(self.levels) + 1
-        new_map = Map(config.map_width, config.map_height, level_depth)
-        new_map.make_map()
-        self.levels.append(new_map)
+        level_depth = len(self.stages) + 1
+        new_stage = Stage(config.stage_width, config.stage_height, level_depth)
+        new_stage.mk_stage()
+        self.stages.append(new_stage)
 
     def hero_at_stairs(self, stair_char):
-        for e in self.current_map().entities:
+        for e in self.get_stage().entities:
             if stair_char == '>' and e.has_comp('stair_down'):
                 return e.x == self.hero.x and e.y == self.hero.y
             if stair_char == '<' and e.has_comp('stair_up'):
                 return e.x == self.hero.x and e.y == self.hero.y
         return False
-
 
     def move_downstairs(self):
         """ Removes the hero from the current level and places them at the
@@ -53,11 +54,11 @@ class Dungeon(object):
             First checks if the hero is at a down-stair. If they are, proceeds
             moving the hero and returns True, otherwise returns False.
         """
-        down_stair = self.current_map().find_stair('>')
+        down_stair = self.get_stage().find_stair('>')
 
         if self.hero.x == down_stair.x and self.hero.y == down_stair.y:
-            next_lvl = self.current_lvl + 1
-            hero_start_x, hero_start_y = self.levels[next_lvl].rooms[0].center()
+            next_lvl = self.current_stage + 1
+            hero_start_x, hero_start_y = self.stages[next_lvl].rooms[0].center()
             return self.move_hero(next_lvl, hero_start_x, hero_start_y)
 
         return False
@@ -68,16 +69,16 @@ class Dungeon(object):
             First checks if the hero is at an up-stair. If they are, proceeds
             moving the hero and returns True, otherwise returns False.
         """
-        up_stair = self.current_map().find_stair('<')
+        up_stair = self.get_stage().find_stair('<')
 
         if self.hero.x == up_stair.x and self.hero.y == up_stair.y:
-            next_lvl = self.current_lvl - 1
-            hero_start_x, hero_start_y = self.levels[next_lvl].rooms[-1].center()
+            next_lvl = self.current_stage - 1
+            hero_start_x, hero_start_y = self.stages[next_lvl].rooms[-1].center()
             return self.move_hero(next_lvl, hero_start_x, hero_start_y)
 
         return False
 
-    def move_hero(self, dest_lvl, dest_x, dest_y):
+    def move_hero(self, dest_stage_index, dest_x, dest_y):
         """Moves the hero from the current to the destination level at the
             specified x and y coordinates.
             If the destination is a wall or unoccupied, we won't be able to move
@@ -90,12 +91,12 @@ class Dungeon(object):
         # Does the destination level exist??
 
         # Is it a wall?
-        src_map = self.levels[dest_lvl]
-        if src_map.tiles[dest_x][dest_y].blocked:
+        src_stage = self.stages[dest_stage_index]
+        if src_stage.tiles[dest_x][dest_y].blocked:
             return False
 
         # Is there a blocking monster there?
-        blockers = [e for e in src_map.entities if e.blocks]
+        blockers = [e for e in src_stage.entities if e.blocks]
         for e in blockers:
             if e.x == dest_x and e.y == dest_y:
                 return False
@@ -104,25 +105,25 @@ class Dungeon(object):
         # If found, keep current location
 
         # Remove the hero
-        src_map.rm_hero()
+        src_stage.rm_hero()
 
         # Place the hero at the destination
-        self.levels[dest_lvl].entities.append(self.hero)
+        self.stages[dest_stage_index].entities.append(self.hero)
 
         # Update hero x/y
         self.hero.x, self.hero.y = dest_x, dest_y
 
         # Update current_lvl
-        self.current_lvl = dest_lvl
+        self.current_stage = dest_stage_index
 
         return True
 
 
-class Map(object):
+class Stage(object):
     def __init__(self, width, height, dungeon_lvl=config.DEFAULT_DUNGEON_LVL):
         # Error checking
-        if width < config.min_map_length or height < config.min_map_length:
-            raise ValueError("The minimum map width/height is {}".format(config.min_map_length))
+        if width < config.stage_length_min or height < config.stage_length_min:
+            raise ValueError("The minimum map width/height is {}".format(config.stage_length_min))
         elif dungeon_lvl <= 0:
             raise ValueError("The minimum map dungeon_lvl is 1")
 
@@ -199,7 +200,7 @@ class Map(object):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
 
-    def make_map(self):
+    def mk_stage(self):
         # Procedurally generate a dungeon map
         for _ in range(config.max_rooms):
             new_room = self.mk_room()
@@ -235,7 +236,7 @@ class Map(object):
         self.place_stairs_down(last_room_centerx, last_room_centery)
 
     def populate(self):
-        """Populates the map with monsters and items.
+        """Populates the stage with monsters and items.
             Possibly adds other entities: stairs/features/etc.
         """
         self.place_monsters()
@@ -247,7 +248,7 @@ class Map(object):
         return any([entity for entity in self.entities if entity.x == x and entity.y == y])
 
     def get_random_open_spot(self):
-        """Find a random non-wall, non-blocked spot on the map.
+        """Find a random non-wall, non-blocked spot on the stage.
             If we find a valid tile, return the (x, y) tuple for that tile.
             Else, return None
         """
@@ -259,7 +260,7 @@ class Map(object):
                 return tile
 
     def get_random_non_wall_loc(self):
-        """Find a random spot on the map that is not a Wall."""
+        """Find a random spot on the stage that is not a Wall."""
         # Find all of the non-wall tiles
         valid_tiles = []
         for x in range(self.width):
@@ -279,8 +280,8 @@ class Map(object):
         return x, y
 
     def place_monsters(self):
-        """Generates monsters for the map. For each monster, we pick a random
-            non-wall and non-occupied spot on the map and places a random monster there.
+        """Generates monsters for the stage. For each monster, we pick a random
+            non-wall and non-occupied spot on the stage and places a random monster there.
         """
         # todo: Create a table for monster generation that increases difficulty
         # max_monsters_per_map = from_dungeon_lvl(config.max_monsters_weights, self.dungeon_lvl)
@@ -289,7 +290,7 @@ class Map(object):
         if not self.get_random_non_wall_loc():
             return None
 
-        for _ in range(config.max_monsters_per_map):
+        for _ in range(config.max_monsters_per_stage):
             x, y = self.get_random_non_wall_loc()
 
             if not self.is_occupied(x, y):
@@ -329,7 +330,7 @@ class Map(object):
         return stair_up
 
     def get_blocker_at_loc(self, x, y):
-        """Scans through all entities on map that match the x, y coordinates and
+        """Scans through all entities on stage that match the x, y coordinates and
             if an entity matches and blocks - we return it.
             Otherwise, returns None.
         """

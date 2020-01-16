@@ -14,17 +14,17 @@ def hero():
 
 
 @pytest.fixture
-def open_map():
+def open_stage():
     # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
-    m = maps.Map(10, 10)
+    m = maps.Stage(10, 10)
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
     return m
 
 
 @pytest.fixture
-def test_map():
+def orc_stage():
     # todo: When we revamp map - revise this fixture!!!!!!!!!!!!!!!!!!!!!!!!
-    m = maps.Map(10, 10)
+    m = maps.Stage(10, 10)
     # All open
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
     orc_coordinates = [
@@ -122,50 +122,51 @@ def test_cast_lightning__no_max_range_raises_exception():
         item_funcs.cast_lightning(hero, **kwargs)
 
 
-    # Need empty map, hero, and entities that are in and out of FOV
+    # Need empty stage, hero, and entities that are in and out of FOV
     # kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'max_range':3}
 
     # if successful cast:
 
-def test_cast_lightning__valid_target_returns_consumed_True(test_map, hero):
-    test_map.entities.append(hero)
-    fov_map = fov.initialize_fov(test_map)
+
+def test_cast_lightning__valid_target_returns_consumed_True(orc_stage, hero):
+    orc_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':test_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['consumed']
 
 
-def test_cast_lightning__valid_target_returns_entity(test_map, hero):
-    test_map.entities.append(hero)
-    fov_map = fov.initialize_fov(test_map)
+def test_cast_lightning__valid_target_returns_entity(orc_stage, hero):
+    orc_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':test_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['target'].x == 1
     assert results[0]['target'].y == 0
 
 
-def test_cast_lightning__valid_target_returns_msg(test_map, hero):
-    test_map.entities.append(hero)
-    fov_map = fov.initialize_fov(test_map)
+def test_cast_lightning__valid_target_returns_msg(orc_stage, hero):
+    orc_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':test_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['msg'] == 'A lighting bolt strikes the Orc with a loud thunder! The damage is 10'
 
 
-def test_cast_lightning__valid_target__take_dmg_called(mocker, test_map, hero):
-    test_map.entities.append(hero)
-    fov_map = fov.initialize_fov(test_map)
+def test_cast_lightning__valid_target__take_dmg_called(mocker, orc_stage, hero):
+    orc_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':test_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     # todo: Better way to do this...
-    orc = test_map.entities[0]
+    orc = orc_stage.entities[0]
 
     mocker.patch.object(orc.fighter, 'take_dmg')
 
@@ -174,87 +175,87 @@ def test_cast_lightning__valid_target__take_dmg_called(mocker, test_map, hero):
     orc.fighter.take_dmg.assert_called_once_with(10)
 
 
-def test_cast_lightning__no_target_returns_consumed_False(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_lightning__no_target_returns_consumed_False(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_lightning__no_target_returns_target_None(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_lightning__no_target_returns_target_None(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['target'] is None
 
 
-def test_cast_lightning__no_target_returns_msg(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_lightning__no_target_returns_msg(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['msg'] == 'No enemy is close enough to strike.'
 
 
-def test_cast_lightning__out_of_range__consumed_False(open_map, hero):
+def test_cast_lightning__out_of_range__consumed_False(open_stage, hero):
     orc = factory.mk_entity('orc', 4, 4)
-    open_map.entities.append(hero)
-    open_map.entities.append(orc)
+    open_stage.entities.append(hero)
+    open_stage.entities.append(orc)
 
-    fov_map = fov.initialize_fov(open_map)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_lightning__out_of_range__target_None(open_map, hero):
+def test_cast_lightning__out_of_range__target_None(open_stage, hero):
     orc = factory.mk_entity('orc', 4, 4)
-    open_map.entities.append(hero)
-    open_map.entities.append(orc)
+    open_stage.entities.append(hero)
+    open_stage.entities.append(orc)
 
-    fov_map = fov.initialize_fov(open_map)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['target'] is None
 
 
-def test_cast_lightning__out_of_range__returns_msg(open_map, hero):
+def test_cast_lightning__out_of_range__returns_msg(open_stage, hero):
     orc = factory.mk_entity('orc', 4, 4)
-    open_map.entities.append(hero)
-    open_map.entities.append(orc)
+    open_stage.entities.append(hero)
+    open_stage.entities.append(orc)
 
-    fov_map = fov.initialize_fov(open_map)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':10, 'max_range':3}
 
     results = item_funcs.cast_lightning(hero, **kwargs)
     assert results[0]['msg'] == 'No enemy is close enough to strike.'
 
 
 @pytest.mark.skip(reason='need Boulder entity to block FOV')
-def test_cast_lightning__out_of_fov__consumed_False(open_map, hero):
+def test_cast_lightning__out_of_fov__consumed_False(open_stage, hero):
     pass
 
 
 @pytest.mark.skip(reason='need Boulder entity to block FOV')
-def test_cast_lightning__out_of_fov__target_None(open_map, hero):
+def test_cast_lightning__out_of_fov__target_None(open_stage, hero):
     pass
 
 
 @pytest.mark.skip(reason='need Boulder entity to block FOV')
-def test_cast_lightning__out_of_fov__returns_msg(open_map, hero):
+def test_cast_lightning__out_of_fov__returns_msg(open_stage, hero):
     pass
 
 
@@ -297,74 +298,74 @@ def test_cast_fireball__no_target_y_raises_exception():
         item_funcs.cast_fireball(**kwargs)
 
 
-def test_cast_fireball__outside_fov__consumed_False(open_map, hero):
+def test_cast_fireball__outside_fov__consumed_False(open_stage, hero):
     orc = factory.mk_entity('orc', 9, 9)
-    open_map.entities.extend([hero, orc])
+    open_stage.entities.extend([hero, orc])
 
-    fov_map = fov.initialize_fov(open_map)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_fireball__outside_fov__msg(open_map, hero):
+def test_cast_fireball__outside_fov__msg(open_stage, hero):
     orc = factory.mk_entity('orc', 9, 9)
-    open_map.entities.extend([hero, orc])
+    open_stage.entities.extend([hero, orc])
 
-    fov_map = fov.initialize_fov(open_map)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
     assert results[0]['msg'] == 'You cannot target a tile outside your field of view.'
 
 
-def test_cast_fireball__in_fov__consumed_True(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_fireball__in_fov__consumed_True(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     radius = 3
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
     assert results[0]['consumed']
 
 
-def test_cast_fireball__in_fov__msg(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_fireball__in_fov__msg(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     radius = 3
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
     assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
 
 
-def test_cast_fireball__close_to_hero__msg(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_fireball__close_to_hero__msg(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     radius = 3
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
     assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
     assert results[1]['msg'] == 'The Player gets burned for 25 hit points!'
 
 
-def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
     radius = 3
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
 
     mocker.patch.object(hero.fighter, 'take_dmg')
 
@@ -372,14 +373,14 @@ def test_cast_fireball__close_to_hero__take_dmg_called(mocker, open_map, hero):
     hero.fighter.take_dmg.assert_called_once_with(25)
 
 
-def test_cast_fireball__orc_mob__hits_5_orcs(test_map, hero):
-    test_map.entities.append(hero)
-    fov_map = fov.initialize_fov(test_map)
+def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero):
+    orc_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
 
-    orc_xp = test_map.entities[0].fighter.xp
+    orc_xp = orc_stage.entities[0].fighter.xp
     radius = 1
-    kwargs = {'entities':test_map.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 2, 'target_y': 2}
+    kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 2, 'target_y': 2}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
     assert len(results) == 11
@@ -430,38 +431,38 @@ def test_cast_confuse__no_target_y_raises_exception():
         item_funcs.cast_confuse(**kwargs)
 
 
-def test_cast_confuse__outside_fov__consumed_False(open_map, hero):
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_confuse__outside_fov__consumed_False(open_stage, hero):
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
     results = item_funcs.cast_confuse(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_confuse__outside_fov__msg(open_map, hero):
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_confuse__outside_fov__msg(open_stage, hero):
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':9, 'target_y':9}
     results = item_funcs.cast_confuse(hero, **kwargs)
     assert results[0]['msg'] == 'You cannot target a tile outside your field of view.'
 
 
-def test_cast_confuse__in_fov_but_not_entity__consumed_False(open_map, hero):
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_confuse__in_fov_but_not_entity__consumed_False(open_stage, hero):
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
     results = item_funcs.cast_confuse(hero, **kwargs)
     assert results[0]['consumed'] is False
 
 
-def test_cast_confuse__in_fov_but_not_entity__msg(open_map, hero):
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_confuse__in_fov_but_not_entity__msg(open_stage, hero):
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
     results = item_funcs.cast_confuse(hero, **kwargs)
     assert results[0]['msg'] == 'There is no targetable enemy at that location.'
 
@@ -472,48 +473,48 @@ def test_cast_confuse__in_fov_but_not_entity__msg(open_map, hero):
     # 'msg': 'The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
 
 
-def test_cast_confuse__success__replaced_ai(open_map, hero):
+def test_cast_confuse__success__replaced_ai(open_stage, hero):
     orc = factory.mk_entity('orc', 1, 1)
-    open_map.entities.extend([hero, orc])
-    fov_map = fov.initialize_fov(open_map)
+    open_stage.entities.extend([hero, orc])
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
     item_funcs.cast_confuse(hero, **kwargs)
 
     assert isinstance(orc.ai, components.ConfusedBehavior)
 
 
-def test_cast_confuse__success__consumed_True(open_map, hero):
+def test_cast_confuse__success__consumed_True(open_stage, hero):
     orc = factory.mk_entity('orc', 1, 1)
-    open_map.entities.extend([hero, orc])
-    fov_map = fov.initialize_fov(open_map)
+    open_stage.entities.extend([hero, orc])
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
     results = item_funcs.cast_confuse(hero, **kwargs)
 
     assert results[0]['consumed']
 
 
-def test_cast_confuse__success__msg(open_map, hero):
+def test_cast_confuse__success__msg(open_stage, hero):
     orc = factory.mk_entity('orc', 1, 1)
-    open_map.entities.extend([hero, orc])
-    fov_map = fov.initialize_fov(open_map)
+    open_stage.entities.extend([hero, orc])
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':1, 'target_y':1}
     results = item_funcs.cast_confuse(hero, **kwargs)
 
     assert results[0]['msg'] == 'The eyes of the Orc look vacant, as he starts to stumble around!'
 
 
-def test_cast_confuse__on_hero__not_successful(open_map, hero):
-    open_map.entities.append(hero)
-    fov_map = fov.initialize_fov(open_map)
+def test_cast_confuse__on_hero__not_successful(open_stage, hero):
+    open_stage.entities.append(hero)
+    fov_map = fov.initialize_fov(open_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
 
-    kwargs = {'entities':open_map.entities, 'fov_map':fov_map, 'target_x':0, 'target_y':0}
+    kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'target_x':0, 'target_y':0}
     results = item_funcs.cast_confuse(hero, **kwargs)
 
     assert results[0]['consumed'] is False

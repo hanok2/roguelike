@@ -27,17 +27,17 @@ class RenderEngine(object):
         self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
 
     def render_all(self, dungeon, fov_map, fov_recompute, msg_log, mouse, state, turns):
-        game_map = dungeon.current_map()
+        stage = dungeon.get_stage()
 
-        # Draw all the tiles in the game map
+        # Draw all the tiles in the stage
         if fov_recompute:
-            self.render_map_tiles(game_map, fov_map)
+            self.render_tiles(stage, fov_map)
 
         # Draw all entities in the list
-        sorted_entities = sorted(game_map.entities, key=lambda x: x.render_order.value)
+        sorted_entities = sorted(stage.entities, key=lambda x: x.render_order.value)
 
         for entity in sorted_entities:
-            self.draw_entity(entity, fov_map, game_map)
+            self.draw_entity(entity, fov_map, stage)
 
         # Display console
         self.con.blit(
@@ -71,14 +71,14 @@ class RenderEngine(object):
         self.render_status_bar(dungeon, fov_map, mouse, turns)
         self.render_console_messages(msg_log)
 
-    def render_map_tiles(self, game_map, fov_map):
+    def render_tiles(self, stage, fov_map):
         # visible = fov_map.fov[:]
 
-        for y in range(game_map.height):
-            for x in range(game_map.width):
+        for y in range(stage.height):
+            for x in range(stage.width):
                 visible = fov_map.fov[y, x]
 
-                wall = game_map.tiles[x][y].block_sight
+                wall = stage.tiles[x][y].block_sight
 
                 # Tiles within field-of-vision
                 if visible:
@@ -100,10 +100,10 @@ class RenderEngine(object):
                         )
 
                     # It's visible therefore explored
-                    game_map.tiles[x][y].explored = True
+                    stage.tiles[x][y].explored = True
 
                 # Tiles outside field-of-vision
-                elif game_map.tiles[x][y].explored:
+                elif stage.tiles[x][y].explored:
                     if wall:
                         tcod.console_put_char_ex(
                             con=self.con,
@@ -136,12 +136,12 @@ class RenderEngine(object):
             flag=tcod.BKGND_NONE
         )
 
-    def draw_entity(self, entity, fov_map, game_map):
+    def draw_entity(self, entity, fov_map, stage):
         # Draw an entity on the console
         entity_in_fov = fov_map.fov[entity.y, entity.x]
 
         # todo: Break into nicer booleans
-        stair_entity = ((entity.has_comp('stair_down') or entity.has_comp('stair_up')) and game_map.tiles[entity.x][entity.y].explored)
+        stair_entity = ((entity.has_comp('stair_down') or entity.has_comp('stair_up')) and stage.tiles[entity.x][entity.y].explored)
 
         if entity_in_fov or stair_entity:
             self.con.default_fg = entity.color
@@ -200,12 +200,12 @@ class RenderEngine(object):
 
     def render_status_bar(self, dungeon, fov_map, mouse, turns):
         hero = dungeon.hero
-        game_map = dungeon.current_map()
+        stage = dungeon.get_stage()
 
         # Display dungeon level
         self.panel.print(
             x=1, y=1,
-            string='DungeonLvl: {}'.format(game_map.dungeon_lvl),
+            string='DungeonLvl: {}'.format(stage.dungeon_lvl),
             alignment=tcod.LEFT,
         )
 
@@ -249,7 +249,7 @@ class RenderEngine(object):
         # Display entity under mouse
         self.panel.print(
             x=1, y=0,
-            string=get_names_under_mouse(mouse, game_map.entities, fov_map),
+            string=get_names_under_mouse(mouse, stage.entities, fov_map),
             alignment=tcod.LEFT,
         )
 

@@ -20,25 +20,25 @@ def hero():
 def test_dungeon_init__beginning_variables(hero):
     d = maps.Dungeon(hero)
     assert d.hero is hero
-    assert d.current_lvl == 0
+    assert d.current_stage == 0
 
 
 def test_dungeon_init__1_level_exists(hero):
     # Make sure 1 level is generated on init
     d = maps.Dungeon(hero)
-    assert len(d.levels) == 1
+    assert len(d.stages) == 1
 
 
-@pytest.mark.skip(reason='Cannot implement yet because mocking causes problem with hero access to levels list.')
-def test_dungeon_init__generate_next_lvl_called(mocker, hero):
-    mocker.patch.object(maps.Dungeon, 'generate_next_level')
+@pytest.mark.skip(reason='Cannot implement yet because mocking causes problem with hero access to stages list.')
+def test_dungeon_init__mk_next_stage_called(mocker, hero):
+    mocker.patch.object(maps.Dungeon, 'mk_next_stage')
     d = maps.Dungeon(hero)
-    d.generate_next_level.assert_called_once()
+    d.mk_next_stage.assert_called_once()
 
 
-def test_dungeon_init__hero_exists_on_map(hero):
+def test_dungeon_init__hero_exists_on_stage(hero):
     d = maps.Dungeon(hero)
-    m = d.current_map()
+    m = d.get_stage()
     assert any([True for e in m.entities if e.has_comp('human')])
 
 
@@ -49,54 +49,54 @@ def test_dungeon_init__move_hero_called(mocker, hero):
 
 
 def test_dungeon_init__populate_called(mocker, hero):
-    mocker.patch.object(maps.Map, 'populate')
+    mocker.patch.object(maps.Stage, 'populate')
     d = maps.Dungeon(hero)
-    m = d.current_map()
+    m = d.get_stage()
 
     m.populate.assert_called_once()
 
 
-def test_current_map__1_level(hero):
+def test_get_stage__1_level(hero):
     d = maps.Dungeon(hero)
-    m = d.current_map()
-    assert m.dungeon_lvl == d.current_lvl + 1
+    m = d.get_stage()
+    assert m.dungeon_lvl == d.current_stage + 1
 
 
-def test_current_map__2_levels(hero):
+def test_get_stage__2_stages(hero):
     d = maps.Dungeon(hero)
-    d.generate_next_level()
+    d.mk_next_stage()
 
-    m = d.current_map()
-    assert m.dungeon_lvl == d.current_lvl + 1
+    m = d.get_stage()
+    assert m.dungeon_lvl == d.current_stage + 1
 
-    d.current_lvl = 1
-    m = d.current_map()
-    assert m.dungeon_lvl == d.current_lvl + 1
+    d.current_stage = 1
+    m = d.get_stage()
+    assert m.dungeon_lvl == d.current_stage + 1
 
 
 # def test_place_hero(, level):
     # Should this take the hero as a parameter?
     # Test that the hero is put somewhere
 
-def test_generate_next_level__levels_increases(hero):
+def test_mk_next_stage__stages_increases(hero):
     d = maps.Dungeon(hero)
-    assert len(d.levels) == 1
-    d.generate_next_level()
+    assert len(d.stages) == 1
+    d.mk_next_stage()
 
-    assert len(d.levels) == 2
+    assert len(d.stages) == 2
 
 
-def test_generate_next_level__maps_are_numbered_correctly(hero):
+def test_mk_next_stage__stages_are_numbered_correctly(hero):
     d = maps.Dungeon(hero)
-    assert d.levels[0].dungeon_lvl == 1
-    d.generate_next_level()
+    assert d.stages[0].dungeon_lvl == 1
+    d.mk_next_stage()
 
-    assert d.levels[1].dungeon_lvl == 2
+    assert d.stages[1].dungeon_lvl == 2
 
 
 def test_hero_at_stairs__valid_returns_True(hero):
     d = maps.Dungeon(hero)
-    down_stair = d.current_map().find_stair('>')
+    down_stair = d.get_stage().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
     assert d.hero_at_stairs('>')
 
@@ -114,7 +114,7 @@ def test_hero_at_stairs__starting_upstair_returns_True(hero):
 
 def test_move_downstairs__not_on_down_stair_returns_False(hero):
     d = maps.Dungeon(hero)
-    d.generate_next_level()
+    d.mk_next_stage()
 
     result = d.move_downstairs()
     assert result is False
@@ -122,12 +122,12 @@ def test_move_downstairs__not_on_down_stair_returns_False(hero):
 
 def test_move_downstairs__hero_moved_to_next_upstair(hero):
     d = maps.Dungeon(hero)
-    down_stair = d.current_map().find_stair('>')
+    down_stair = d.get_stage().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
-    d.generate_next_level()
+    d.mk_next_stage()
 
     d.move_downstairs()
-    up_stair = d.current_map().find_stair('<')
+    up_stair = d.get_stage().find_stair('<')
 
     assert d.hero.x == up_stair.x
     assert d.hero.y == up_stair.y
@@ -135,28 +135,28 @@ def test_move_downstairs__hero_moved_to_next_upstair(hero):
 
 def test_move_downstairs__dungeon_lvl_incremented(hero):
     d = maps.Dungeon(hero)
-    prev_lvl = d.current_lvl
-    down_stair = d.current_map().find_stair('>')
+    prev_lvl = d.current_stage
+    down_stair = d.get_stage().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
-    d.generate_next_level()
+    d.mk_next_stage()
 
     d.move_downstairs()
 
-    assert d.current_lvl == prev_lvl + 1
+    assert d.current_stage == prev_lvl + 1
 
 def test_move_downstairs__success_returns_True(hero):
     d = maps.Dungeon(hero)
-    prev_lvl = d.current_lvl
-    down_stair = d.current_map().find_stair('>')
+    prev_lvl = d.current_stage
+    down_stair = d.get_stage().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
-    d.generate_next_level()
+    d.mk_next_stage()
 
     assert d.move_downstairs()
 
 
 def test_move_upstairs__not_on_up_stair_returns_False(hero):
     d = maps.Dungeon(hero)
-    down_stair = d.current_map().find_stair('>')
+    down_stair = d.get_stage().find_stair('>')
 
     # Move hero to downstair (won't be on upstair)
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
@@ -165,9 +165,9 @@ def test_move_upstairs__not_on_up_stair_returns_False(hero):
 
 def test_move_upstairs__hero_moved_to_prev_downstair(hero):
     d = maps.Dungeon(hero)
-    down_stair = d.current_map().find_stair('>')
+    down_stair = d.get_stage().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
-    d.generate_next_level()
+    d.mk_next_stage()
 
     # Move the hero downstairs first
     d.move_downstairs()
@@ -180,9 +180,9 @@ def test_move_upstairs__hero_moved_to_prev_downstair(hero):
 
 def test_move_upstairs__success_returns_True(hero):
     d = maps.Dungeon(hero)
-    down_stair = d.current_map().find_stair('>')
+    down_stair = d.get_stage().find_stair('>')
     d.hero.x, d.hero.y = down_stair.x, down_stair.y
-    d.generate_next_level()
+    d.mk_next_stage()
 
     d.move_downstairs()
     assert d.move_upstairs()
@@ -197,101 +197,101 @@ def test_move_upstairs__success_returns_True(hero):
 
 def test_move_hero__to_wall_returns_False(hero):
     d = maps.Dungeon(hero)
-    m = maps.Map(10, 10, 2)
-    d.levels.append(m)
-    assert d.move_hero(dest_lvl=1, dest_x=0, dest_y=0) is False
+    m = maps.Stage(10, 10, 2)
+    d.stages.append(m)
+    assert d.move_hero(dest_stage_index=1, dest_x=0, dest_y=0) is False
 
 
 def test_move_hero__to_occupied_spot_returns_False(hero):
     d = maps.Dungeon(hero)
-    rnd_monster = [e for e in d.current_map().entities if e.has_comp('ai')].pop()
+    rnd_monster = [e for e in d.get_stage().entities if e.has_comp('ai')].pop()
     dest_x = rnd_monster.x
     dest_y = rnd_monster.y
-    assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y) is False
+    assert d.move_hero(dest_stage_index=0, dest_x=dest_x, dest_y=dest_y) is False
 
 
 def test_move_hero__same_floor_returns_True(hero):
     d = maps.Dungeon(hero)
-    dest_x, dest_y = d.current_map().get_random_open_spot()
-    assert d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
+    dest_x, dest_y = d.get_stage().get_random_open_spot()
+    assert d.move_hero(dest_stage_index=0, dest_x=dest_x, dest_y=dest_y)
 
 
 def test_move_hero__same_floor_hero_xy_updated(hero):
     d = maps.Dungeon(hero)
-    dest_x, dest_y = d.current_map().get_random_open_spot()
-    d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
+    dest_x, dest_y = d.get_stage().get_random_open_spot()
+    d.move_hero(dest_stage_index=0, dest_x=dest_x, dest_y=dest_y)
     assert d.hero.x == dest_x
     assert d.hero.y == dest_y
 
 
 def test_move_hero__same_floor_lvl_remains_same(hero):
     d = maps.Dungeon(hero)
-    d_lvl = d.current_lvl
-    dest_x, dest_y = d.current_map().get_random_open_spot()
-    d.move_hero(dest_lvl=0, dest_x=dest_x, dest_y=dest_y)
-    assert d.current_lvl == d_lvl
+    d_lvl = d.current_stage
+    dest_x, dest_y = d.get_stage().get_random_open_spot()
+    d.move_hero(dest_stage_index=0, dest_x=dest_x, dest_y=dest_y)
+    assert d.current_stage == d_lvl
 
 
 def test_move_hero__diff_floor_returns_True(hero):
-    dest_lvl = 1
+    dest_stage_index = 1
     d = maps.Dungeon(hero)
-    d.generate_next_level()
+    d.mk_next_stage()
 
-    dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
-    assert d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
+    dest_x, dest_y = d.stages[dest_stage_index].get_random_open_spot()
+    assert d.move_hero(dest_stage_index=dest_stage_index, dest_x=dest_x, dest_y=dest_y)
 
 
 def test_move_hero__diff_floor_hero_xy_updated(hero):
-    dest_lvl = 1
+    dest_stage_index = 1
     d = maps.Dungeon(hero)
-    d.generate_next_level()
+    d.mk_next_stage()
 
-    dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
-    d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
+    dest_x, dest_y = d.stages[dest_stage_index].get_random_open_spot()
+    d.move_hero(dest_stage_index=dest_stage_index, dest_x=dest_x, dest_y=dest_y)
     assert d.hero.x == dest_x
     assert d.hero.y == dest_y
 
 
 def test_move_hero__diff_floor_dungeon_lvl_updated(hero):
-    dest_lvl = 1
+    dest_stage_index = 1
     d = maps.Dungeon(hero)
-    d.generate_next_level()
+    d.mk_next_stage()
 
-    dest_x, dest_y = d.levels[dest_lvl].get_random_open_spot()
-    d.move_hero(dest_lvl=dest_lvl, dest_x=dest_x, dest_y=dest_y)
-    assert d.current_lvl == dest_lvl
-
-
-"""Tests for class Map(object):"""
+    dest_x, dest_y = d.stages[dest_stage_index].get_random_open_spot()
+    d.move_hero(dest_stage_index=dest_stage_index, dest_x=dest_x, dest_y=dest_y)
+    assert d.current_stage == dest_stage_index
 
 
-def test_map_init():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+"""Tests for class Stage(object):"""
+
+
+def test_Stage_init():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     assert len(m.tiles) == DEFAULT_LENGTH
     assert m.entities == []
     assert m.rooms == []
     assert m.dungeon_lvl == config.DEFAULT_DUNGEON_LVL
 
-def test_map_init_invalid_width_raises_exception():
+def test_Stage_init_invalid_width_raises_exception():
     with pytest.raises(ValueError):
-        maps.Map(width=INVALID_LENGTH, height=DEFAULT_LENGTH)
+        maps.Stage(width=INVALID_LENGTH, height=DEFAULT_LENGTH)
 
-def test_map_init_invalid_height_raises_exception():
+def test_Stage_init_invalid_height_raises_exception():
     with pytest.raises(ValueError):
-        maps.Map(width=DEFAULT_LENGTH, height=INVALID_LENGTH)
+        maps.Stage(width=DEFAULT_LENGTH, height=INVALID_LENGTH)
 
-def test_map_init_invalid_dungeon_lvl_raises_exception():
+def test_Stage_init_invalid_dungeon_lvl_raises_exception():
     with pytest.raises(ValueError):
-        maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH, dungeon_lvl=0)
+        maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH, dungeon_lvl=0)
 
-def test_map_rm_hero_if_absent_returns_False():
-    m = maps.Map(width=3, height=3)
+def test_Stage_rm_hero_if_absent_returns_False():
+    m = maps.Stage(width=3, height=3)
     result = m.rm_hero()
-    # Should be False because the map is not initialized with the hero in it.
+    # Should be False because the stage is not initialized with the hero in it.
     assert result is False
 
-def test_map_rm_hero_if_present_returns_True(hero):
-    m = maps.Map(width=3, height=3)
+def test_Stage_rm_hero_if_present_returns_True(hero):
+    m = maps.Stage(width=3, height=3)
     m.entities.append(hero)
     result = m.rm_hero()
     assert result is True
@@ -299,73 +299,73 @@ def test_map_rm_hero_if_present_returns_True(hero):
     assert hero not in m.entities
 
 
-def test_map_find_stair__down_stair_returns_entity():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
-    m.make_map()
+def test_Stage_find_stair__down_stair_returns_entity():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    m.mk_stage()
     stair = [e for e in m.entities if e.has_comp('stair_down')].pop()
     result = m.find_stair('>')
     assert result == stair
 
-def test_map_find_stair__up_stair_returns_entity():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
-    m.make_map()
+def test_Stage_find_stair__up_stair_returns_entity():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+    m.mk_stage()
     stair = [e for e in m.entities if e.has_comp('stair_up')].pop()
     result = m.find_stair('<')
     assert result == stair
 
 
-def test_map_find_stair__DNE_returns_None():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_find_stair__DNE_returns_None():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     assert m.find_stair('>') is None
     assert m.find_stair('<') is None
 
-def test_map_initialize_tiles():
+def test_Stage_initialize_tiles():
     # Test that all initialized tiles are True (aka: Wall)
-    m = maps.Map(width=3, height=3)
+    m = maps.Stage(width=3, height=3)
     result = m.initialize_tiles()
     assert all(t for t in result)
 
 
-def test_map_is_blocked_wall_returns_true():
-    m = maps.Map(width=3, height=3)
+def test_Stage_is_blocked_wall_returns_true():
+    m = maps.Stage(width=3, height=3)
     result = m.is_blocked(0, 0)
     assert result is True
 
-def test_map_is_blocked_not_wall_returns_False():
+def test_Stage_is_blocked_not_wall_returns_False():
     x, y = 1, 1  # Dig out
-    m = maps.Map(width=3, height=3)
+    m = maps.Stage(width=3, height=3)
     m.tiles[x][y].blocked = False
     result = m.is_blocked(x, y)
     assert result is False
 
 
-def test_map_mk_room_x1_in_map():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_mk_room_x1_in_stage():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r = m.mk_room()
     assert r.x1 >= 0
     assert r.x1 < DEFAULT_LENGTH
 
-def test_map_mk_room_x2_in_map():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_mk_room_x2_in_stage():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r = m.mk_room()
     assert r.x2 >= 0
     assert r.x2 < DEFAULT_LENGTH
 
-def test_map_mk_room_y1_in_map():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_mk_room_y1_in_stage():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r = m.mk_room()
     assert r.y1 >= 0
     assert r.y1 < DEFAULT_LENGTH
 
-def test_map_mk_room_y2_in_map():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_mk_room_y2_in_stage():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r = m.mk_room()
     assert r.y2 >= 0
     assert r.y2 < DEFAULT_LENGTH
 
 
-def test_map_dig_room_4x4():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_room_4x4():
+    m = maps.Stage(width=10, height=10)
     r = rect.Rect(0, 0, 4, 4)
     m.dig_room(r)
 
@@ -375,8 +375,8 @@ def test_map_dig_room_4x4():
     assert m.tiles[3][3].blocked is True  # Wall
 
 
-def test_map_dig_room_room_4x3():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_room_room_4x3():
+    m = maps.Stage(width=10, height=10)
     r = rect.Rect(0, 0, 4, 3)
     m.dig_room(r)
 
@@ -386,8 +386,8 @@ def test_map_dig_room_room_4x3():
     assert m.tiles[2][3].blocked is True # Wall
 
 
-def test_map_dig_room_5x5():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_room_5x5():
+    m = maps.Stage(width=10, height=10)
     r = rect.Rect(0, 0, 5, 5)
     m.dig_room(r)
 
@@ -398,8 +398,8 @@ def test_map_dig_room_5x5():
     assert m.tiles[4][4].blocked is True  # Wall
 
 
-def test_map_mk_tunnel_simple_horz_first():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_mk_tunnel_simple_horz_first():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r1 = rect.Rect(0, 0, 4, 4)
     r2 = rect.Rect(8, 8, 4, 4)
     m.mk_tunnel_simple(r1, r2)
@@ -416,8 +416,8 @@ def test_map_mk_tunnel_simple_horz_first():
         assert m.tiles[cx2][y].blocked is False # Floor
 
 
-def test_map_mk_tunnel_simple_vert_first():
-    m = maps.Map(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
+def test_Stage_mk_tunnel_simple_vert_first():
+    m = maps.Stage(width=DEFAULT_LENGTH, height=DEFAULT_LENGTH)
     r1 = rect.Rect(0, 0, 4, 4)
     r2 = rect.Rect(8, 8, 4, 4)
     m.mk_tunnel_simple(r1, r2, horz_first=False)
@@ -434,58 +434,58 @@ def test_map_mk_tunnel_simple_vert_first():
         assert m.tiles[x][cy2].blocked is False # Floor
 
 
-def test_map_dig_h_tunnel():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_h_tunnel():
+    m = maps.Stage(width=10, height=10)
     m.dig_h_tunnel(x1=0, x2=8, y=0)
     assert m.tiles[0][0].blocked is False
     assert m.tiles[8][0].blocked is False
     assert m.tiles[9][0].blocked is True
 
 
-def test_map_dig_h_tunnel_reversed_parameters():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_h_tunnel_reversed_parameters():
+    m = maps.Stage(width=10, height=10)
     m.dig_h_tunnel(x1=8, x2=0, y=0)
     assert m.tiles[0][0].blocked is False
     assert m.tiles[8][0].blocked is False
     assert m.tiles[9][0].blocked is True
 
 
-def test_map_dig_v_tunnel():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_v_tunnel():
+    m = maps.Stage(width=10, height=10)
     m.dig_v_tunnel(y1=0, y2=8, x=0)
     assert m.tiles[0][0].blocked is False
     assert m.tiles[0][8].blocked is False
     assert m.tiles[0][9].blocked is True
 
 
-def test_map_dig_v_tunnel_reversed_parameters():
-    m = maps.Map(width=10, height=10)
+def test_Stage_dig_v_tunnel_reversed_parameters():
+    m = maps.Stage(width=10, height=10)
     m.dig_v_tunnel(y1=8, y2=0, x=0)
     assert m.tiles[0][0].blocked is False
     assert m.tiles[0][8].blocked is False
     assert m.tiles[0][9].blocked is True
 
-def test_map_make_map__has_at_least_2_rooms():
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_mk_stage__has_at_least_2_rooms():
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     assert len(m.rooms) >= 2
 
 
-def test_map_make_map__has_up_stair():
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_mk_stage__has_up_stair():
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     assert  m.find_stair('<')
 
 
-def test_map_make_map__has_down_stair():
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_mk_stage__has_down_stair():
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     assert m.find_stair('>')
 
 
-def test_map_make_map__up_and_down_stairs_in_diff_rooms():
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_mk_stage__up_and_down_stairs_in_diff_rooms():
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     stair_up = m.find_stair('<')
     stair_down = m.find_stair('>')
 
@@ -498,13 +498,13 @@ def test_map_make_map__up_and_down_stairs_in_diff_rooms():
     assert not stair_up_room.within(stair_down.x, stair_down.y)
 
 
-# def test_map_make_map__all_rooms_interconnected():
+# def test_Stage_mk_stage__all_rooms_interconnected():
     # Need a pathfinding algorithm??
 
 
-def test_map_populate__calls_place_entities_and_items(mocker):
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_populate__calls_place_entities_and_items(mocker):
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     mocker.patch.object(m, 'place_monsters')
     mocker.patch.object(m, 'place_items')
     m.populate()
@@ -513,8 +513,8 @@ def test_map_populate__calls_place_entities_and_items(mocker):
     m.place_items.assert_called()
 
 
-def test_map_populate__no_rooms_does_not_call_place_items(mocker):
-    m = maps.Map(width=50, height=50)
+def test_Stage_populate__no_rooms_does_not_call_place_items(mocker):
+    m = maps.Stage(width=50, height=50)
     mocker.patch.object(m, 'place_monsters')
     mocker.patch.object(m, 'place_items')
     m.populate()
@@ -523,44 +523,44 @@ def test_map_populate__no_rooms_does_not_call_place_items(mocker):
     assert not m.place_items.called
 
 
-def test_map_is_occupied__not_occupied_returns_False():
+def test_Stage_is_occupied__not_occupied_returns_False():
     # Test if there are any entities at the coordinates
-    m = maps.Map(width=10, height=10)
+    m = maps.Stage(width=10, height=10)
     result = m.is_occupied(0, 0)
     assert result is False
 
-def test_map_is_occupied__occupied_return_True(hero):
+def test_Stage_is_occupied__occupied_return_True(hero):
     # Test if there are any entities at the coordinates
-    m = maps.Map(width=10, height=10)
+    m = maps.Stage(width=10, height=10)
     x, y = 0, 0
     m.entities.append(hero)
     assert m.is_occupied(x, y) is True
 
 
 def test_get_random_open_spot__all_wall_returns_None():
-    m = maps.Map(width=10, height=10)
+    m = maps.Stage(width=10, height=10)
     assert m.get_random_open_spot() is None
 
 
 def test_get_random_open_spot__single_spot():
-    m = maps.Map(width=10, height=10)
+    m = maps.Stage(width=10, height=10)
     m.tiles[0][0].blocked = False
     assert m.get_random_open_spot() == (0, 0)
 
 
-def test_map_get_random_non_wall_loc__default_map_returns_None():
-    m = maps.Map(width=10, height=10)
-    # There should be no non-Wall tiles in a default map
+def test_Stage_get_random_non_wall_loc__default_stage_returns_None():
+    m = maps.Stage(width=10, height=10)
+    # There should be no non-Wall tiles in a default stage
     assert m.get_random_non_wall_loc() is None
 
-def test_map_get_random_non_wall_loc__returns_non_wall():
-    m = maps.Map(width=10, height=10)
+def test_Stage_get_random_non_wall_loc__returns_non_wall():
+    m = maps.Stage(width=10, height=10)
     m.tiles[0][0].blocked = False
     result = m.get_random_non_wall_loc()
     assert result == (0, 0)
 
-def test_map_get_random_room_loc__map_corner():
-    m = maps.Map(width=50, height=50)
+def test_Stage_get_random_room_loc__stage_corner():
+    m = maps.Stage(width=50, height=50)
     r = rect.Rect(x=0, y=0, w=5, h=5)
     result_x, result_y = m.get_random_room_loc(r)
     min_x = r.x1 + config.NW_OFFSET
@@ -572,8 +572,8 @@ def test_map_get_random_room_loc__map_corner():
     assert result_y >= min_y and result_y <= max_y
 
 
-def test_map_get_random_room_loc__map_middle():
-    m = maps.Map(width=50, height=50)
+def test_Stage_get_random_room_loc__stage_middle():
+    m = maps.Stage(width=50, height=50)
     r = rect.Rect(x=10, y=10, w=15, h=5)
     result_x, result_y = m.get_random_room_loc(r)
     min_x = r.x1 + config.NW_OFFSET
@@ -585,8 +585,8 @@ def test_map_get_random_room_loc__map_middle():
     assert result_y >= min_y and result_y <= max_y
 
 
-def test_map_place_monsters__all_wall_tiles():
-    m = maps.Map(width=50, height=50)
+def test_Stage_place_monsters__all_wall_tiles():
+    m = maps.Stage(width=50, height=50)
     m.place_monsters()
 
     # Check that no entities are on Wall tiles
@@ -594,9 +594,9 @@ def test_map_place_monsters__all_wall_tiles():
         assert m.tiles[e.x][e.y].blocked is False
 
 
-def test_map_place_monsters_no_entities_appear_in_Wall():
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_place_monsters_no_entities_appear_in_Wall():
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     m.place_monsters()
 
     # Check that no entities are on Wall tiles
@@ -604,8 +604,8 @@ def test_map_place_monsters_no_entities_appear_in_Wall():
         assert m.tiles[e.x][e.y].blocked is False
 
 
-def test_map_place_items_no_entities_appear_in_Wall():
-    m = maps.Map(width=50, height=50)
+def test_Stage_place_items_no_entities_appear_in_Wall():
+    m = maps.Stage(width=50, height=50)
     r = rect.Rect(0, 0, 5, 5)
     m.dig_room(r)
     m.place_items(r)
@@ -615,8 +615,8 @@ def test_map_place_items_no_entities_appear_in_Wall():
         assert m.tiles[e.x][e.y].blocked is False
 
 
-def test_map_place_stairs_down_on_floor__valid_pos():
-    m = maps.Map(width=50, height=50)
+def test_Stage_place_stairs_down_on_floor__valid_pos():
+    m = maps.Stage(width=50, height=50)
     r = rect.Rect(0, 0, 5, 5)
     m.dig_room(r)
     x, y = r.center()
@@ -627,15 +627,15 @@ def test_map_place_stairs_down_on_floor__valid_pos():
     assert result in m.entities
 
 
-def test_map_place_stairs_down_on_wall_raises_exception():
-    m = maps.Map(width=50, height=50)
+def test_Stage_place_stairs_down_on_wall_raises_exception():
+    m = maps.Stage(width=50, height=50)
     x, y = 0, 0
     with pytest.raises(ValueError):
         m.place_stairs_down(x, y)
 
 
-def test_map_place_stairs_up__valid_pos():
-    m = maps.Map(width=50, height=50)
+def test_Stage_place_stairs_up__valid_pos():
+    m = maps.Stage(width=50, height=50)
     r = rect.Rect(0, 0, 5, 5)
     m.dig_room(r)
     x, y = r.center()
@@ -646,16 +646,16 @@ def test_map_place_stairs_up__valid_pos():
     assert result in m.entities
 
 
-def test_map_place_stairs_up_on_wall_raises_exception():
-    m = maps.Map(width=50, height=50)
+def test_Stage_place_stairs_up_on_wall_raises_exception():
+    m = maps.Stage(width=50, height=50)
     x, y = 0, 0
     with pytest.raises(ValueError):
         m.place_stairs_up(x, y)
 
 
-def test_map_get_blocker_at_loc__blocked_returns_entity():
-    m = maps.Map(width=50, height=50)
-    m.make_map()
+def test_Stage_get_blocker_at_loc__blocked_returns_entity():
+    m = maps.Stage(width=50, height=50)
+    m.mk_stage()
     m.place_monsters()
 
     # Note - might be fragile - depending on monsters added last
@@ -666,7 +666,7 @@ def test_map_get_blocker_at_loc__blocked_returns_entity():
     assert result == monster
 
 
-def test_map_get_blocker_at_loc__not_blocked_returns_None():
-    m = maps.Map(width=50, height=50)
+def test_Stage_get_blocker_at_loc__not_blocked_returns_None():
+    m = maps.Stage(width=50, height=50)
     result = m.get_blocker_at_loc(0, 0)
     assert result is None

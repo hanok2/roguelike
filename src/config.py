@@ -48,11 +48,11 @@ msg_height = 5
 char_scr_width = 30
 char_scr_height = 10
 
-# Map info
+# Stage info
 DEFAULT_DUNGEON_LVL = 1
-min_map_length = 3
-map_width = 60
-map_height = scr_height - panel_height - msg_height
+stage_length_min = 3
+stage_width = 60
+stage_height = scr_height - panel_height - msg_height
 
 # Room generation
 room_max_len = 15
@@ -63,7 +63,7 @@ max_rooms = 10
 max_items_weights = [[1, 1], [2, 4]]
 
 # Monster data
-max_monsters_per_map = 20
+max_monsters_per_stage = 20
 max_monsters_weights = [[2, 1], [3, 4], [5, 6]]
 troll_chances = [[15, 3], [30, 5], [60, 7]]
 
