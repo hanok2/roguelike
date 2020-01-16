@@ -28,6 +28,13 @@ def test_Player__xy_are_0_0():
     assert p.y == 0
 
 
+def test_Player__xy_are_passed():
+    x, y = 1, 2
+    p = player.Player(x, y)
+    assert p.x == x
+    assert p.y == y
+
+
 def test_Player__char():
     p = player.Player()
     assert p.char == '@'

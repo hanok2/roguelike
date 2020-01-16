@@ -21,10 +21,10 @@ def get_hero():
 
 
 class Player(entity.Entity):
-    def __init__(self):
+    def __init__(self, x=0, y=0):
         super().__init__(
-            x=0,
-            y=0,
+            x=x,
+            y=y,
             char='@',
             color=tcod.white,
             name='Player',
