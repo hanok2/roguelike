@@ -1,5 +1,5 @@
 from . import config
-from . import maps
+from . import dungeon
 from . import player
 from .messages import MsgLog
 
@@ -11,7 +11,7 @@ def get_game_data():
     hero = player.get_hero()
 
     # Initialize the Dungeon
-    dungeon = maps.Dungeon(hero)
+    new_dungeon = dungeon.Dungeon(hero)
 
     # Initialize the MsgLog
     msg_log = MsgLog(
@@ -27,4 +27,4 @@ def get_game_data():
     turn = 0
 
     # Return a tuple to start the game
-    return dungeon, msg_log, state, turn
+    return new_dungeon, msg_log, state, turn
