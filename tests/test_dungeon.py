@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import mocker
 from ..src import dungeon
-from ..src import maps
+from ..src import stages
 from ..src import player
 
 
@@ -45,7 +45,7 @@ def test_dungeon_init__move_hero_called(mocker, hero):
 
 
 def test_dungeon_init__populate_called(mocker, hero):
-    mocker.patch.object(maps.Stage, 'populate')
+    mocker.patch.object(stages.Stage, 'populate')
     d = dungeon.Dungeon(hero)
     m = d.get_stage()
 
@@ -192,7 +192,7 @@ def test_move_upstairs__success_returns_True(hero):
 
 def test_move_hero__to_wall_returns_False(hero):
     d = dungeon.Dungeon(hero)
-    m = maps.Stage(10, 10, 2)
+    m = stages.Stage(10, 10, 2)
     d.stages.append(m)
     assert d.move_hero(dest_stage_index=1, dest_x=0, dest_y=0) is False
 

@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import mocker
 from ..src import entity
-from ..src import maps
+from ..src import stages
 from ..src import tile
 from .test_death_functions import orc
 from ..src.config import RenderOrder
@@ -13,7 +13,7 @@ from ..src.stairs import Stairs
 @pytest.fixture
 def open_map():
     # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
-    m = maps.Stage(10, 10)
+    m = stages.Stage(10, 10)
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
     return m
 
@@ -166,7 +166,7 @@ def test_Entity_move_towards__invalid_coordinates_raises_exception(open_map):
 
 
 def test_Entity_move_towards__blocked_doesnt_move():
-    m = maps.Stage(10, 10)
+    m = stages.Stage(10, 10)
     e = entity.Entity(x=5, y=5, char='@', color=None, name='Player')
     e.move_towards(6, 6, m)
     assert e.x == 5

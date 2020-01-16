@@ -1,5 +1,5 @@
 from . import config
-from . import maps
+from . import stages
 
 
 class Dungeon(object):
@@ -29,7 +29,7 @@ class Dungeon(object):
     def mk_next_stage(self):
         # Generate next dungeon level
         level_depth = len(self.stages) + 1
-        new_stage = maps.Stage(config.stage_width, config.stage_height, level_depth)
+        new_stage = stages.Stage(config.stage_width, config.stage_height, level_depth)
         new_stage.mk_stage()
         self.stages.append(new_stage)
 

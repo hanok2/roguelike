@@ -4,7 +4,7 @@ from ..src import components
 from ..src import factory
 from ..src import fov
 from ..src import item_funcs
-from ..src import maps
+from ..src import stages
 from ..src import player
 from ..src import tile
 
@@ -16,7 +16,7 @@ def hero():
 @pytest.fixture
 def open_stage():
     # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
-    m = maps.Stage(10, 10)
+    m = stages.Stage(10, 10)
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
     return m
 
@@ -24,7 +24,7 @@ def open_stage():
 @pytest.fixture
 def orc_stage():
     # todo: When we revamp map - revise this fixture!!!!!!!!!!!!!!!!!!!!!!!!
-    m = maps.Stage(10, 10)
+    m = stages.Stage(10, 10)
     # All open
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
     orc_coordinates = [
