@@ -3,7 +3,7 @@ from . import config
 from .config import RenderOrder, EquipmentSlots
 from .components import Fighter, ApproachAI, Item, Equippable
 from .entity import Entity
-from .item_functions import heal, cast_confuse, cast_lightning, cast_fireball
+from .item_funcs import heal, cast_confuse, cast_lightning, cast_fireball
 from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
 
 
