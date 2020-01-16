@@ -206,7 +206,6 @@ def test_UseItemAction__hero_is_dead(walk_map, hero):
     assert use.results == []
 
 
-
 def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
     use = actions.UseItemAction()
     with pytest.raises(IndexError):
@@ -237,6 +236,46 @@ def test_DropItemAction__results_is_empty():
     assert drop.results == []
 
 
+def test_DropItemAction__hero_is_dead(walk_map, hero):
+    drop = actions.DropItemAction()
+    drop.perform(
+        stage=walk_map,
+        inv_index=0,
+        hero=hero,
+        prev_state=config.States.HERO_DEAD
+    )
+    assert drop.results == []
+
+
+def test_DropItemAction__valid_item(walk_map, hero):
+    potion = factory.mk_entity('healing_potion', 1, 0)
+    hero.inv.add_item(potion)
+    inv_index = 0  # Assume potion is at index 0
+
+    drop = actions.DropItemAction()
+    drop.perform(
+        stage=walk_map,
+        inv_index=inv_index,
+        hero=hero,
+        prev_state=None
+    )
+    assert drop.results == [{
+        'item_dropped': potion,
+        'msg': 'You dropped the {}.'.format(potion.name)
+    }]
+
+
+def test_DropItemAction__inv_index_out_of_bounds(walk_map, hero):
+    drop = actions.DropItemAction()
+    with pytest.raises(IndexError):
+        drop.perform(
+            stage=walk_map,
+            inv_index=-1,
+            hero=hero,
+            prev_state=config.States.HERO_TURN
+        )
+
+
 """ Tests for StairUpAction """
 
 
@@ -253,7 +292,6 @@ def test_StairUpAction__consumes_turn():
 def test_StairUpAction__results_is_empty():
     stairup = actions.StairUpAction()
     assert stairup.results == []
-
 
 """ Tests for StairDownAction """
 

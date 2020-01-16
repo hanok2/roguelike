@@ -78,6 +78,7 @@ class PickupAction(Action):
 
 class UseItemAction(Action):
     def perform(self, stage, fov_map, inv_index, hero, prev_state):
+        # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
 
@@ -89,24 +90,14 @@ class UseItemAction(Action):
 
 
 class DropItemAction(Action):
-    def perform(self):
-        pass
+    def perform(self, stage, hero, inv_index, prev_state):
+        # Check this in the input handler??
+        if prev_state == States.HERO_DEAD:
+            return
 
-# InvIndexAction  ?
-    # Item usage
-    # if inv_index is not None and prev_state != States.HERO_DEAD and inv_index < len(hero.inv.items):
-        # log.debug('Inventory menu.')
-        # item = hero.inv.items[inv_index]
+        item = hero.inv.items[inv_index]
 
-        # if state == States.SHOW_INV:
-            # hero_turn_results.extend(
-                # hero.inv.use(
-                    # item, entities=stage.entities, fov_map=fov_map
-                # )
-            # )
-
-        # elif state == States.DROP_INV:
-            # hero_turn_results.extend(hero.inv.drop(item))
+        self.results.extend(hero.inv.drop(item))
 
 
 class StairUpAction(Action):
