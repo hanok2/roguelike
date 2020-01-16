@@ -1,5 +1,6 @@
 import pytest
 from ..src import actions
+from ..src import config
 from ..src import factory
 from ..src import player
 from ..src import stages
@@ -172,6 +173,50 @@ def test_UseItemAction__consumes_turn():
 def test_UseItemAction__results_is_empty():
     use = actions.UseItemAction()
     assert use.results == []
+
+
+def test_UseItemAction__valid_item(walk_map, hero):
+    potion = factory.mk_entity('healing_potion', 1, 0)
+    hero.inv.add_item(potion)
+    inv_index = 0  # Assume potion is at index 0
+    use = actions.UseItemAction()
+    use.perform(
+        stage=walk_map,
+        fov_map=None,
+        inv_index=inv_index,
+        hero=hero,
+        prev_state=None
+    )
+    assert use.results == [{
+        'consumed': False,
+        'cancel_inv': True,
+        'msg': 'You are already at full health'
+    }]
+
+
+def test_UseItemAction__hero_is_dead(walk_map, hero):
+    use = actions.UseItemAction()
+    use.perform(
+        stage=walk_map,
+        fov_map=None,
+        inv_index=0,
+        hero=hero,
+        prev_state=config.States.HERO_DEAD
+    )
+    assert use.results == []
+
+
+
+def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
+    use = actions.UseItemAction()
+    with pytest.raises(IndexError):
+        use.perform(
+            stage=walk_map,
+            fov_map=None,
+            inv_index=-1,
+            hero=hero,
+            prev_state=config.States.HERO_TURN
+        )
 
 
 """ Tests for DropItemAction """

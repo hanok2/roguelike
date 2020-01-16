@@ -77,8 +77,15 @@ class PickupAction(Action):
 
 
 class UseItemAction(Action):
-    def perform(self):
-        pass
+    def perform(self, stage, fov_map, inv_index, hero, prev_state):
+        if prev_state == States.HERO_DEAD:
+            return
+
+        item = hero.inv.items[inv_index]
+
+        self.results.extend(
+            hero.inv.use(item, entities=stage.entities, fov_map=fov_map)
+        )
 
 
 class DropItemAction(Action):
