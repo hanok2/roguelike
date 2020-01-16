@@ -92,7 +92,7 @@ def cast_fireball(*args, **kwargs):
     })
 
     for entity in entities:
-        if entity.distance(target_x, target_y) <= radius and entity.fighter:
+        if entity.distance(target_x, target_y) <= radius and entity.has_comp('fighter'):
             results.append({'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)})
             results.extend(entity.fighter.take_dmg(dmg))
 

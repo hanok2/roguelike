@@ -31,11 +31,14 @@ def orc_stage():
         (1, 0), (3, 0), (5, 0),
         (2, 1),
         (1, 2), (2, 2), (3, 2),
-        (2, 3), (3, 3),
+        (3, 3),
         (9, 9)
     ]
     orcs = [factory.mk_entity('orc', x, y) for x, y in orc_coordinates]
+    potion = factory.mk_entity('healing_potion', 2, 3)
+
     m.entities.extend(orcs)
+    m.entities.append(potion)   # Useful for testing non-fighter
 
     return m
 
@@ -383,7 +386,7 @@ def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero):
     kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 2, 'target_y': 2}
 
     results = item_funcs.cast_fireball(hero, **kwargs)
-    assert len(results) == 11
+    assert len(results) == 9
 
     assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
     assert results[0]['consumed']
@@ -399,9 +402,9 @@ def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero):
     assert results[7]['msg'] == 'The Orc gets burned for 25 hit points!'
     assert results[8]['dead']
     assert results[8]['xp'] == orc_xp
-    assert results[9]['msg'] == 'The Orc gets burned for 25 hit points!'
-    assert results[10]['dead']
-    assert results[10]['xp'] == orc_xp
+    # assert results[9]['msg'] == 'The Orc gets burned for 25 hit points!'
+    # assert results[10]['dead']
+    # assert results[10]['xp'] == orc_xp
 
 
 """ Tests for cast_confuse() """
