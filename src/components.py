@@ -89,7 +89,7 @@ class Fighter(object):
         return results
 
 
-class ApproachingBehavior(object):
+class ApproachAI(object):
     """AI for an entity/monster to approach the hero when within line of sight"""
     def __init__(self, owner):
         self.owner = owner

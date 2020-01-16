@@ -1,7 +1,7 @@
 import tcod
 from . import config
 from .config import RenderOrder, EquipmentSlots
-from .components import Fighter, ApproachingBehavior, Item, Equippable
+from .components import Fighter, ApproachAI, Item, Equippable
 from .entity import Entity
 from .item_functions import heal, cast_confuse, cast_lightning, cast_fireball
 from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
@@ -56,7 +56,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ACTOR,
         )
         spider.fighter = Fighter(owner=spider, hp=5, defense=0, power=2, xp=5)
-        spider.ai = ApproachingBehavior(spider)
+        spider.ai = ApproachAI(spider)
         return spider
 
     elif entity_name == 'orc':
@@ -70,7 +70,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ACTOR,
         )
         orc.fighter = Fighter(owner=orc, hp=10, defense=1, power=3, xp=35)
-        orc.ai = ApproachingBehavior(orc)
+        orc.ai = ApproachAI(orc)
         return orc
 
     elif entity_name == 'troll':
@@ -84,7 +84,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ACTOR,
         )
         troll.fighter = Fighter(owner=troll, hp=10, defense=2, power=4, xp=100)
-        troll.ai = ApproachingBehavior(troll)
+        troll.ai = ApproachAI(troll)
         return troll
 
     if entity_name == 'healing_potion':

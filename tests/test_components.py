@@ -152,11 +152,11 @@ def test_Fighter_attack__no_dmg_returns_results(hero, orc):
     assert results['msg'] == 'Player attacks Orc... But does no damage.'
 
 
-""" Tests for class ApproachingBehavior(object): """
+""" Tests for class ApproachAI(object): """
 
 # Requires some major mocking or testing...
-# def test_ApproachingBehavior_take_turn():
-# def take_ApproachingBehavior_turn(self, target, fov_map, game_map, entities):
+# def test_ApproachAI():
+# def take_ApproachAI_turn(self, target, fov_map, game_map, entities):
     # hero is usually target
     # target needs .x and .y
 
