@@ -401,7 +401,6 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 log.debug('Inventory menu cancelled')
                 state = prev_state
 
-
             if xp:
                 log.debug('Adding xp.')
                 leveled_up = hero.lvl.add_xp(xp)
