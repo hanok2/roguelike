@@ -45,7 +45,7 @@ def cast_lightning(*args, **kwargs):
         # todo: Break into better boolean
         if entity.has_comp('fighter') and entity != caster and fov_map.fov[entity.y, entity.x]:
 
-            distance = caster.distance_to_entity(entity)
+            distance = caster.distance_to(entity)
 
             if distance < closest_distance:
                 target = entity

@@ -98,7 +98,7 @@ class ApproachAI(object):
         results = []
 
         if fov_map.fov[self.owner.y, self.owner.x]:
-            if self.owner.distance_to_entity(target) >= 2:
+            if self.owner.distance_to(target) >= 2:
                 self.owner.move_astar(target, game_map)
 
             elif target.fighter.hp > 0:

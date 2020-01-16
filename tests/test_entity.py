@@ -260,10 +260,10 @@ def test_distance__1_diagonal_tile_away_returns_something():
     assert result == 1.41
 
 
-def test_Entity_distance_to_entity(mocker, orc):
+def test_Entity_distance_to(mocker, orc):
     e = entity.Entity(x=1, y=1, char='@', color=None, name='Player')
     mocker.patch.object(entity.Entity, 'distance')
-    e.distance_to_entity(orc)
+    e.distance_to(orc)
 
     # Check that it calls Entity.distance with the entity's x/y
     e.distance.assert_called_once_with(orc.x, orc.y)

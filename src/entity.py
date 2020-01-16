@@ -149,8 +149,8 @@ class Entity(object):
         dy = y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
-    def distance_to_entity(self, other):
+    def distance_to(self, entity):
         """A wrapper for self.distance - Returns the distance from this entity
             to the passed entity.
         """
-        return self.distance(other.x, other.y)
+        return self.distance(entity.x, entity.y)
