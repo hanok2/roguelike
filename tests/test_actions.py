@@ -24,12 +24,20 @@ def walk_map():
     return m
 
 
+""" Tests for WalkAction """
+
+
 # Don't Need?
 # def test_WalkAction__not_heros_turn__returns_False(walk_map):
 
 def test_WalkAction__is_subclass_of_Action():
     walk = actions.WalkAction(dx=1, dy=0)
     assert isinstance(walk, actions.Action)
+
+
+def test_WalkAction__consumed_turn():
+    walk = actions.WalkAction(dx=1, dy=0)
+    assert walk.consumes_turn
 
 
 def test_WalkAction__blocked_by_monster__returns_AttackAction(walk_map, hero):
@@ -67,3 +75,22 @@ def test_WalkAction__more_than_1_sq_away__raise_exception(walk_map):
     walk_map.entities.append(hero)
     with pytest.raises(ValueError):
         actions.WalkAction(dx=-2, dy=-1)
+
+
+""" Tests for WaitAction """
+
+
+def test_WaitAction__is_subclass_of_Action():
+    wait = actions.WaitAction()
+    assert isinstance(wait, actions.Action)
+
+
+def test_WalkAction__consumes_turn():
+    wait = actions.WaitAction()
+    assert wait.consumes_turn
+
+
+def test_WaitAction__returns_True():
+    wait = actions.WaitAction()
+    assert wait.perform()
+

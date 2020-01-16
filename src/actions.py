@@ -14,9 +14,9 @@ class WalkAction(Action):
     def __init__(self, dx, dy):
         if abs(dx) > 1 or abs(dy) > 1:
             raise ValueError('WalkAction dx or dy cannot be < -1 or > 1.')
-
         self.dx = dx
         self.dy = dy
+        self.consumes_turn = True
 
         # redraw_fov_on_success?
 
@@ -49,9 +49,13 @@ class WalkAction(Action):
         # Add walk over items
 
 
+class WaitAction(Action):
+    def __init__(self):
+        self.consumes_turn = True
 
+    def perform(self):
+        return True
 
-# WaitAction
 # PickupAction
 # ShowInvAction
 # DropInvAction
