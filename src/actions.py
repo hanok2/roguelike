@@ -190,11 +190,26 @@ class LevelUpAction(Action):
 
 
 class ExitAction(Action):
-    def __init__(self, ):
+    def __init__(self, prev_state):
         super().__init__(consumes_turn=False)
+        self.prev_state = prev_state
 
-    def perform(self):
-        pass
+    def perform(self, state):
+        if state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
+            self.results.append({'state': self.prev_state})
+
+        elif state == States.TARGETING:
+            self.results.append({
+                'state': self.prev_state,
+                'cancel_target': True,
+                'msg': 'Targeting cancelled.',
+            })
+
+        else:
+            self.results.append({'state': States.MAIN_MENU})
+            # save_game(config.savefile, dungeon, msg_log, state, turns)
+            # return True
+
 
 
 class FullScreenAction(Action):

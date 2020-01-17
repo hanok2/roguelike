@@ -462,18 +462,64 @@ def test_LevelUpAction__boost_defense(hero):
 
 
 def test_ExitAction__is_subclass_of_Action():
-    exit_action = actions.ExitAction()
+    state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(state)
     assert isinstance(exit_action, actions.Action)
 
 
 def test_ExitAction__consumes_turn_is_False():
-    exit_action = actions.ExitAction()
+    state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(state)
     assert exit_action.consumes_turn is False
 
 
-def test_ExitAction__results_is_empty():
-    exit_action = actions.ExitAction()
-    assert exit_action.results == []
+def test_ExitAction__state_is_SHOW_INV():
+    prev_state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(prev_state)
+
+    state = config.States.SHOW_INV
+    exit_action.perform(state)
+    assert exit_action.results == [{'state': prev_state}]
+
+
+def test_ExitAction__state_is_DROP_INV():
+    prev_state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(prev_state)
+
+    state = config.States.DROP_INV
+    exit_action.perform(state)
+    assert exit_action.results == [{'state': prev_state}]
+
+
+def test_ExitAction__state_is_SHOW_STATS():
+    prev_state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(prev_state)
+
+    state = config.States.SHOW_STATS
+    exit_action.perform(state)
+    assert exit_action.results == [{'state': prev_state}]
+
+
+def test_ExitAction__state_is_TARGETING():
+    prev_state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(prev_state)
+
+    state = config.States.TARGETING
+    exit_action.perform(state)
+    assert exit_action.results == [{
+        'state': prev_state,
+        'cancel_target': True,
+        'msg': 'Targeting cancelled.',
+    }]
+
+
+def test_ExitAction__state_is_HERO_TURN():
+    prev_state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(prev_state)
+
+    state = config.States.MAIN_MENU
+    exit_action.perform(state)
+    assert exit_action.results == [{'state': state}]
 
 
 """ Tests for FullScreenAction """
