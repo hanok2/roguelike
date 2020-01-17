@@ -616,18 +616,29 @@ def test_ShowInvAction():
 
 """ Tests for DropInvAction """
 def test_DropInvAction__is_subclass_of_Action():
-    drop_inv = actions.DropInvAction()
+    prev_state = config.States.HERO_TURN
+    drop_inv = actions.DropInvAction(prev_state)
+
     assert isinstance(drop_inv, actions.Action)
 
 
 def test_DropInvAction__consumes_turn_is_False():
-    drop_inv = actions.DropInvAction()
+    prev_state = config.States.HERO_TURN
+    drop_inv = actions.DropInvAction(prev_state)
     assert drop_inv.consumes_turn is False
 
 
 def test_DropInvAction__results_is_empty():
-    drop_inv = actions.DropInvAction()
+    prev_state = config.States.HERO_TURN
+    drop_inv = actions.DropInvAction(prev_state)
     assert drop_inv.results == []
+
+
+def test_DropInvAction():
+    prev_state = config.States.HERO_TURN
+    show_inv = actions.DropInvAction(prev_state)
+    show_inv.perform()
+    assert show_inv.results == [{'state': config.States.DROP_INV}]
 
 
 """ Tests for ShowCharScreenAction """
