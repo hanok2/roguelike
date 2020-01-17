@@ -21,6 +21,7 @@ class States(Enum):
     TARGETING = auto()
     LEVEL_UP = auto()
     SHOW_STATS = auto()
+    MAIN_MENU = auto()
 
 VERSION = 1.2
 window_title = 'Infinity Dronez'
