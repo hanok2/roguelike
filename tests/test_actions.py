@@ -586,19 +586,32 @@ def test_RClickAction__results_is_empty():
 
 
 """ Tests for ShowInvAction """
+
+
 def test_ShowInvAction__is_subclass_of_Action():
-    show_inv = actions.ShowInvAction()
+    prev_state = config.States.HERO_TURN
+    show_inv = actions.ShowInvAction(prev_state)
     assert isinstance(show_inv, actions.Action)
 
 
 def test_ShowInvAction__consumes_turn_is_False():
-    show_inv = actions.ShowInvAction()
+    prev_state = config.States.HERO_TURN
+    show_inv = actions.ShowInvAction(prev_state)
     assert show_inv.consumes_turn is False
 
 
 def test_ShowInvAction__results_is_empty():
-    show_inv = actions.ShowInvAction()
+    prev_state = config.States.HERO_TURN
+    show_inv = actions.ShowInvAction(prev_state)
     assert show_inv.results == []
+
+
+def test_ShowInvAction():
+    prev_state = config.States.HERO_TURN
+    show_inv = actions.ShowInvAction(prev_state)
+    show_inv.perform()
+    assert show_inv.results == [{'state': config.States.SHOW_INV}]
+
 
 
 """ Tests for DropInvAction """

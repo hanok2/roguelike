@@ -238,11 +238,13 @@ class RClickAction(Action):
 
 
 class ShowInvAction(Action):
-    def __init__(self, ):
+    def __init__(self, prev_state):
         super().__init__(consumes_turn=False)
+        self.prev_state = prev_state
 
     def perform(self):
-        pass
+        self.results = [{'state': States.SHOW_INV}]
+
 
 
 class DropInvAction(Action):
