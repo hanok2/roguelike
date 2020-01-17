@@ -1,7 +1,7 @@
-import tcod
 from abc import ABC, abstractmethod
+import tcod
+from . import config
 from .config import States
-from . import render_functions
 
 
 class Action(ABC):
@@ -221,20 +221,39 @@ class FullScreenAction(Action):
         tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
 
 
-class LClickAction(Action):
-    def __init__(self, ):
+class TargetAction(Action):
+    def __init__(self, x, y, lclick=None, rclick=None):
+        if not lclick and not rclick:
+            raise ValueError('TargetAction requires exactly 1 mouse button to be clicked.')
+        elif lclick and rclick:
+            raise ValueError('TargetAction requires exactly 1 mouse button to be clicked.')
+
         super().__init__(consumes_turn=False)
+        self.x = x
+        self.y = y
+        self.lclick = lclick
+        self.rclick = rclick
 
-    def perform(self):
-        pass
+    def perform(self, hero, targeting_item, stage, fov_map):
+        if self.l_click:
+            # note: Due to the message console - we have to offset the y.
+            self.y -= config.msg_height
 
+            # todo: Replace with UseItemAction?
 
-class RClickAction(Action):
-    def __init__(self, ):
-        super().__init__(consumes_turn=False)
+            item_use_results = hero.inv.use(
+                targeting_item,
+                entities=stage.entities,
+                fov_map=fov_map,
+                target_x=self.x,
+                target_y=self.y
+            )
+            self.results.extend(item_use_results)
 
-    def perform(self):
-        pass
+        elif self.r_click:
+            # todo: Replace with ExitAction?
+            self.results.append({'cancel_target': True})
+
 
 
 class ShowInvAction(Action):
@@ -244,7 +263,6 @@ class ShowInvAction(Action):
 
     def perform(self):
         self.results = [{'state': States.SHOW_INV}]
-
 
 
 class DropInvAction(Action):

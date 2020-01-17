@@ -549,40 +549,32 @@ def test_FullScreenAction__calls_tcod_console_set_fullscreen(mocker):
     tcod.console_set_fullscreen.assert_called_with(fullscreen=not tcod.console_is_fullscreen())
 
 
-""" Tests for LClickAction """
+""" Tests for TargetAction """
 
 
-def test_LClickAction__is_subclass_of_Action():
-    lclick = actions.LClickAction()
-    assert isinstance(lclick, actions.Action)
+def test_TargetAction__is_subclass_of_Action():
+    target = actions.TargetAction(x=0, y=0, lclick=True)
+    assert isinstance(target, actions.Action)
 
 
-def test_LClickAction__consumes_turn_is_False():
-    lclick = actions.LClickAction()
+def test_TargetAction__consumes_turn_is_False():
+    lclick = actions.TargetAction(x=0, y=0, lclick=True)
     assert lclick.consumes_turn is False
 
 
-def test_LClickAction__results_is_empty():
-    lclick = actions.LClickAction()
+def test_TargetAction__results_is_empty():
+    lclick = actions.TargetAction(x=0, y=0, lclick=True)
     assert lclick.results == []
 
 
-""" Tests for RClickAction """
+def test_TargetAction__no_click_raises_exception():
+    with pytest.raises(ValueError):
+        actions.TargetAction(x=0, y=0)
 
 
-def test_RClickAction__is_subclass_of_Action():
-    rclick = actions.RClickAction()
-    assert isinstance(rclick, actions.Action)
-
-
-def test_RClickAction__consumes_turn_is_False():
-    rclick = actions.RClickAction()
-    assert rclick.consumes_turn is False
-
-
-def test_RClickAction__results_is_empty():
-    rclick = actions.RClickAction()
-    assert rclick.results == []
+def test_TargetAction__both_clicks_raises_exception():
+    with pytest.raises(ValueError):
+        actions.TargetAction(x=0, y=0, lclick=True, rclick=True)
 
 
 """ Tests for ShowInvAction """
