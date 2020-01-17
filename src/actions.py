@@ -161,11 +161,32 @@ class StairDownAction(Action):
 
 
 class LevelUpAction(Action):
-    def __init__(self, ):
+    def __init__(self, stat):
         super().__init__(consumes_turn=False)
+        valid_stats = ['hp', 'str', 'def']
+        if stat in valid_stats:
+            self.stat = stat
+        else:
+            raise ValueError('stat not valid! Must be one of: {}'.format(valid_stats))
 
-    def perform(self):
-        pass
+    def perform(self, entity):
+        if self.stat == 'hp':
+            entity.fighter.base_max_hp += 20
+            entity.fighter.hp += 20
+            self.results.append({'msg': 'Boosted max HP!'})
+
+        elif self.stat == 'str':
+            entity.fighter.base_power += 1
+            self.results.append({'msg': 'Boosted strength!'})
+
+        elif self.stat == 'def':
+            entity.fighter.base_defense += 1
+            self.results.append({'msg': 'Boosted defense!'})
+
+        # state = prev_state
+        self.results.append({'state': 'previous state'})
+
+
 
 
 class ExitAction(Action):

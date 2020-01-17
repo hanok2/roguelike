@@ -412,18 +412,50 @@ def test_StairDownAction__next_stage_exists(hero):
 
 
 def test_LevelUpAction__is_subclass_of_Action():
-    levelup = actions.LevelUpAction()
+    levelup = actions.LevelUpAction('hp')
     assert isinstance(levelup, actions.Action)
 
 
 def test_LevelUpAction__consumes_turn_is_False():
-    levelup = actions.LevelUpAction()
+    levelup = actions.LevelUpAction('hp')
     assert levelup.consumes_turn is False
 
 
 def test_LevelUpAction__results_is_empty():
-    levelup = actions.LevelUpAction()
+    levelup = actions.LevelUpAction('hp')
     assert levelup.results == []
+
+
+def test_LevelUpAction__invalid_stat(hero):
+    with pytest.raises(ValueError):
+        levelup = actions.LevelUpAction(stat='boogers')
+
+
+def test_LevelUpAction__boost_hp(hero):
+    levelup = actions.LevelUpAction(stat='hp')
+    levelup.perform(hero)
+    assert levelup.results == [
+        {'msg': 'Boosted max HP!'},
+        {'state': 'previous state'}
+    ]
+
+
+def test_LevelUpAction__boost_strength(hero):
+    levelup = actions.LevelUpAction(stat='str')
+    levelup.perform(hero)
+    assert levelup.results == [
+        {'msg': 'Boosted strength!'},
+        {'state': 'previous state'}
+    ]
+
+
+def test_LevelUpAction__boost_defense(hero):
+    levelup = actions.LevelUpAction(stat='def')
+    levelup.perform(hero)
+    assert levelup.results == [
+        {'msg': 'Boosted defense!'},
+        {'state': 'previous state'}
+    ]
 
 
 """ Tests for ExitAction """
