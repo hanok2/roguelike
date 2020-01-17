@@ -1,4 +1,5 @@
 import pytest
+import tcod
 from ..src import actions
 from ..src import config
 from ..src import dungeon
@@ -538,6 +539,14 @@ def test_FullScreenAction__consumes_turn_is_False():
 def test_FullScreenAction__results_is_empty():
     fullscreen = actions.FullScreenAction()
     assert fullscreen.results == []
+
+
+def test_FullScreenAction__calls_tcod_console_set_fullscreen(mocker):
+    mocker.patch('tcod.console_set_fullscreen')
+
+    fullscreen = actions.FullScreenAction()
+    fullscreen.perform()
+    tcod.console_set_fullscreen.assert_called_with(fullscreen=not tcod.console_is_fullscreen())
 
 
 """ Tests for LClickAction """

@@ -1,3 +1,4 @@
+import tcod
 from abc import ABC, abstractmethod
 from .config import States
 from . import render_functions
@@ -211,13 +212,13 @@ class ExitAction(Action):
             # return True
 
 
-
 class FullScreenAction(Action):
     def __init__(self, ):
         super().__init__(consumes_turn=False)
 
     def perform(self):
-        pass
+        # Toggle fullscreen on/off
+        tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
 
 
 class LClickAction(Action):
