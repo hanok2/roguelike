@@ -27,6 +27,8 @@ class Dungeon(object):
         return self.stages[self.current_stage]
 
     def mk_next_stage(self):
+        # todo: Does this work no matter what stage the hero is at?
+        # todo: What if we run it 10x in a row?
         # Generate next dungeon level
         level_depth = len(self.stages) + 1
         new_stage = stages.Stage(config.stage_width, config.stage_height, level_depth)
@@ -50,9 +52,11 @@ class Dungeon(object):
         down_stair = self.get_stage().find_stair('>')
 
         if self.hero.x == down_stair.x and self.hero.y == down_stair.y:
-            next_lvl = self.current_stage + 1
-            hero_start_x, hero_start_y = self.stages[next_lvl].rooms[0].center()
-            return self.move_hero(next_lvl, hero_start_x, hero_start_y)
+            stage_index = self.current_stage + 1
+            next_stage = self.stages[stage_index]
+
+            hero_start_x, hero_start_y = next_stage.rooms[0].center()
+            return self.move_hero(stage_index, hero_start_x, hero_start_y)
 
         return False
 

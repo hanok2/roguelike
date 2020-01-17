@@ -1,6 +1,7 @@
 import pytest
 from ..src import actions
 from ..src import config
+from ..src import dungeon
 from ..src import factory
 from ..src import player
 from ..src import stages
@@ -293,6 +294,50 @@ def test_StairUpAction__results_is_empty():
     stairup = actions.StairUpAction()
     assert stairup.results == []
 
+
+def test_StairUpAction__not_at_stairs(hero):
+    d = dungeon.Dungeon(hero)
+    stage = d.get_stage()
+
+    # Remove the stair up for testing
+    stage.entities.remove(stage.find_stair('<'))
+
+    stairup = actions.StairUpAction()
+    stairup.perform(d, hero)
+    assert stairup.results == [{
+        'msg': 'There are no stairs here.'
+    }]
+
+
+def test_StairUpAction__top_stage__leaves_game(hero):
+    d = dungeon.Dungeon(hero)
+    stairup = actions.StairUpAction()
+    stairup.perform(d, hero)
+    assert stairup.results == [{
+        'msg': 'You go up the stairs and leave the dungeon forever...',
+        'state': config.States.HERO_DEAD
+    }]
+
+
+def test_StairUpAction__success_on_lower_level(hero):
+    d = dungeon.Dungeon(hero)
+
+    # Create another stage, then move the hero to that stage's upstair
+    d.mk_next_stage()
+    s = d.stages[1].find_stair('<')
+    d.move_hero(1, s.x, s.y)
+
+    stairup = actions.StairUpAction()
+    stairup.perform(d, hero)
+
+    assert stairup.results == [{
+        'msg': 'You ascend the stairs up.',
+        'recompute_fov': True,
+        'reset_rendering': True
+    }]
+
+
+
 """ Tests for StairDownAction """
 
 
@@ -309,6 +354,58 @@ def test_StairDownAction__consumes_turn():
 def test_StairDownAction__results_is_empty():
     stairdown = actions.StairDownAction()
     assert stairdown.results == []
+
+
+def test_StairDownAction__not_at_stairs(hero):
+    d = dungeon.Dungeon(hero)
+    stage = d.get_stage()
+
+    # Remove the stair up for testing
+    stage.entities.remove(stage.find_stair('>'))
+
+    stairdown = actions.StairDownAction()
+    stairdown.perform(d, hero)
+    assert stairdown.results == [{
+        'msg': 'There are no stairs here.'
+    }]
+
+
+
+# Next level DNE: Create level action?  Or use mocking?
+def test_StairDownAction__next_stage_DNE(hero):
+    d = dungeon.Dungeon(hero)
+    prev_stages = len(d.stages)
+
+    s = d.get_stage().find_stair('>')
+    d.move_hero(0, s.x, s.y)
+
+    # Find the stairs down and put the hero there for testing
+    stairdown = actions.StairDownAction()
+    stairdown.perform(d, hero)
+
+    assert len(d.stages) == prev_stages + 1
+
+
+
+# Next level exists: Go to next level and place hero at Up stair
+def test_StairDownAction__next_stage_exists(hero):
+    d = dungeon.Dungeon(hero)
+
+    s = d.get_stage().find_stair('>')
+    d.move_hero(0, s.x, s.y)
+
+    # Create the next stage
+    d.mk_next_stage()
+
+    # Find the stairs down and put the hero there for testing
+    stairdown = actions.StairDownAction()
+    stairdown.perform(d, hero)
+
+    assert stairdown.results == [{
+        'msg': 'You carefully descend the stairs down.',
+        'recompute_fov': True,
+        'reset_rendering': True
+    }]
 
 
 """ Tests for LevelUpAction """

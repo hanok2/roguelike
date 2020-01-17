@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from .config import States
+from . import render_functions
 
 
 class Action(ABC):
@@ -101,13 +102,63 @@ class DropItemAction(Action):
 
 
 class StairUpAction(Action):
-    def perform(self):
-        pass
+    def perform(self, dungeon, hero):
+        stage = dungeon.get_stage()
+
+        for entity in stage.entities:
+            if entity.has_comp('stair_up'):
+                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                if hero_at_stairs:
+
+                    if dungeon.current_stage == 0:
+                        self.results.append({
+                            'msg': 'You go up the stairs and leave the dungeon forever...',
+                            'state': States.HERO_DEAD
+                        })
+                        break
+
+                    elif dungeon.move_upstairs():
+                        stage = dungeon.get_stage()
+                        self.results.append({
+                            'msg': 'You ascend the stairs up.',
+                            'recompute_fov': True,
+                            'reset_rendering': True
+                        })
+                        break
+                    else:
+                        raise ValueError("Something weird happened with going upstairs!")
+
+        else:
+            self.results.append({'msg': 'There are no stairs here.'})
 
 
 class StairDownAction(Action):
-    def perform(self):
-        pass
+    def perform(self, dungeon, hero):
+        stage = dungeon.get_stage()
+
+        for entity in stage.entities:
+            if entity.has_comp('stair_down'):
+                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+
+                if hero_at_stairs:
+                    dungeon.mk_next_stage()
+
+                    if dungeon.move_downstairs():
+                        stage = dungeon.get_stage()
+                        stage.populate()
+
+                        self.results.append({
+                            'msg': 'You carefully descend the stairs down.',
+                            'recompute_fov': True,
+                            'reset_rendering': True
+                        })
+                        break
+                    else:
+                        raise ValueError("Something weird happened with going downstairs!")
+
+        else:
+            self.results.append({'msg': 'There are no stairs here.'})
+
 
 class LevelUpAction(Action):
     def __init__(self, ):
