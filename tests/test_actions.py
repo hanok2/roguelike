@@ -641,18 +641,31 @@ def test_DropInvAction():
     assert show_inv.results == [{'state': config.States.DROP_INV}]
 
 
-""" Tests for ShowCharScreenAction """
+""" Tests for CharScreenAction """
 
-def test_ShowCharScreenAction__is_subclass_of_Action():
-    char_scr = actions.ShowCharScreenAction()
+
+def test_CharScreenAction__is_subclass_of_Action():
+    prev_state = config.States.HERO_TURN
+    char_scr = actions.CharScreenAction(prev_state)
     assert isinstance(char_scr, actions.Action)
 
 
-def test_ShowCharScreenAction__consumes_turn_is_False():
-    char_scr = actions.ShowCharScreenAction()
+def test_CharScreenAction__consumes_turn_is_False():
+    prev_state = config.States.HERO_TURN
+    char_scr = actions.CharScreenAction(prev_state)
     assert char_scr.consumes_turn is False
 
 
-def test_ShowCharScreenAction__results_is_empty():
-    char_scr = actions.ShowCharScreenAction()
+def test_CharScreenAction__results_is_empty():
+    prev_state = config.States.HERO_TURN
+    char_scr = actions.CharScreenAction(prev_state)
     assert char_scr.results == []
+
+
+def test_CharScreenAction():
+    prev_state = config.States.HERO_TURN
+    show_inv = actions.CharScreenAction(prev_state)
+    show_inv.perform()
+    assert show_inv.results == [{'state': config.States.SHOW_STATS}]
+
+

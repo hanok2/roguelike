@@ -256,11 +256,10 @@ class DropInvAction(Action):
         self.results = [{'state': States.DROP_INV}]
 
 
-
-
-class ShowCharScreenAction(Action):
-    def __init__(self, ):
+class CharScreenAction(Action):
+    def __init__(self, prev_state):
         super().__init__(consumes_turn=False)
+        self.prev_state = prev_state
 
     def perform(self):
-        pass
+        self.results = [{'state': States.SHOW_STATS}]
