@@ -42,13 +42,15 @@ class WalkAction(Action):
         # Check for wall
         if stage.is_blocked(dest_x, dest_y):
             # There is a wall blocking our path
-            self.results.append({'msg': 'You walk into the wall...'})
+            self.consumes_turn = False
+            self.results.append({'msg': 'You cannot walk into the wall...'})
             return
 
         # Check for attacker
         target = stage.get_blocker_at_loc(dest_x, dest_y)
 
         if target:
+            self.consumes_turn = False
             self.results.append({'alternate': AttackAction(entity, self.dx, self.dy)})
             return
 

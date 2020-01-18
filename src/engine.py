@@ -124,6 +124,9 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
     # Keep track of any targeting items that were selected.
     targeting_item = None
 
+    # Keep track of any alternate Actions
+    next_action = None
+
     # Game loop
 
     # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
@@ -176,129 +179,28 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         # Flush True: returns just this
         # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
 
-        tcod.sys_wait_for_event(
-            mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
-            k=key,
-            m=mouse,
-            flush=True
-        )
+        if next_action:
+            action = next_action
+            next_action = None
 
-        # Get keyboard/mouse input
-        key_char = process_tcod_input(key)
-        action = handle_keys(state, key_char)
-        mouse_action = handle_mouse(mouse)
-
-        hero_turn_results = []
-
-        if action:
-            # Perform action
-            action.perform(
-                state=state,
-                prev_state=prev_state,
-                dungeon=dungeon,
-                stage=stage,
-                fov_map=fov_map,
-                hero=hero,     # todo: consolidate to entity
-                entity=hero,
-                targeting_item=targeting_item,
+        else:
+            tcod.sys_wait_for_event(
+                mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+                k=key,
+                m=mouse,
+                flush=True
             )
 
-            hero_turn_results = action.results
+            # Get keyboard/mouse input
+            key_char = process_tcod_input(key)
 
-        # Process hero results
-        for result in hero_turn_results:
-            new_state = result.get('state')
+            action = handle_keys(state, key_char)
+            mouse_action = handle_mouse(mouse)
 
-            fov_recompute = result.get('fov_recompute')
+        if action:
+            next_action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log = process_action(action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log)
 
-            msg = result.get('msg')
-            dead_entity = result.get('dead')
-            item_added = result.get('item_added')
-            item_consumed = result.get('consumed')
-            item_dropped = result.get('item_dropped')
-            equip = result.get('equip')
-            targeting = result.get('targeting')
-
-            cancel_target = result.get('cancel_target')
-            cancel_inv = result.get('cancel_inv')
-
-            xp = result.get('xp')
-
-            if new_state:
-                state = new_state
-
-            if fov_recompute:
-                fov_recompute = True
-
-            if msg:
-                log.debug('msg: {}.'.format(msg))
-                msg_log.add(msg)
-
-            if cancel_target:
-                log.debug('Targeting cancelled.')
-                state = prev_state
-                msg_log.add('Targeting cancelled.')
-
-            if cancel_inv:
-                log.debug('Inventory menu cancelled')
-                state = prev_state
-
-            if xp:
-                log.debug('Adding xp.')
-                leveled_up = hero.lvl.add_xp(xp)
-
-                if leveled_up:
-                    log.debug('Hero level up.')
-                    msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
-                    prev_state = state
-                    state = States.LEVEL_UP
-
-            if dead_entity:
-                log.debug('Dead entity.')
-                if dead_entity == hero:
-                    msg, state = kill_hero(dead_entity)
-                else:
-                    msg = kill_monster(dead_entity)
-
-                msg_log.add(msg)
-
-            if item_added:
-                log.debug('Item added.')
-                stage.entities.remove(item_added)
-                state = States.WORLD_TURN
-
-            if item_consumed:
-                log.debug('Item consumed.')
-                state = States.WORLD_TURN
-
-            if targeting:
-                log.debug('Targeting.')
-                # Set to HERO_TURN so that if cancelled, we don't go back to inv.
-                prev_state = States.HERO_TURN
-                state = States.TARGETING
-                targeting_item = targeting
-                msg_log.add(targeting_item.item.targeting_msg)
-
-            if item_dropped:
-                log.debug('Item dropped.')
-                stage.entities.append(item_dropped)
-                state = States.WORLD_TURN
-
-            if equip:
-                log.debug('Equip.')
-                equip_results = hero.equipment.toggle_equip(equip)
-
-                for equip_result in equip_results:
-                    equipped = equip_result.get('equipped')
-                    dequipped = equip_result.get('dequipped')
-
-                    if equipped:
-                        msg_log.add('You equipped the {}'.format(equipped.name))
-
-                    if dequipped:
-                        msg_log.add('You dequipped the {}'.format(dequipped.name))
-
-                state = States.WORLD_TURN
+        # if mouse_action?
 
         if state == States.WORLD_TURN:
             log.debug('Turn: {}'.format(turns))
@@ -340,6 +242,130 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                 state = States.HERO_TURN
 
         # check_for_quit()
+
+
+def process_action(action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log):
+    next_action = None
+    hero_turn_results = []
+
+    # Perform action
+    action.perform(
+        state=state,
+        prev_state=prev_state,
+        dungeon=dungeon,
+        stage=stage,
+        fov_map=fov_map,
+        hero=hero,     # todo: consolidate to entity
+        entity=hero,
+        targeting_item=targeting_item,
+    )
+
+    hero_turn_results = action.results
+
+    # Increment turn if necessary
+    if action.consumes_turn:
+        state = States.WORLD_TURN
+
+    # Process hero results
+    for result in hero_turn_results:
+        alternate = result.get('alternate')
+
+        attack = result.get('attack')
+        new_state = result.get('state')
+        fov_recompute = result.get('fov_recompute')
+        msg = result.get('msg')
+        dead_entity = result.get('dead')
+        item_added = result.get('item_added')
+        item_consumed = result.get('consumed')
+        item_dropped = result.get('item_dropped')
+        equip = result.get('equip')
+        targeting = result.get('targeting')
+        cancel_target = result.get('cancel_target')
+        cancel_inv = result.get('cancel_inv')
+
+        xp = result.get('xp')
+
+        if new_state:
+            state = new_state
+
+        if alternate:
+            next_action = alternate
+
+        if fov_recompute:
+            fov_recompute = True
+
+        if msg:
+            log.debug('msg: {}.'.format(msg))
+            msg_log.add(msg)
+
+        if cancel_target:
+            log.debug('Targeting cancelled.')
+            state = prev_state
+            msg_log.add('Targeting cancelled.')
+
+        if cancel_inv:
+            log.debug('Inventory menu cancelled')
+            state = prev_state
+
+        if xp:
+            log.debug('Adding xp.')
+            leveled_up = hero.lvl.add_xp(xp)
+
+            if leveled_up:
+                log.debug('Hero level up.')
+                msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
+                prev_state = state
+                state = States.LEVEL_UP
+
+        if dead_entity:
+            log.debug('Dead entity.')
+            if dead_entity == hero:
+                msg, state = kill_hero(dead_entity)
+            else:
+                msg = kill_monster(dead_entity)
+
+            msg_log.add(msg)
+
+        if item_added:
+            log.debug('Item added.')
+            stage.entities.remove(item_added)
+            state = States.WORLD_TURN
+
+        if item_consumed:
+            log.debug('Item consumed.')
+            state = States.WORLD_TURN
+
+        if targeting:
+            log.debug('Targeting.')
+            # Set to HERO_TURN so that if cancelled, we don't go back to inv.
+            prev_state = States.HERO_TURN
+            state = States.TARGETING
+            targeting_item = targeting
+            msg_log.add(targeting_item.item.targeting_msg)
+
+        if item_dropped:
+            log.debug('Item dropped.')
+            stage.entities.append(item_dropped)
+            state = States.WORLD_TURN
+
+        if equip:
+            log.debug('Equip.')
+            equip_results = hero.equipment.toggle_equip(equip)
+
+            for equip_result in equip_results:
+                equipped = equip_result.get('equipped')
+                dequipped = equip_result.get('dequipped')
+
+                if equipped:
+                    msg_log.add('You equipped the {}'.format(equipped.name))
+
+                if dequipped:
+                    msg_log.add('You dequipped the {}'.format(dequipped.name))
+
+            state = States.WORLD_TURN
+
+
+        return next_action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log
 
 
 def check_for_quit():

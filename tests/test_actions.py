@@ -40,7 +40,7 @@ def test_WalkAction__init():
     assert walk.results == []
 
 
-def test_WalkAction__blocked_by_monster__returns_AttackAction(walk_map, hero):
+def test_WalkAction__into_monster__returns_AttackAction(walk_map, hero):
     walk_map.entities.append(hero)
 
     walk = actions.WalkAction(dx=1, dy=0)
@@ -49,6 +49,15 @@ def test_WalkAction__blocked_by_monster__returns_AttackAction(walk_map, hero):
     assert isinstance(result, actions.AttackAction)
     assert result.dx == walk.dx
     assert result.dy == walk.dy
+    assert walk.consumes_turn is False
+
+
+def test_WalkAction__alt_AttackAction__consumes_turn_is_False(walk_map, hero):
+    walk_map.entities.append(hero)
+
+    walk = actions.WalkAction(dx=1, dy=0)
+    walk.perform(stage=walk_map, entity=hero)
+    assert walk.consumes_turn is False
 
 
 def test_WalkAction__blocked_by_wall__msg_and_returns_fail(walk_map, hero):
@@ -56,7 +65,8 @@ def test_WalkAction__blocked_by_wall__msg_and_returns_fail(walk_map, hero):
 
     walk = actions.WalkAction(dx=0, dy=1)
     walk.perform(stage=walk_map, entity=hero)
-    assert walk.results == [{'msg': 'You walk into the wall...'}]
+    assert walk.results == [{ 'msg': 'You cannot walk into the wall...' }]
+    assert walk.consumes_turn is False
 
 
 def test_WalkAction__success__recompute_fov(walk_map, hero):
