@@ -402,41 +402,50 @@ def test_StairDownAction__next_stage_exists(hero):
 
 
 def test_LevelUpAction__init():
+    prev_state = config.States.HERO_TURN
     levelup = actions.LevelUpAction('hp')
+
     assert isinstance(levelup, actions.Action)
     assert levelup.consumes_turn is False
     assert levelup.results == []
 
 
 def test_LevelUpAction__invalid_stat(hero):
+    prev_state = config.States.HERO_TURN
     with pytest.raises(ValueError):
         levelup = actions.LevelUpAction(stat='boogers')
 
 
 def test_LevelUpAction__boost_hp(hero):
+    prev_state = config.States.HERO_TURN
     levelup = actions.LevelUpAction(stat='hp')
-    levelup.perform(entity=hero)
+    levelup.perform(entity=hero, prev_state=prev_state)
+
     assert levelup.results == [
         {'msg': 'Boosted max HP!'},
-        {'state': 'previous state'}
+        {'state': prev_state}
     ]
 
 
 def test_LevelUpAction__boost_strength(hero):
+    prev_state = config.States.HERO_TURN
     levelup = actions.LevelUpAction(stat='str')
-    levelup.perform(entity=hero)
+    levelup.perform(entity=hero, prev_state=prev_state)
+
     assert levelup.results == [
         {'msg': 'Boosted strength!'},
-        {'state': 'previous state'}
+        {'state': prev_state}
     ]
 
 
 def test_LevelUpAction__boost_defense(hero):
+    prev_state = config.States.HERO_TURN
     levelup = actions.LevelUpAction(stat='def')
-    levelup.perform(entity=hero)
+    levelup.perform(entity=hero, prev_state=prev_state)
+
     assert levelup.results == [
         {'msg': 'Boosted defense!'},
-        {'state': 'previous state'}
+        {'state': prev_state}
     ]
 
 

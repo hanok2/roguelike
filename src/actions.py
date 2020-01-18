@@ -231,6 +231,7 @@ class LevelUpAction(Action):
 
     def perform(self, *args, **kwargs):
         entity = kwargs['entity']
+        prev_state = kwargs['prev_state']
 
         if self.stat == 'hp':
             entity.fighter.base_max_hp += 20
@@ -245,8 +246,7 @@ class LevelUpAction(Action):
             entity.fighter.base_defense += 1
             self.results.append({'msg': 'Boosted defense!'})
 
-        # state = prev_state
-        self.results.append({'state': 'previous state'})
+        self.results.append({'state': prev_state})
 
 
 class ExitAction(Action):

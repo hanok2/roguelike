@@ -315,6 +315,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
             log.debug('Adding xp.')
             leveled_up = hero.lvl.add_xp(xp)
 
+            # next_action =
             if leveled_up:
                 log.debug('Hero level up.')
                 msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
