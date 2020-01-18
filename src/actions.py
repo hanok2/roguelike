@@ -96,7 +96,7 @@ class AttackAction(Action):
 
 class WaitAction(Action):
     def perform(self, *args, **kwargs):
-        return True
+        pass
 
 
 class PickupAction(Action):

@@ -198,7 +198,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             mouse_action = handle_mouse(mouse)
 
         if action:
-            next_action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log = process_action(action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log)
+            next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
 
 
         if state == States.MAIN_MENU:
@@ -249,7 +249,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         # check_for_quit()
 
 
-def process_action(action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log):
+def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log):
     next_action = None
     hero_turn_results = []
 
@@ -274,7 +274,6 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, hero, tar
     # Process hero results
     for result in hero_turn_results:
         alternate = result.get('alternate')
-
         attack = result.get('attack')
         new_state = result.get('state')
         fov_recompute = result.get('fov_recompute')
@@ -370,7 +369,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, hero, tar
             state = States.WORLD_TURN
 
 
-        return next_action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log
+    return next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log
 
 
 def check_for_quit():
