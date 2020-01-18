@@ -44,6 +44,7 @@ class WalkAction(Action):
 
         # Check for attacker
         target = stage.get_blocker_at_loc(dest_x, dest_y)
+
         if target:
             self.results.append({'alternate': 'AttackAction'})
 
@@ -56,6 +57,34 @@ class WalkAction(Action):
         # Add walk into door
         # Add walk into water/lava/etc
         # Add walk over items
+
+
+class AttackAction(Action):
+    def __init__(self, entity, dx, dy):
+        if abs(dx) > 1 or abs(dy) > 1:
+            raise ValueError('AttackAction dx or dy cannot be < -1 or > 1.')
+
+        super().__init__()
+        self.entity = entity
+        self.dx = dx
+        self.dy = dy
+
+    def perform(self, stage):
+        dest_x = self.entity.x + self.dx
+        dest_y = self.entity.y + self.dy
+
+        if stage.is_blocked(dest_x, dest_y):
+            self.results.append({'msg': 'You cannot attack the wall!'})
+            return
+
+        target = stage.get_blocker_at_loc(dest_x, dest_y)
+
+        if target:
+            attack_results = self.entity.fighter.attack(target)
+            self.results.extend(attack_results)
+        else:
+            self.results.append({'msg': 'There is nothing to attack at that position.'})
+
 
 
 class WaitAction(Action):

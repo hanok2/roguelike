@@ -85,6 +85,51 @@ def test_WalkAction__more_than_1_sq_away__raise_exception(walk_map):
         actions.WalkAction(dx=-2, dy=-1)
 
 
+""" Tests for AttackAction """
+
+
+def test_AttackAction__super_init(hero):
+    attack = actions.AttackAction(hero, dx=1, dy=1)
+    assert isinstance(attack, actions.Action)
+    assert attack.consumes_turn
+    assert attack.results == []
+
+
+def test_AttackAction__init__instance_variables(hero):
+    attack = actions.AttackAction(hero, dx=1, dy=0)
+    assert attack.entity == hero
+    assert attack.dx == 1
+    assert attack.dy == 0
+
+
+def test_AttackAction__invalid_dx__raises_exception():
+    with pytest.raises(ValueError):
+        actions.AttackAction(hero, dx=-2, dy=2)
+
+
+def test_AttackAction__invalid_dy__raises_exception():
+    with pytest.raises(ValueError):
+        actions.AttackAction(hero, dx=1, dy=-2)
+
+
+def test_AttackAction__no_target(hero, walk_map):
+    attack = actions.AttackAction(hero, dx=-1, dy=0)
+    attack.perform(walk_map)
+    assert attack.results == [{'msg': 'There is nothing to attack at that position.'}]
+
+
+def test_AttackAction__attacking_wall(hero, walk_map):
+    attack = actions.AttackAction(hero, dx=0, dy=1)
+    attack.perform(walk_map)
+    assert attack.results == [{'msg': 'You cannot attack the wall!'}]
+
+
+def test_AttackAction__valid_target(hero, walk_map):
+    attack = actions.AttackAction(hero, dx=1, dy=0)
+    attack.perform(walk_map)
+    assert attack.results == [{'msg': 'Player attacks Orc!'}]
+
+
 """ Tests for WaitAction """
 
 
