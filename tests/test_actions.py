@@ -33,18 +33,10 @@ def walk_map():
 # Don't Need?
 # def test_WalkAction__not_heros_turn__returns_False(walk_map):
 
-def test_WalkAction__is_subclass_of_Action():
+def test_WalkAction__init():
     walk = actions.WalkAction(dx=1, dy=0)
     assert isinstance(walk, actions.Action)
-
-
-def test_WalkAction__consumes_turn():
-    walk = actions.WalkAction(dx=1, dy=0)
     assert walk.consumes_turn
-
-
-def test_WalkAction__results_is_empty():
-    walk = actions.WalkAction(dx=1, dy=0)
     assert walk.results == []
 
 
@@ -88,7 +80,7 @@ def test_WalkAction__more_than_1_sq_away__raise_exception(walk_map):
 """ Tests for AttackAction """
 
 
-def test_AttackAction__super_init(hero):
+def test_AttackAction__init(hero):
     attack = actions.AttackAction(hero, dx=1, dy=1)
     assert isinstance(attack, actions.Action)
     assert attack.consumes_turn
@@ -133,18 +125,10 @@ def test_AttackAction__valid_target(hero, walk_map):
 """ Tests for WaitAction """
 
 
-def test_WaitAction__is_subclass_of_Action():
+def test_WaitAction__init():
     wait = actions.WaitAction()
     assert isinstance(wait, actions.Action)
-
-
-def test_WaitAction__consumes_turn():
-    wait = actions.WaitAction()
     assert wait.consumes_turn
-
-
-def test_WaitAction__results_is_empty():
-    wait = actions.WaitAction()
     assert wait.results == []
 
 
@@ -156,18 +140,10 @@ def test_WaitAction__returns_True():
 """ Tests for PickupAction """
 
 
-def test_PickupAction__is_subclass_of_Action():
+def test_PickupAction__init():
     pickup = actions.PickupAction()
     assert isinstance(pickup, actions.Action)
-
-
-def test_PickupAction__consumes_turn():
-    pickup = actions.PickupAction()
     assert pickup.consumes_turn
-
-
-def test_PickupAction__results_is_empty():
-    pickup = actions.PickupAction()
     assert pickup.results == []
 
 
@@ -207,18 +183,10 @@ def test_PickupAction__no_items_at_entity_location(walk_map, hero):
 """ Tests for UseItemAction """
 
 
-def test_UseItemAction__is_subclass_of_Action():
+def test_UseItemAction__init():
     use = actions.UseItemAction()
     assert isinstance(use, actions.Action)
-
-
-def test_UseItemAction__consumes_turn():
-    use = actions.UseItemAction()
     assert use.consumes_turn
-
-
-def test_UseItemAction__results_is_empty():
-    use = actions.UseItemAction()
     assert use.results == []
 
 
@@ -268,18 +236,10 @@ def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
 """ Tests for DropItemAction """
 
 
-def test_DropItemAction__is_subclass_of_Action():
+def test_DropItemAction__init():
     drop = actions.DropItemAction()
     assert isinstance(drop, actions.Action)
-
-
-def test_DropItemAction__consumes_turn():
-    drop = actions.DropItemAction()
     assert drop.consumes_turn
-
-
-def test_DropItemAction__results_is_empty():
-    drop = actions.DropItemAction()
     assert drop.results == []
 
 
@@ -326,18 +286,10 @@ def test_DropItemAction__inv_index_out_of_bounds(walk_map, hero):
 """ Tests for StairUpAction """
 
 
-def test_StairUpAction__is_subclass_of_Action():
+def test_StairUpAction__init():
     stairup = actions.StairUpAction()
     assert isinstance(stairup, actions.Action)
-
-
-def test_StairUpAction__consumes_turn():
-    stairup = actions.StairUpAction()
     assert stairup.consumes_turn
-
-
-def test_StairUpAction__results_is_empty():
-    stairup = actions.StairUpAction()
     assert stairup.results == []
 
 
@@ -383,22 +335,13 @@ def test_StairUpAction__success_on_lower_level(hero):
     }]
 
 
-
 """ Tests for StairDownAction """
 
 
-def test_StairDownAction__is_subclass_of_Action():
+def test_StairDownAction__init():
     stairdown = actions.StairDownAction()
     assert isinstance(stairdown, actions.Action)
-
-
-def test_StairDownAction__consumes_turn():
-    stairdown = actions.StairDownAction()
     assert stairdown.consumes_turn
-
-
-def test_StairDownAction__results_is_empty():
-    stairdown = actions.StairDownAction()
     assert stairdown.results == []
 
 
@@ -416,8 +359,6 @@ def test_StairDownAction__not_at_stairs(hero):
     }]
 
 
-
-# Next level DNE: Create level action?  Or use mocking?
 def test_StairDownAction__next_stage_DNE(hero):
     d = dungeon.Dungeon(hero)
     prev_stages = len(d.stages)
@@ -432,8 +373,6 @@ def test_StairDownAction__next_stage_DNE(hero):
     assert len(d.stages) == prev_stages + 1
 
 
-
-# Next level exists: Go to next level and place hero at Up stair
 def test_StairDownAction__next_stage_exists(hero):
     d = dungeon.Dungeon(hero)
 
@@ -457,18 +396,10 @@ def test_StairDownAction__next_stage_exists(hero):
 """ Tests for LevelUpAction """
 
 
-def test_LevelUpAction__is_subclass_of_Action():
+def test_LevelUpAction__init():
     levelup = actions.LevelUpAction('hp')
     assert isinstance(levelup, actions.Action)
-
-
-def test_LevelUpAction__consumes_turn_is_False():
-    levelup = actions.LevelUpAction('hp')
     assert levelup.consumes_turn is False
-
-
-def test_LevelUpAction__results_is_empty():
-    levelup = actions.LevelUpAction('hp')
     assert levelup.results == []
 
 
@@ -507,16 +438,12 @@ def test_LevelUpAction__boost_defense(hero):
 """ Tests for ExitAction """
 
 
-def test_ExitAction__is_subclass_of_Action():
+def test_ExitAction__init():
     state = config.States.HERO_TURN
     exit_action = actions.ExitAction(state)
     assert isinstance(exit_action, actions.Action)
-
-
-def test_ExitAction__consumes_turn_is_False():
-    state = config.States.HERO_TURN
-    exit_action = actions.ExitAction(state)
     assert exit_action.consumes_turn is False
+    assert exit_action.results == []
 
 
 def test_ExitAction__state_is_SHOW_INV():
@@ -571,18 +498,10 @@ def test_ExitAction__state_is_HERO_TURN():
 """ Tests for FullScreenAction """
 
 
-def test_FullScreenAction__is_subclass_of_Action():
+def test_FullScreenAction__init():
     fullscreen = actions.FullScreenAction()
     assert isinstance(fullscreen, actions.Action)
-
-
-def test_FullScreenAction__consumes_turn_is_False():
-    fullscreen = actions.FullScreenAction()
     assert fullscreen.consumes_turn is False
-
-
-def test_FullScreenAction__results_is_empty():
-    fullscreen = actions.FullScreenAction()
     assert fullscreen.results == []
 
 
@@ -597,19 +516,11 @@ def test_FullScreenAction__calls_tcod_console_set_fullscreen(mocker):
 """ Tests for TargetAction """
 
 
-def test_TargetAction__is_subclass_of_Action():
+def test_TargetAction__init():
     target = actions.TargetAction(x=0, y=0, lclick=True)
     assert isinstance(target, actions.Action)
-
-
-def test_TargetAction__consumes_turn_is_False():
-    lclick = actions.TargetAction(x=0, y=0, lclick=True)
-    assert lclick.consumes_turn is False
-
-
-def test_TargetAction__results_is_empty():
-    lclick = actions.TargetAction(x=0, y=0, lclick=True)
-    assert lclick.results == []
+    assert target.consumes_turn is False
+    assert target.results == []
 
 
 def test_TargetAction__no_click_raises_exception():
@@ -625,21 +536,11 @@ def test_TargetAction__both_clicks_raises_exception():
 """ Tests for ShowInvAction """
 
 
-def test_ShowInvAction__is_subclass_of_Action():
+def test_ShowInvAction__init():
     prev_state = config.States.HERO_TURN
     show_inv = actions.ShowInvAction(prev_state)
     assert isinstance(show_inv, actions.Action)
-
-
-def test_ShowInvAction__consumes_turn_is_False():
-    prev_state = config.States.HERO_TURN
-    show_inv = actions.ShowInvAction(prev_state)
     assert show_inv.consumes_turn is False
-
-
-def test_ShowInvAction__results_is_empty():
-    prev_state = config.States.HERO_TURN
-    show_inv = actions.ShowInvAction(prev_state)
     assert show_inv.results == []
 
 
@@ -650,24 +551,15 @@ def test_ShowInvAction():
     assert show_inv.results == [{'state': config.States.SHOW_INV}]
 
 
-
 """ Tests for DropInvAction """
-def test_DropInvAction__is_subclass_of_Action():
+
+
+def test_DropInvAction__init():
     prev_state = config.States.HERO_TURN
     drop_inv = actions.DropInvAction(prev_state)
 
     assert isinstance(drop_inv, actions.Action)
-
-
-def test_DropInvAction__consumes_turn_is_False():
-    prev_state = config.States.HERO_TURN
-    drop_inv = actions.DropInvAction(prev_state)
     assert drop_inv.consumes_turn is False
-
-
-def test_DropInvAction__results_is_empty():
-    prev_state = config.States.HERO_TURN
-    drop_inv = actions.DropInvAction(prev_state)
     assert drop_inv.results == []
 
 
@@ -681,21 +573,11 @@ def test_DropInvAction():
 """ Tests for CharScreenAction """
 
 
-def test_CharScreenAction__is_subclass_of_Action():
+def test_CharScreenAction__init():
     prev_state = config.States.HERO_TURN
     char_scr = actions.CharScreenAction(prev_state)
     assert isinstance(char_scr, actions.Action)
-
-
-def test_CharScreenAction__consumes_turn_is_False():
-    prev_state = config.States.HERO_TURN
-    char_scr = actions.CharScreenAction(prev_state)
     assert char_scr.consumes_turn is False
-
-
-def test_CharScreenAction__results_is_empty():
-    prev_state = config.States.HERO_TURN
-    char_scr = actions.CharScreenAction(prev_state)
     assert char_scr.results == []
 
 
@@ -704,5 +586,3 @@ def test_CharScreenAction():
     show_inv = actions.CharScreenAction(prev_state)
     show_inv.perform()
     assert show_inv.results == [{'state': config.States.SHOW_STATS}]
-
-
