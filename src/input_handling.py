@@ -134,7 +134,7 @@ def handle_main_menu(state, key):
     elif key == 'q':
         return {'exit': True}
 
-    return None
+    return {}
 
 
 def handle_targeting_keys(state, key):

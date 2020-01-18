@@ -44,7 +44,7 @@ def test_WalkAction__blocked_by_monster__returns_AttackAction(walk_map, hero):
     walk_map.entities.append(hero)
 
     walk = actions.WalkAction(dx=1, dy=0)
-    walk.perform(walk_map, hero)
+    walk.perform(stage=walk_map, entity=hero)
     result = walk.results[0]['alternate']
     assert isinstance(result, actions.AttackAction)
     assert result.dx == walk.dx
@@ -55,14 +55,14 @@ def test_WalkAction__blocked_by_wall__msg_and_returns_fail(walk_map, hero):
     walk_map.entities.append(hero)
 
     walk = actions.WalkAction(dx=0, dy=1)
-    walk.perform(walk_map, hero)
+    walk.perform(stage=walk_map, entity=hero)
     assert walk.results == [{'msg': 'You walk into the wall...'}]
 
 
 def test_WalkAction__success__recompute_fov(walk_map, hero):
     walk_map.entities.append(hero)
     walk = actions.WalkAction(dx=-1, dy=-1)
-    walk.perform(walk_map, hero)
+    walk.perform(stage=walk_map, entity=hero)
     assert walk.results == [{'fov_recompute': True}]
 
 
@@ -70,7 +70,7 @@ def test_WalkAction__success__recompute_fov(walk_map, hero):
 def test_WalkAction__over_item__returns_walkover_msg(walk_map, hero):
     walk_map.entities.append(hero)
     walk = actions.WalkAction(dx=0, dy=-1)
-    result = walk.perform(walk_map, hero)
+    result = walk.perform(stage=walk_map, entity=hero)
     assert result == 'you see a healing position'
 
 
@@ -109,19 +109,19 @@ def test_AttackAction__invalid_dy__raises_exception():
 
 def test_AttackAction__no_target(hero, walk_map):
     attack = actions.AttackAction(hero, dx=-1, dy=0)
-    attack.perform(walk_map)
+    attack.perform(stage=walk_map)
     assert attack.results == [{'msg': 'There is nothing to attack at that position.'}]
 
 
 def test_AttackAction__attacking_wall(hero, walk_map):
     attack = actions.AttackAction(hero, dx=0, dy=1)
-    attack.perform(walk_map)
+    attack.perform(stage=walk_map)
     assert attack.results == [{'msg': 'You cannot attack the wall!'}]
 
 
 def test_AttackAction__valid_target(hero, walk_map):
     attack = actions.AttackAction(hero, dx=1, dy=0)
-    attack.perform(walk_map)
+    attack.perform(stage=walk_map)
     assert attack.results == [{'msg': 'Player attacks Orc!'}]
 
 
@@ -154,7 +154,7 @@ def test_PickupAction__item(walk_map, hero):
     hero.x, hero.y = 1, 0   # Move the player to the same tile as the potion
     walk_map.entities.append(hero)
     pickup = actions.PickupAction()
-    pickup.perform(walk_map, hero)
+    pickup.perform(stage=walk_map, hero=hero)
 
     # todo: Fix this later - use a Stage.get_entities function instead
     potion = walk_map.entities[0]
@@ -169,7 +169,7 @@ def test_PickupAction__multiple_items(walk_map, hero):
     # Add another potion to the same tile
     walk_map.entities.append(factory.mk_entity('healing_potion', 1, 0))
     pickup = actions.PickupAction()
-    pickup.perform(walk_map, hero)
+    pickup.perform(stage=walk_map, hero=hero)
 
     # pickup.results[0] = {'item_added': None, 'msg': INV_FULL_MSG}
     assert pickup.results == 'pickup menu'
@@ -178,7 +178,7 @@ def test_PickupAction__multiple_items(walk_map, hero):
 def test_PickupAction__no_items_at_entity_location(walk_map, hero):
     walk_map.entities.append(hero)
     pickup = actions.PickupAction()
-    pickup.perform(walk_map, hero)
+    pickup.perform(stage=walk_map, hero=hero)
 
     assert pickup.results == [{'msg': 'There is nothing here to pick up.'}]
 
@@ -296,7 +296,7 @@ def test_StairUpAction__not_at_stairs(hero):
     stage.entities.remove(stage.find_stair('<'))
 
     stairup = actions.StairUpAction()
-    stairup.perform(d, hero)
+    stairup.perform(dungeon=d, hero=hero)
     assert stairup.results == [{
         'msg': 'There are no stairs here.'
     }]
@@ -305,7 +305,7 @@ def test_StairUpAction__not_at_stairs(hero):
 def test_StairUpAction__top_stage__leaves_game(hero):
     d = dungeon.Dungeon(hero)
     stairup = actions.StairUpAction()
-    stairup.perform(d, hero)
+    stairup.perform(dungeon=d, hero=hero)
     assert stairup.results == [{
         'msg': 'You go up the stairs and leave the dungeon forever...',
         'state': config.States.HERO_DEAD
@@ -321,7 +321,7 @@ def test_StairUpAction__success_on_lower_level(hero):
     d.move_hero(1, s.x, s.y)
 
     stairup = actions.StairUpAction()
-    stairup.perform(d, hero)
+    stairup.perform(dungeon=d, hero=hero)
 
     assert stairup.results == [{
         'msg': 'You ascend the stairs up.',
@@ -348,7 +348,7 @@ def test_StairDownAction__not_at_stairs(hero):
     stage.entities.remove(stage.find_stair('>'))
 
     stairdown = actions.StairDownAction()
-    stairdown.perform(d, hero)
+    stairdown.perform(dungeon=d, hero=hero)
     assert stairdown.results == [{
         'msg': 'There are no stairs here.'
     }]
@@ -363,7 +363,7 @@ def test_StairDownAction__next_stage_DNE(hero):
 
     # Find the stairs down and put the hero there for testing
     stairdown = actions.StairDownAction()
-    stairdown.perform(d, hero)
+    stairdown.perform(dungeon=d, hero=hero)
 
     assert len(d.stages) == prev_stages + 1
 
@@ -379,7 +379,7 @@ def test_StairDownAction__next_stage_exists(hero):
 
     # Find the stairs down and put the hero there for testing
     stairdown = actions.StairDownAction()
-    stairdown.perform(d, hero)
+    stairdown.perform(dungeon=d, hero=hero)
 
     assert stairdown.results == [{
         'msg': 'You carefully descend the stairs down.',
@@ -405,7 +405,7 @@ def test_LevelUpAction__invalid_stat(hero):
 
 def test_LevelUpAction__boost_hp(hero):
     levelup = actions.LevelUpAction(stat='hp')
-    levelup.perform(hero)
+    levelup.perform(entity=hero)
     assert levelup.results == [
         {'msg': 'Boosted max HP!'},
         {'state': 'previous state'}
@@ -414,7 +414,7 @@ def test_LevelUpAction__boost_hp(hero):
 
 def test_LevelUpAction__boost_strength(hero):
     levelup = actions.LevelUpAction(stat='str')
-    levelup.perform(hero)
+    levelup.perform(entity=hero)
     assert levelup.results == [
         {'msg': 'Boosted strength!'},
         {'state': 'previous state'}
@@ -423,7 +423,7 @@ def test_LevelUpAction__boost_strength(hero):
 
 def test_LevelUpAction__boost_defense(hero):
     levelup = actions.LevelUpAction(stat='def')
-    levelup.perform(hero)
+    levelup.perform(entity=hero)
     assert levelup.results == [
         {'msg': 'Boosted defense!'},
         {'state': 'previous state'}
@@ -446,7 +446,7 @@ def test_ExitAction__state_is_SHOW_INV():
     exit_action = actions.ExitAction(prev_state)
 
     state = config.States.SHOW_INV
-    exit_action.perform(state)
+    exit_action.perform(state=state)
     assert exit_action.results == [{'state': prev_state}]
 
 
@@ -455,7 +455,7 @@ def test_ExitAction__state_is_DROP_INV():
     exit_action = actions.ExitAction(prev_state)
 
     state = config.States.DROP_INV
-    exit_action.perform(state)
+    exit_action.perform(state=state)
     assert exit_action.results == [{'state': prev_state}]
 
 
@@ -464,7 +464,7 @@ def test_ExitAction__state_is_SHOW_STATS():
     exit_action = actions.ExitAction(prev_state)
 
     state = config.States.SHOW_STATS
-    exit_action.perform(state)
+    exit_action.perform(state=state)
     assert exit_action.results == [{'state': prev_state}]
 
 
@@ -473,7 +473,7 @@ def test_ExitAction__state_is_TARGETING():
     exit_action = actions.ExitAction(prev_state)
 
     state = config.States.TARGETING
-    exit_action.perform(state)
+    exit_action.perform(state=state)
     assert exit_action.results == [{
         'state': prev_state,
         'cancel_target': True,
@@ -486,7 +486,7 @@ def test_ExitAction__state_is_HERO_TURN():
     exit_action = actions.ExitAction(prev_state)
 
     state = config.States.MAIN_MENU
-    exit_action.perform(state)
+    exit_action.perform(state=state)
     assert exit_action.results == [{'state': state}]
 
 

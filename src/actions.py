@@ -13,7 +13,7 @@ class Action(ABC):
         self.results = []
 
     @abstractmethod
-    def perform(self):
+    def perform(self, *args, **kwargs):
         # We can return alternate Actions
         # We can return True or False to indicate success
         # Do the parameters need to be (*args, **kwargs)?
@@ -30,7 +30,9 @@ class WalkAction(Action):
 
         # redraw_fov_on_success?
 
-    def perform(self, stage, entity):
+    def perform(self, *args, **kwargs):
+        entity = kwargs['entity']
+        stage = kwargs['stage']
         # Do we really need to check state?
 
         # log.debug('Attempting move.')
@@ -71,7 +73,8 @@ class AttackAction(Action):
         self.dx = dx
         self.dy = dy
 
-    def perform(self, stage):
+    def perform(self, *args, **kwargs):
+        stage = kwargs['stage']
         dest_x = self.entity.x + self.dx
         dest_y = self.entity.y + self.dy
 
@@ -90,12 +93,14 @@ class AttackAction(Action):
 
 
 class WaitAction(Action):
-    def perform(self):
+    def perform(self, *args, **kwargs):
         return True
 
 
 class PickupAction(Action):
-    def perform(self, stage, hero):
+    def perform(self, *args, **kwargs):
+        stage = kwargs['stage']
+        hero = kwargs['hero']
 
         # todo: Move this functionality to stage....
         for entity in stage.entities:
@@ -114,7 +119,12 @@ class UseItemAction(Action):
         super().__init__()
         self.inv_index = inv_index
 
-    def perform(self, stage, fov_map, hero, prev_state):
+    def perform(self, *args, **kwargs):
+        stage = kwargs['stage']
+        fov_map = kwargs['fov_map']
+        hero = kwargs['hero']
+        prev_state = kwargs['prev_state']
+
         # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
@@ -131,7 +141,10 @@ class DropItemAction(Action):
         super().__init__()
         self.inv_index = inv_index
 
-    def perform(self, stage, hero, prev_state):
+    def perform(self, *args, **kwargs):
+        hero = kwargs['hero']
+        prev_state = kwargs['prev_state']
+
         # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
@@ -142,7 +155,10 @@ class DropItemAction(Action):
 
 
 class StairUpAction(Action):
-    def perform(self, dungeon, hero):
+    def perform(self, *args, **kwargs):
+        dungeon = kwargs['dungeon']
+        hero = kwargs['hero']
+
         stage = dungeon.get_stage()
 
         for entity in stage.entities:
@@ -173,7 +189,9 @@ class StairUpAction(Action):
 
 
 class StairDownAction(Action):
-    def perform(self, dungeon, hero):
+    def perform(self, *args, **kwargs):
+        dungeon = kwargs['dungeon']
+        hero = kwargs['hero']
         stage = dungeon.get_stage()
 
         for entity in stage.entities:
@@ -209,7 +227,9 @@ class LevelUpAction(Action):
         else:
             raise ValueError('stat not valid! Must be one of: {}'.format(valid_stats))
 
-    def perform(self, entity):
+    def perform(self, *args, **kwargs):
+        entity = kwargs['entity']
+
         if self.stat == 'hp':
             entity.fighter.base_max_hp += 20
             entity.fighter.hp += 20
@@ -232,7 +252,9 @@ class ExitAction(Action):
         super().__init__(consumes_turn=False)
         self.prev_state = prev_state
 
-    def perform(self, state):
+    def perform(self, *args, **kwargs):
+        state = kwargs['state']
+
         if state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
             self.results.append({'state': self.prev_state})
 
@@ -253,7 +275,7 @@ class FullScreenAction(Action):
     def __init__(self):
         super().__init__(consumes_turn=False)
 
-    def perform(self):
+    def perform(self, *args, **kwargs):
         # Toggle fullscreen on/off
         tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
 
@@ -271,7 +293,12 @@ class TargetAction(Action):
         self.lclick = lclick
         self.rclick = rclick
 
-    def perform(self, hero, targeting_item, stage, fov_map):
+    def perform(self, *args, **kwargs):
+        hero = kwargs['hero']
+        targeting_item = kwargs['targeting_item']
+        stage = kwargs['stage']
+        fov_map = kwargs['fov_map']
+
         if self.l_click:
             # note: Due to the message console - we have to offset the y.
             self.y -= config.msg_height
@@ -292,13 +319,12 @@ class TargetAction(Action):
             self.results.append({'cancel_target': True})
 
 
-
 class ShowInvAction(Action):
     def __init__(self, prev_state):
         super().__init__(consumes_turn=False)
         self.prev_state = prev_state
 
-    def perform(self):
+    def perform(self, *args, **kwargs):
         self.results = [{'state': States.SHOW_INV}]
 
 
@@ -307,7 +333,7 @@ class DropInvAction(Action):
         super().__init__(consumes_turn=False)
         self.prev_state = prev_state
 
-    def perform(self):
+    def perform(self, *args, **kwargs):
         self.results = [{'state': States.DROP_INV}]
 
 
@@ -316,5 +342,5 @@ class CharScreenAction(Action):
         super().__init__(consumes_turn=False)
         self.prev_state = prev_state
 
-    def perform(self):
+    def perform(self, *args, **kwargs):
         self.results = [{'state': States.SHOW_STATS}]

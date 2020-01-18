@@ -59,7 +59,7 @@ def main():
             tcod.console_flush()
 
             key_char = process_tcod_input(key)
-            action = handle_main_menu(key_char)
+            action = handle_main_menu(state=None, key=key_char)
 
             new_game = action.get('new_game')
             load_saved_game = action.get('load_game')
@@ -186,194 +186,21 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         # Get keyboard/mouse input
         key_char = process_tcod_input(key)
         action = handle_keys(state, key_char)
-
         mouse_action = handle_mouse(mouse)
 
-        move = action.get('move')
-        wait = action.get('wait')
-        pickup = action.get('pickup')
-        show_inv = action.get('show_inv')
-        drop_inv = action.get('drop_inv')
-        inv_index = action.get('inv_index')
-        stair_down = action.get('stair_down')
-        stair_up = action.get('stair_up')
-        lvl_up = action.get('lvl_up')
-        show_char_scr = action.get('show_char_scr')
-        gameexit = action.get('exit')
-        full_scr = action.get('fullscreen')
-        l_click = mouse_action.get('l_click')
-        r_click = mouse_action.get('r_click')
+        # Perform action
+        action.perform(
+            state=state,
+            prev_state=prev_state,
+            dungeon=dungeon,
+            stage=stage,
+            fov_map=fov_map,
+            hero=hero,     # todo: consolidate to entity
+            entity=hero,
+            targeting_item=targeting_item,
+        )
 
-        hero_turn_results = []
-
-        if move and state == States.HERO_TURN:
-            log.debug('Attempting move.')
-            dx, dy = move
-            dest_x = hero.x + dx
-            dest_y = hero.y + dy
-
-            if not stage.is_blocked(dest_x, dest_y):
-                target = stage.get_blocker_at_loc(dest_x, dest_y)
-
-                if target:
-                    log.debug('Attacking.')
-                    attack_results = hero.fighter.attack(target)
-                    hero_turn_results.extend(attack_results)
-                else:
-                    log.debug('Moving.')
-                    hero.move(dx, dy)
-
-                    # Need to redraw FOV
-                    fov_recompute = True
-
-                # hero's turn is over
-                state = States.WORLD_TURN
-
-        elif wait:
-            log.debug('Waiting.')
-            # Skip the hero turn
-            state = States.WORLD_TURN
-
-        elif pickup and state == States.HERO_TURN:
-            log.debug('Attempting pickup.')
-            for entity in stage.entities:
-                item_pos_at_our_pos = entity.x == hero.x and entity.y == hero.y
-
-                if entity.has_comp('item') and item_pos_at_our_pos:
-                    pickup_results = hero.inv.add_item(entity)
-                    hero_turn_results.extend(pickup_results)
-
-                    break
-            else:
-                msg_log.add('There is nothing here to pick up.')
-
-        if show_inv:
-            log.debug('Show inventory.')
-            prev_state = state
-            state = States.SHOW_INV
-
-        if drop_inv:
-            log.debug('Drop inventory.')
-            prev_state == state
-            state = States.DROP_INV
-
-        # Item usage
-        if inv_index is not None and prev_state != States.HERO_DEAD and inv_index < len(hero.inv.items):
-            log.debug('Inventory menu.')
-            item = hero.inv.items[inv_index]
-
-            if state == States.SHOW_INV:
-                hero_turn_results.extend(
-                    hero.inv.use(
-                        item, entities=stage.entities, fov_map=fov_map
-                    )
-                )
-
-            elif state == States.DROP_INV:
-                hero_turn_results.extend(hero.inv.drop(item))
-
-        if stair_down and state == States.HERO_TURN:
-            log.debug('Attempting stair down.')
-            for entity in stage.entities:
-                if entity.has_comp('stair_down'):
-                    hero_at_stairs = entity.x == hero.x and entity.y == hero.y
-                    if hero_at_stairs:
-                        dungeon.mk_next_stage()
-
-                        if dungeon.move_downstairs():
-                            stage = dungeon.get_stage()
-                            stage.populate()
-                            msg_log.add('You carefully descend the stairs down.')
-
-                            fov_map = initialize_fov(stage)
-                            fov_recompute = True
-                            render_eng.con.clear()
-                            break
-                        else:
-                            raise ValueError("Something weird happened with going downstairs!")
-
-            else:
-                msg_log.add('There are no stairs here.')
-
-        if stair_up and state == States.HERO_TURN:
-            log.debug('Attempting stair up.')
-            for entity in stage.entities:
-                if entity.has_comp('stair_up'):
-                    hero_at_stairs = entity.x == hero.x and entity.y == hero.y
-                    if hero_at_stairs:
-
-                        if dungeon.current_stage == 0:
-                            msg_log.add('You go up the stairs and leave the dungeon forever...')
-                            state = States.HERO_DEAD
-                            # gameexit = True
-                            break
-
-                        elif dungeon.move_upstairs():
-                            stage = dungeon.get_stage()
-                            msg_log.add('You ascend the stairs up.')
-
-                            fov_map = initialize_fov(stage)
-                            fov_recompute = True
-                            render_eng.con.clear()
-                            break
-                        else:
-                            raise ValueError("Something weird happened with going upstairs!")
-
-            else:
-                msg_log.add('There are no stairs here.')
-
-        if lvl_up:
-            log.debug('Level up stat boost.')
-            # todo: Move stat boosts to config
-            if lvl_up == 'hp':
-                hero.fighter.base_max_hp += 20
-                hero.fighter.hp += 20
-            elif lvl_up == 'str':
-                hero.fighter.base_power += 1
-            elif lvl_up == 'def':
-                hero.fighter.base_defense += 1
-
-            state = prev_state
-
-        if show_char_scr:
-            log.debug('Show character screen.')
-            prev_state = state
-            state = States.SHOW_STATS
-
-        if state == States.TARGETING:
-            log.debug('Targeting.')
-            if l_click:
-                target_x, target_y = l_click
-
-                # note: Due to the message console - we have to offset the y.
-                target_y -= config.msg_height
-
-                item_use_results = hero.inv.use(
-                    targeting_item,
-                    entities=stage.entities,
-                    fov_map=fov_map,
-                    target_x=target_x,
-                    target_y=target_y
-                )
-                hero_turn_results.extend(item_use_results)
-
-            elif r_click:
-                hero_turn_results.append({'cancel_target': True})
-
-        if gameexit:
-            log.debug('Attempting exit.')
-            if state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
-                state = prev_state
-            elif state == States.TARGETING:
-                hero_turn_results.append({'cancel_target': True})
-            else:
-                save_game(config.savefile, dungeon, msg_log, state, turns)
-                return True
-
-        if full_scr:
-            log.debug('Full screen.')
-            # Toggle fullscreen on/off
-            tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
+        hero_turn_results = action.results
 
         # Process hero results
         for result in hero_turn_results:
