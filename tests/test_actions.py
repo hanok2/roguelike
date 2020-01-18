@@ -45,7 +45,10 @@ def test_WalkAction__blocked_by_monster__returns_AttackAction(walk_map, hero):
 
     walk = actions.WalkAction(dx=1, dy=0)
     walk.perform(walk_map, hero)
-    assert walk.results == [{'alternate': 'AttackAction'}]
+    result = walk.results[0]['alternate']
+    assert isinstance(result, actions.AttackAction)
+    assert result.dx == walk.dx
+    assert result.dy == walk.dy
 
 
 def test_WalkAction__blocked_by_wall__msg_and_returns_fail(walk_map, hero):
@@ -56,11 +59,11 @@ def test_WalkAction__blocked_by_wall__msg_and_returns_fail(walk_map, hero):
     assert walk.results == [{'msg': 'You walk into the wall...'}]
 
 
-def test_WalkAction__unblocked__performs_walk_and_returns_True(walk_map, hero):
+def test_WalkAction__success__recompute_fov(walk_map, hero):
     walk_map.entities.append(hero)
     walk = actions.WalkAction(dx=-1, dy=-1)
     walk.perform(walk_map, hero)
-    assert walk.results == []
+    assert walk.results == [{'fov_recompute': True}]
 
 
 @pytest.mark.skip(reason='we do not have an item checking method yet for stages.')

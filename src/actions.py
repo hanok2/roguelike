@@ -41,18 +41,20 @@ class WalkAction(Action):
         if stage.is_blocked(dest_x, dest_y):
             # There is a wall blocking our path
             self.results.append({'msg': 'You walk into the wall...'})
+            return
 
         # Check for attacker
         target = stage.get_blocker_at_loc(dest_x, dest_y)
 
         if target:
-            self.results.append({'alternate': 'AttackAction'})
+            self.results.append({'alternate': AttackAction(entity, self.dx, self.dy)})
+            return
 
         # log.debug('Moving.')
         entity.move(self.dx, self.dy)
 
         # Need to redraw FOV
-        fov_recompute = True
+        self.results.append({'fov_recompute': True})
 
         # Add walk into door
         # Add walk into water/lava/etc
