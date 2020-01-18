@@ -185,7 +185,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         # Get keyboard/mouse input
         key_char = process_tcod_input(key)
-        action = handle_keys(key_char, state)
+        action = handle_keys(state, key_char)
 
         mouse_action = handle_mouse(mouse)
 

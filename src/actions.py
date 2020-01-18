@@ -110,12 +110,16 @@ class PickupAction(Action):
 
 
 class UseItemAction(Action):
-    def perform(self, stage, fov_map, inv_index, hero, prev_state):
+    def __init__(self, inv_index):
+        super().__init__()
+        self.inv_index = inv_index
+
+    def perform(self, stage, fov_map, hero, prev_state):
         # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
 
-        item = hero.inv.items[inv_index]
+        item = hero.inv.items[self.inv_index]
 
         self.results.extend(
             hero.inv.use(item, entities=stage.entities, fov_map=fov_map)
@@ -123,12 +127,16 @@ class UseItemAction(Action):
 
 
 class DropItemAction(Action):
-    def perform(self, stage, hero, inv_index, prev_state):
+    def __init__(self, inv_index):
+        super().__init__()
+        self.inv_index = inv_index
+
+    def perform(self, stage, hero, prev_state):
         # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
 
-        item = hero.inv.items[inv_index]
+        item = hero.inv.items[self.inv_index]
 
         self.results.extend(hero.inv.drop(item))
 
@@ -219,8 +227,6 @@ class LevelUpAction(Action):
         self.results.append({'state': 'previous state'})
 
 
-
-
 class ExitAction(Action):
     def __init__(self, prev_state):
         super().__init__(consumes_turn=False)
@@ -244,7 +250,7 @@ class ExitAction(Action):
 
 
 class FullScreenAction(Action):
-    def __init__(self, ):
+    def __init__(self):
         super().__init__(consumes_turn=False)
 
     def perform(self):

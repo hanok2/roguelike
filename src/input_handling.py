@@ -1,5 +1,6 @@
 import tcod
 from .config import States
+from . import actions
 
 # TCOD - EVENT CONSTANTS:
 # https://github.com/libtcod/python-tcod/blob/master/tcod/event_constants.py
@@ -12,110 +13,145 @@ from .config import States
 """
 
 
-def handle_keys(key, state):
+def handle_keys(state, key):
     # Put this here for now... move later when doing other ports
     # key = process_tcod_input(key)
 
     if state == States.HERO_TURN:
-        return handle_hero_turn_keys(key)
+        return handle_hero_turn_keys(state, key)
 
     elif state == States.HERO_DEAD:
-        return handle_hero_dead_keys(key)
+        return handle_hero_dead_keys(state, key)
 
     elif state == States.TARGETING:
-        return handle_targeting_keys(key)
+        return handle_targeting_keys(state, key)
 
     elif state in (States.SHOW_INV, States.DROP_INV):
-        return handle_inv_keys(key)
+        return handle_inv_keys(state, key)
 
     elif state == States.LEVEL_UP:
-        return handle_lvl_up_menu(key)
+        return handle_lvl_up_menu(state, key)
 
     elif state == States.SHOW_STATS:
-        return handle_char_scr(key)
+        return handle_char_scr(state, key)
 
     return {}
     # Raise exception instead?
 
 
-def handle_hero_turn_keys(key):
+def handle_hero_turn_keys(state, key):
     # Stairs
     if key == '>':
-        return {'stair_down': True}
+        # return {'stair_down': True}
+        return actions.StairDownAction()
     elif key == '<':
-        return {'stair_up': True}
+        # return {'stair_up': True}
+        return actions.StairUpAction()
 
     # Actions
     if key == ',':
-        return {'pickup': True}
+        # return {'pickup': True}
+        return actions.PickupAction()
+
     elif key == 'i':
-        return {'show_inv': True}
+        # return {'show_inv': True}
+        return actions.ShowInvAction(prev_state=state)
+
     elif key == 'd':
-        return {'drop_inv': True}
+        # return {'drop_inv': True}
+        return actions.DropInvAction(prev_state=state)
 
     if key == '^x':
-        return {'show_char_scr': True}
+        # return {'show_char_scr': True}
+        return actions.CharScreenAction(prev_state=state)
 
     elif key == '.':
-        return {'wait': True}
+        # return {'wait': True}
+        return actions.WaitAction()
 
     # Movement
     if key == 'k':
-        return {'move': (0, -1)}  # Move Up
+        # return {'move': (0, -1)}
+        return actions.WalkAction(0, -1)  # Move Up
     elif key == 'j':
-        return {'move': (0, 1)}  # Move Down
+        # return {'move': (0, 1)}
+        return actions.WalkAction(0, 1)  # Move Down
     elif key == 'h':
-        return {'move': (-1, 0)}  # Move Left
+        # return {'move': (-1, 0)}
+        return actions.WalkAction(-1, 0) # Move Left
     elif key == 'l':
-        return {'move': (1, 0)}  # Move Right
+        # return {'move': (1, 0)}
+        return actions.WalkAction(1, 0) # Move Right
     elif key == 'y':
-        return {'move': (-1, -1)}  # Move NW
+        # return {'move': (-1, -1)}
+        return actions.WalkAction(-1, -1)  # Move NW
     elif key == 'u':
-        return {'move': (1, -1)}  # Move NE
+        # return {'move': (1, -1)}
+        return actions.WalkAction(1, -1)  # Move NE
     elif key == 'b':
-        return {'move': (-1, 1)}  # Move SW
+        # return {'move': (-1, 1)}
+        return actions.WalkAction(-1, 1)  # Move SW
     elif key == 'n':
-        return {'move': (1, 1)}  # Move SE
+        # return {'move': (1, 1)}
+        return actions.WalkAction(1, 1) # Move SE
 
     if key == '!a':
-        return {'full_scr': True}
+        # return {'full_scr': True}
+        return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
+
     elif key == 'esc':
-        return {'exit': True}
+        # return {'exit': True}
+        return actions.ExitAction(prev_state=state)
 
     # No key was pressed
     return {}
 
 
-def handle_hero_dead_keys(key):
+def handle_hero_dead_keys(state, key):
     if key == 'i':
-        return {'show_inv': True}
+        # return {'show_inv': True}
+        return actions.ShowInvAction(prev_state=state)
+
     elif key == 'alt-enter':
-        return {'full_scr': True}  # Alt+Enter: Toggle full screen
+        # return {'full_scr': True}  # Alt+Enter: Toggle full screen
+        return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
+
     elif key == '^x':
-        return {'show_char_scr': True}
+        # return {'show_char_scr': True}
+        return actions.CharScreenAction(prev_state=state)
+
     elif key == 'esc':
-        return {'exit': True}
+        # return {'exit': True}
+        return actions.ExitAction(prev_state=state)
 
     return {}
 
 
-def handle_inv_keys(key):
-    # Convert the key pressed to an index. a is 0, b is 1, etc.
-    if len(key) == 1:
-        index = ord(key) - ord('a')
 
-        if index >= 0:
-            return {'inv_index': index}
+def handle_inv_keys(state, key):
+    if key == 'alt-enter':
+        # return {'full_scr': True}
+        return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
 
-    elif key == 'alt-enter':
-        return {'full_scr': True}  # Alt+Enter: Toggle full screen
     elif key == 'esc':
-        return {'exit': True}
+        # return {'exit': True}
+        return actions.ExitAction(prev_state=state)
+
+    index = key_to_index(key)
+
+    if index >= 0:
+        # return {'inv_index': index}
+
+        if state == States.SHOW_INV:
+            return actions.UseItemAction(inv_index=index)
+
+        elif state == States.DROP_INV:
+            return actions.DropItemAction(inv_index=index)
 
     return {}
 
 
-def handle_main_menu(key):
+def handle_main_menu(state, key):
     if key == 'n':
         return {'new_game': True}
     elif key == 'c':  # For "Continue"
@@ -128,30 +164,37 @@ def handle_main_menu(key):
     return {}
 
 
-def handle_targeting_keys(key):
+def handle_targeting_keys(state, key):
     # todo: Add ability to move a cursor to target.
 
     if key == 'esc':
-        return {'exit': True}
+        # return {'exit': True}
+        return actions.ExitAction(prev_state=state)
 
-    return {}
+    return None
 
 
-def handle_lvl_up_menu(key):
+def handle_lvl_up_menu(state, key):
     if key == 'c':                 # Constitution
-        return {'lvl_up': 'hp'}
+        # return {'lvl_up': 'hp'}
+        return actions.LevelUpAction('hp')
+
     elif key == 's':               # Strength
-        return {'lvl_up': 'str'}
+        # return {'lvl_up': 'str'}
+        return actions.LevelUpAction('str')
+
     elif key == 'd':               # Defense
-        return {'lvl_up': 'def'}
+        # return {'lvl_up': 'def'}
+        return actions.LevelUpAction('def')
 
-    return {}
+    return None
 
 
-def handle_char_scr(key):
+def handle_char_scr(state, key):
     if key == 'esc':
-        return {'exit': True}
-    return {}
+        return actions.ExitAction(prev_state=state)
+
+    return None
 
 
 def process_tcod_input(key):
@@ -224,3 +267,13 @@ def handle_mouse(mouse):
         return {'m_click': (x, y)}
 
     return {}
+
+
+def key_to_index(key):
+    # Convert the key pressed to an index. a is 0, b is 1, etc.
+    # todo: Do we need to constrain this to just letters?
+
+    if len(key) == 1:
+        return ord(key) - ord('a')
+
+    return -1

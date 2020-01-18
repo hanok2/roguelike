@@ -187,7 +187,7 @@ def test_PickupAction__no_items_at_entity_location(walk_map, hero):
 
 
 def test_UseItemAction__init():
-    use = actions.UseItemAction()
+    use = actions.UseItemAction(0)
     assert isinstance(use, actions.Action)
     assert use.consumes_turn
     assert use.results == []
@@ -196,12 +196,10 @@ def test_UseItemAction__init():
 def test_UseItemAction__valid_item(walk_map, hero):
     potion = factory.mk_entity('healing_potion', 1, 0)
     hero.inv.add_item(potion)
-    inv_index = 0  # Assume potion is at index 0
-    use = actions.UseItemAction()
+    use = actions.UseItemAction(inv_index=0)  # Assume potion is at index 0
     use.perform(
         stage=walk_map,
         fov_map=None,
-        inv_index=inv_index,
         hero=hero,
         prev_state=None
     )
@@ -213,11 +211,10 @@ def test_UseItemAction__valid_item(walk_map, hero):
 
 
 def test_UseItemAction__hero_is_dead(walk_map, hero):
-    use = actions.UseItemAction()
+    use = actions.UseItemAction(inv_index=0)
     use.perform(
         stage=walk_map,
         fov_map=None,
-        inv_index=0,
         hero=hero,
         prev_state=config.States.HERO_DEAD
     )
@@ -225,12 +222,11 @@ def test_UseItemAction__hero_is_dead(walk_map, hero):
 
 
 def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
-    use = actions.UseItemAction()
+    use = actions.UseItemAction(inv_index=-1)
     with pytest.raises(IndexError):
         use.perform(
             stage=walk_map,
             fov_map=None,
-            inv_index=-1,
             hero=hero,
             prev_state=config.States.HERO_TURN
         )
@@ -240,17 +236,16 @@ def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
 
 
 def test_DropItemAction__init():
-    drop = actions.DropItemAction()
+    drop = actions.DropItemAction(inv_index=0)
     assert isinstance(drop, actions.Action)
     assert drop.consumes_turn
     assert drop.results == []
 
 
 def test_DropItemAction__hero_is_dead(walk_map, hero):
-    drop = actions.DropItemAction()
+    drop = actions.DropItemAction(inv_index=0)
     drop.perform(
         stage=walk_map,
-        inv_index=0,
         hero=hero,
         prev_state=config.States.HERO_DEAD
     )
@@ -260,12 +255,10 @@ def test_DropItemAction__hero_is_dead(walk_map, hero):
 def test_DropItemAction__valid_item(walk_map, hero):
     potion = factory.mk_entity('healing_potion', 1, 0)
     hero.inv.add_item(potion)
-    inv_index = 0  # Assume potion is at index 0
 
-    drop = actions.DropItemAction()
+    drop = actions.DropItemAction(inv_index=0)  # Assume potion is at index 0
     drop.perform(
         stage=walk_map,
-        inv_index=inv_index,
         hero=hero,
         prev_state=None
     )
@@ -276,11 +269,10 @@ def test_DropItemAction__valid_item(walk_map, hero):
 
 
 def test_DropItemAction__inv_index_out_of_bounds(walk_map, hero):
-    drop = actions.DropItemAction()
+    drop = actions.DropItemAction(inv_index=-1)
     with pytest.raises(IndexError):
         drop.perform(
             stage=walk_map,
-            inv_index=-1,
             hero=hero,
             prev_state=config.States.HERO_TURN
         )
