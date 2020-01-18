@@ -200,6 +200,11 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         if action:
             next_action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log = process_action(action, state, prev_state, dungeon, stage, fov_map, hero, targeting_item, msg_log)
 
+
+        if state == States.MAIN_MENU:
+            save_game(config.savefile, dungeon, msg_log, state, turns)
+            return
+
         # if mouse_action?
 
         if state == States.WORLD_TURN:
