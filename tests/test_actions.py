@@ -145,9 +145,9 @@ def test_WaitAction__init():
     assert wait.results == []
 
 
-def test_WaitAction__returns_True():
+def test_WaitAction__returns_None():
     wait = actions.WaitAction()
-    assert wait.perform()
+    assert wait.perform() is None
 
 
 """ Tests for PickupAction """
