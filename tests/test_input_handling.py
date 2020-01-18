@@ -8,9 +8,9 @@ from ..src import config
 States = config.States
 
 
-def test_handle_keys__invalid_state():
+def test_handle_keys__invalid_state__returns_None():
     result = input_handling.handle_keys(key='a', state=None)
-    assert result == {}
+    assert result is None
 
 
 def test_handle_keys__HERO_TURN__calls_handle_hero_turn_keys(mocker):
@@ -60,57 +60,41 @@ def test_handle_keys__SHOW_STATS__calls_handle_char_scr(mocker):
 
 def test_handle_hero_turn_keys__stair_down():
     result = input_handling.handle_hero_turn_keys(state=None, key='>')
-
-    # assert result == {'stair_down': True}
     assert isinstance(result, actions.StairDownAction)
 
 
 def test_handle_hero_turn_keys__stair_up():
     result = input_handling.handle_hero_turn_keys(state=None, key='<')
-
-    # assert result == {'stair_up': True}
     assert isinstance(result, actions.StairUpAction)
 
 
 def test_handle_hero_turn_keys__pickup():
     result = input_handling.handle_hero_turn_keys(state=None, key=',')
-
-    # assert result == {'pickup': True}
     assert isinstance(result, actions.PickupAction)
 
 
 def test_handle_hero_turn_keys__inventory():
     result = input_handling.handle_hero_turn_keys(state=None, key='i')
-
-    # assert result == {'show_inv': True}
     assert isinstance(result, actions.ShowInvAction)
 
 
 def test_handle_hero_turn_keys__drop_inventory():
     result = input_handling.handle_hero_turn_keys(state=None, key='d')
-
-    # assert result == {'drop_inv': True}
     assert isinstance(result, actions.DropInvAction)
 
 
 def test_handle_hero_turn_keys__char_screen():
     result = input_handling.handle_hero_turn_keys(state=None, key='^x')
-
-    # assert result == {'show_char_scr': True}
     assert isinstance(result, actions.CharScreenAction)
 
 
 def test_handle_hero_turn_keys__wait():
     result = input_handling.handle_hero_turn_keys(state=None, key='.')
-
-    # assert result == {'wait': True}
     assert isinstance(result, actions.WaitAction)
 
 
 def test_handle_hero_turn_keys__move_N():
     result = input_handling.handle_hero_turn_keys(state=None, key='k')
-
-    # assert result == {'move': (0, -1)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == 0
     assert result.dy == -1
@@ -118,8 +102,6 @@ def test_handle_hero_turn_keys__move_N():
 
 def test_handle_hero_turn_keys__move_S():
     result = input_handling.handle_hero_turn_keys(state=None, key='j')
-
-    # assert result == {'move': (0, 1)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == 0
     assert result.dy == 1
@@ -127,8 +109,6 @@ def test_handle_hero_turn_keys__move_S():
 
 def test_handle_hero_turn_keys__move_E():
     result = input_handling.handle_hero_turn_keys(state=None, key='l')
-
-    # assert result == {'move': (1, 0)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == 1
     assert result.dy == 0
@@ -136,8 +116,6 @@ def test_handle_hero_turn_keys__move_E():
 
 def test_handle_hero_turn_keys__move_W():
     result = input_handling.handle_hero_turn_keys(state=None, key='h')
-
-    # assert result == {'move': (-1, 0)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == -1
     assert result.dy == 0
@@ -145,8 +123,6 @@ def test_handle_hero_turn_keys__move_W():
 
 def test_handle_hero_turn_keys__move_NE():
     result = input_handling.handle_hero_turn_keys(state=None, key='u')
-
-    # assert result == {'move': (1, -1)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == 1
     assert result.dy == -1
@@ -154,8 +130,6 @@ def test_handle_hero_turn_keys__move_NE():
 
 def test_handle_hero_turn_keys__move_NW():
     result = input_handling.handle_hero_turn_keys(state=None, key='y')
-
-    # assert result == {'move': (-1, -1)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == -1
     assert result.dy == -1
@@ -163,8 +137,6 @@ def test_handle_hero_turn_keys__move_NW():
 
 def test_handle_hero_turn_keys__move_SE():
     result = input_handling.handle_hero_turn_keys(state=None, key='n')
-
-    # assert result == {'move': (1, 1)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == 1
     assert result.dy == 1
@@ -172,8 +144,6 @@ def test_handle_hero_turn_keys__move_SE():
 
 def test_handle_hero_turn_keys__move_SW():
     result = input_handling.handle_hero_turn_keys(state=None, key='b')
-
-    # assert result == {'move': (-1, 1)}
     assert isinstance(result, actions.WalkAction)
     assert result.dx == -1
     assert result.dy == 1
@@ -181,23 +151,17 @@ def test_handle_hero_turn_keys__move_SW():
 
 def test_handle_hero_turn_keys__fullscreen():
     result = input_handling.handle_hero_turn_keys(state=None, key='!a')
-
-    # assert result == {'full_scr': True}
     assert isinstance(result, actions.FullScreenAction)
 
 
 def test_handle_hero_turn_keys__escape():
     result = input_handling.handle_hero_turn_keys(state=None, key='esc')
-
-    # assert result == {'exit': True}
     assert isinstance(result, actions.ExitAction)
 
 
-@pytest.mark.skip(reason='look into later')
-def test_handle_hero_turn_keys__nothing_press():
+def test_handle_hero_turn_keys__invalid_key__returns_None():
     result = input_handling.handle_hero_turn_keys(state=None, key=None)
-
-    assert result == {}
+    assert result is None
 
 
 """ Tests for handle_hero_dead_keys """
@@ -205,37 +169,28 @@ def test_handle_hero_turn_keys__nothing_press():
 
 def test_handle_hero_dead_keys__inventory():
     result = input_handling.handle_hero_dead_keys(state=None, key='i')
-
-    # assert result == {'show_inv': True}
     assert isinstance(result, actions.ShowInvAction)
 
 
 @pytest.mark.skip(reason='Fix Alt-Enter on tcod handling first')
 def test_handle_hero_dead_keys__fullscreen():
     result = input_handling.handle_hero_dead_keys(state=None, key='!a')
-
-    # assert result == {'full_scr': True}
     assert isinstance(result, actions.FullScreenAction)
 
 
 def test_handle_hero_dead_keys__char_scr():
     result = input_handling.handle_hero_dead_keys(state=None, key='^x')
-
-    # assert result == {'show_char_scr': True}
     assert isinstance(result, actions.CharScreenAction)
 
 
 def test_handle_hero_dead_keys__esc():
     result = input_handling.handle_hero_dead_keys(state=None, key='esc')
-
-    # assert result == {'exit': True}
     assert isinstance(result, actions.ExitAction)
 
 
-@pytest.mark.skip(reason='look into later')
-def test_handle_hero_dead_keys__nothing_press():
+def test_handle_hero_dead_keys__invalid_key__returns_None():
     result = input_handling.handle_hero_dead_keys(state=None, key=None)
-    assert result == None
+    assert result is None
 
 
 """ Tests for handle_inv_keys """
@@ -244,38 +199,29 @@ def test_handle_hero_dead_keys__nothing_press():
 @pytest.mark.skip(reason='Fix Alt-Enter on tcod handling first')
 def test_handle_inv_keys__fullscreen():
     result = input_handling.handle_inv_keys(state=None, key='alt-enter')
-
-    # assert result == {'full_scr': True}
     assert isinstance(result, actions.FullScreenAction)
 
 
 def test_handle_inv_keys__esc():
     result = input_handling.handle_inv_keys(state=None, key='esc')
-
-    # assert result == {'exit': True}
     assert isinstance(result, actions.ExitAction)
-
-
-@pytest.mark.skip(reason='look into later')
-def test_handle_inv_keys__nothing_press():
-    result = input_handling.handle_inv_keys(state=None, key=None)
-
-    assert result == None
 
 
 def test_handle_inv_keys__SHOW_INV__uses_item():
     result = input_handling.handle_inv_keys(state=States.SHOW_INV, key='a')
-
     assert isinstance(result, actions.UseItemAction)
     assert result.inv_index == 0
 
 
 def test_handle_inv_keys__DROP_INV__returns_DropItemAction():
     result = input_handling.handle_inv_keys(state=States.DROP_INV, key='a')
-
     assert isinstance(result, actions.DropItemAction)
     assert result.inv_index == 0
 
+
+def test_handle_inv_keys__invalid_key__returns_None():
+    result = input_handling.handle_inv_keys(state=None, key='bla')
+    assert result is None
 
 
 """ Tests for test_handle_main_menu(key) """
@@ -322,8 +268,6 @@ def test_handle_main_menu__not_valid_key():
 
 def test_handle_targeting_keys__esc__exits_targeting():
     result = input_handling.handle_targeting_keys(state=None, key='esc')
-
-    # assert result == {'exit': True}
     assert isinstance(result, actions.ExitAction)
 
 
@@ -331,30 +275,24 @@ def test_handle_targeting_keys__non_valid():
     result = input_handling.handle_targeting_keys(state=None, key='z')
     assert result is None
 
+
 """ Tests for test_handle_lvl_up_menu(key)"""
 
 
 def test_handle_lvl_up_menu__pick_constitution():
     result = input_handling.handle_lvl_up_menu(state=None, key='c')
-
-    # assert result == {'lvl_up': 'hp'}
     assert isinstance(result, actions.LevelUpAction)
     assert result.stat == 'hp'
 
 
-
 def test_handle_lvl_up_menu__pick_strength():
     result = input_handling.handle_lvl_up_menu(state=None, key='s')
-
-    # assert result == {'lvl_up': 'str'}
     assert isinstance(result, actions.LevelUpAction)
     assert result.stat == 'str'
 
 
 def test_handle_lvl_up_menu__pick_defense():
     result = input_handling.handle_lvl_up_menu(state=None, key='d')
-
-    # assert result == {'lvl_up': 'def'}
     assert isinstance(result, actions.LevelUpAction)
     assert result.stat == 'def'
 
@@ -369,14 +307,11 @@ def test_handle_lvl_up_menu__invalid():
 
 def test_handle_char_scr__esc__returns_ExitAction():
     result = input_handling.handle_char_scr(state=None, key='esc')
-
-    # assert result == {'exit': True}
     assert isinstance(result, actions.ExitAction)
 
 
 def test_handle_char_scr__invalid():
     result = input_handling.handle_char_scr(state=None, key='z')
-
     assert result is None
 
 
@@ -569,4 +504,3 @@ def test_key_to_index__invalid_key__returns_negative1():
 
     result = input_handling.key_to_index('aa')
     assert result == -1
-

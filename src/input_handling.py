@@ -35,120 +35,93 @@ def handle_keys(state, key):
     elif state == States.SHOW_STATS:
         return handle_char_scr(state, key)
 
-    return {}
-    # Raise exception instead?
+    return None
 
 
 def handle_hero_turn_keys(state, key):
     # Stairs
     if key == '>':
-        # return {'stair_down': True}
         return actions.StairDownAction()
     elif key == '<':
-        # return {'stair_up': True}
         return actions.StairUpAction()
 
     # Actions
     if key == ',':
-        # return {'pickup': True}
         return actions.PickupAction()
 
     elif key == 'i':
-        # return {'show_inv': True}
         return actions.ShowInvAction(prev_state=state)
 
     elif key == 'd':
-        # return {'drop_inv': True}
         return actions.DropInvAction(prev_state=state)
 
     if key == '^x':
-        # return {'show_char_scr': True}
         return actions.CharScreenAction(prev_state=state)
 
     elif key == '.':
-        # return {'wait': True}
         return actions.WaitAction()
 
     # Movement
     if key == 'k':
-        # return {'move': (0, -1)}
         return actions.WalkAction(0, -1)  # Move Up
     elif key == 'j':
-        # return {'move': (0, 1)}
         return actions.WalkAction(0, 1)  # Move Down
     elif key == 'h':
-        # return {'move': (-1, 0)}
         return actions.WalkAction(-1, 0) # Move Left
     elif key == 'l':
-        # return {'move': (1, 0)}
         return actions.WalkAction(1, 0) # Move Right
     elif key == 'y':
-        # return {'move': (-1, -1)}
         return actions.WalkAction(-1, -1)  # Move NW
     elif key == 'u':
-        # return {'move': (1, -1)}
         return actions.WalkAction(1, -1)  # Move NE
     elif key == 'b':
-        # return {'move': (-1, 1)}
         return actions.WalkAction(-1, 1)  # Move SW
     elif key == 'n':
-        # return {'move': (1, 1)}
         return actions.WalkAction(1, 1) # Move SE
 
     if key == '!a':
-        # return {'full_scr': True}
         return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
 
     elif key == 'esc':
-        # return {'exit': True}
         return actions.ExitAction(prev_state=state)
 
-    # No key was pressed
-    return {}
+    return None
 
 
 def handle_hero_dead_keys(state, key):
     if key == 'i':
-        # return {'show_inv': True}
         return actions.ShowInvAction(prev_state=state)
 
     elif key == 'alt-enter':
-        # return {'full_scr': True}  # Alt+Enter: Toggle full screen
         return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
 
     elif key == '^x':
-        # return {'show_char_scr': True}
         return actions.CharScreenAction(prev_state=state)
 
     elif key == 'esc':
-        # return {'exit': True}
         return actions.ExitAction(prev_state=state)
 
-    return {}
+    return None
 
 
 
 def handle_inv_keys(state, key):
     if key == 'alt-enter':
-        # return {'full_scr': True}
         return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
 
     elif key == 'esc':
-        # return {'exit': True}
         return actions.ExitAction(prev_state=state)
 
     index = key_to_index(key)
 
     if index >= 0:
-        # return {'inv_index': index}
-
         if state == States.SHOW_INV:
             return actions.UseItemAction(inv_index=index)
 
         elif state == States.DROP_INV:
             return actions.DropItemAction(inv_index=index)
 
-    return {}
+    return None
 
 
 def handle_main_menu(state, key):
@@ -161,14 +134,13 @@ def handle_main_menu(state, key):
     elif key == 'q':
         return {'exit': True}
 
-    return {}
+    return None
 
 
 def handle_targeting_keys(state, key):
     # todo: Add ability to move a cursor to target.
 
     if key == 'esc':
-        # return {'exit': True}
         return actions.ExitAction(prev_state=state)
 
     return None
@@ -176,15 +148,10 @@ def handle_targeting_keys(state, key):
 
 def handle_lvl_up_menu(state, key):
     if key == 'c':                 # Constitution
-        # return {'lvl_up': 'hp'}
         return actions.LevelUpAction('hp')
-
     elif key == 's':               # Strength
-        # return {'lvl_up': 'str'}
         return actions.LevelUpAction('str')
-
     elif key == 'd':               # Defense
-        # return {'lvl_up': 'def'}
         return actions.LevelUpAction('def')
 
     return None
