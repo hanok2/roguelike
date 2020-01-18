@@ -83,7 +83,7 @@ def handle_hero_turn_keys(state, key):
         return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
 
     elif key == 'esc':
-        return actions.ExitAction(prev_state=state)
+        return actions.ExitAction(state=state)
 
     return None
 
@@ -99,7 +99,7 @@ def handle_hero_dead_keys(state, key):
         return actions.CharScreenAction(prev_state=state)
 
     elif key == 'esc':
-        return actions.ExitAction(prev_state=state)
+        return actions.ExitAction(state=state)
 
     return None
 
@@ -110,7 +110,7 @@ def handle_inv_keys(state, key):
         return actions.FullScreenAction()  # Alt+Enter: Toggle full screen
 
     elif key == 'esc':
-        return actions.ExitAction(prev_state=state)
+        return actions.ExitAction(state=state)
 
     index = key_to_index(key)
 
@@ -141,7 +141,7 @@ def handle_targeting_keys(state, key):
     # todo: Add ability to move a cursor to target.
 
     if key == 'esc':
-        return actions.ExitAction(prev_state=state)
+        return actions.ExitAction(state=state)
 
     return None
 
@@ -159,7 +159,7 @@ def handle_lvl_up_menu(state, key):
 
 def handle_char_scr(state, key):
     if key == 'esc':
-        return actions.ExitAction(prev_state=state)
+        return actions.ExitAction(state=state)
 
     return None
 

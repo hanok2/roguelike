@@ -248,19 +248,19 @@ class LevelUpAction(Action):
 
 
 class ExitAction(Action):
-    def __init__(self, prev_state):
+    def __init__(self, state):
         super().__init__(consumes_turn=False)
-        self.prev_state = prev_state
+        self.state = state
 
     def perform(self, *args, **kwargs):
-        state = kwargs['state']
+        prev_state = kwargs['prev_state']
 
-        if state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
-            self.results.append({'state': self.prev_state})
+        if self.state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
+            self.results.append({'state': prev_state})
 
-        elif state == States.TARGETING:
+        elif self.state == States.TARGETING:
             self.results.append({
-                'state': self.prev_state,
+                'state': prev_state,
                 'cancel_target': True,
                 'msg': 'Targeting cancelled.',
             })

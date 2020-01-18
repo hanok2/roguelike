@@ -188,22 +188,29 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         action = handle_keys(state, key_char)
         mouse_action = handle_mouse(mouse)
 
-        # Perform action
-        action.perform(
-            state=state,
-            prev_state=prev_state,
-            dungeon=dungeon,
-            stage=stage,
-            fov_map=fov_map,
-            hero=hero,     # todo: consolidate to entity
-            entity=hero,
-            targeting_item=targeting_item,
-        )
+        hero_turn_results = []
 
-        hero_turn_results = action.results
+        if action:
+            # Perform action
+            action.perform(
+                state=state,
+                prev_state=prev_state,
+                dungeon=dungeon,
+                stage=stage,
+                fov_map=fov_map,
+                hero=hero,     # todo: consolidate to entity
+                entity=hero,
+                targeting_item=targeting_item,
+            )
+
+            hero_turn_results = action.results
 
         # Process hero results
         for result in hero_turn_results:
+            new_state = result.get('state')
+
+            fov_recompute = result.get('fov_recompute')
+
             msg = result.get('msg')
             dead_entity = result.get('dead')
             item_added = result.get('item_added')
@@ -211,9 +218,17 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             item_dropped = result.get('item_dropped')
             equip = result.get('equip')
             targeting = result.get('targeting')
+
             cancel_target = result.get('cancel_target')
             cancel_inv = result.get('cancel_inv')
+
             xp = result.get('xp')
+
+            if new_state:
+                state = new_state
+
+            if fov_recompute:
+                fov_recompute = True
 
             if msg:
                 log.debug('msg: {}.'.format(msg))

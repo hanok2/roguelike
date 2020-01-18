@@ -434,46 +434,48 @@ def test_LevelUpAction__boost_defense(hero):
 
 
 def test_ExitAction__init():
-    state = config.States.HERO_TURN
+    state = config.States.SHOW_INV
     exit_action = actions.ExitAction(state)
+
     assert isinstance(exit_action, actions.Action)
     assert exit_action.consumes_turn is False
     assert exit_action.results == []
 
 
-def test_ExitAction__state_is_SHOW_INV():
-    prev_state = config.States.HERO_TURN
-    exit_action = actions.ExitAction(prev_state)
-
+def test_ExitAction__SHOW_INV_returns_to_HERO_TURN():
     state = config.States.SHOW_INV
-    exit_action.perform(state=state)
+    exit_action = actions.ExitAction(state)
+
+    prev_state = config.States.HERO_TURN
+    exit_action.perform(prev_state=prev_state)
     assert exit_action.results == [{'state': prev_state}]
 
 
-def test_ExitAction__state_is_DROP_INV():
-    prev_state = config.States.HERO_TURN
-    exit_action = actions.ExitAction(prev_state)
-
+def test_ExitAction__DROP_INV_returns_to_HERO_TURN():
     state = config.States.DROP_INV
-    exit_action.perform(state=state)
+    exit_action = actions.ExitAction(state)
+
+    prev_state = config.States.HERO_TURN
+    exit_action.perform(prev_state=prev_state)
     assert exit_action.results == [{'state': prev_state}]
 
 
-def test_ExitAction__state_is_SHOW_STATS():
-    prev_state = config.States.HERO_TURN
-    exit_action = actions.ExitAction(prev_state)
-
+def test_ExitAction__SHOW_STATS_returns_to_HERO_TURN():
     state = config.States.SHOW_STATS
-    exit_action.perform(state=state)
+    exit_action = actions.ExitAction(state)
+
+    prev_state = config.States.HERO_TURN
+    exit_action.perform(prev_state=prev_state)
     assert exit_action.results == [{'state': prev_state}]
 
 
-def test_ExitAction__state_is_TARGETING():
-    prev_state = config.States.HERO_TURN
-    exit_action = actions.ExitAction(prev_state)
-
+def test_ExitAction__TARGETING_returns_to_HERO_TURN():
     state = config.States.TARGETING
-    exit_action.perform(state=state)
+    exit_action = actions.ExitAction(state)
+
+    prev_state = config.States.HERO_TURN
+    exit_action.perform(prev_state=prev_state)
+
     assert exit_action.results == [{
         'state': prev_state,
         'cancel_target': True,
@@ -481,13 +483,13 @@ def test_ExitAction__state_is_TARGETING():
     }]
 
 
-def test_ExitAction__state_is_HERO_TURN():
-    prev_state = config.States.HERO_TURN
-    exit_action = actions.ExitAction(prev_state)
+def test_ExitAction__HERO_TURN_returns_to_MAIN_MENU():
+    state = config.States.HERO_TURN
+    exit_action = actions.ExitAction(state)
 
-    state = config.States.MAIN_MENU
-    exit_action.perform(state=state)
-    assert exit_action.results == [{'state': state}]
+    prev_state = config.States.MAIN_MENU
+    exit_action.perform(prev_state=prev_state)
+    assert exit_action.results == [{'state': prev_state}]
 
 
 """ Tests for FullScreenAction """
