@@ -309,10 +309,10 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
             log.debug('msg: {}.'.format(msg))
             msg_log.add(msg)
 
-        if cancel_target:
-            log.debug('Targeting cancelled.')
-            state = prev_state
-            msg_log.add('Targeting cancelled.')
+        # if cancel_target:
+            # log.debug('Targeting cancelled.')
+            # state = prev_state
+            # msg_log.add('Targeting cancelled.')
 
         if cancel_inv:
             log.debug('Inventory menu cancelled')
@@ -351,6 +351,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
             log.debug('Targeting.')
             # Set to HERO_TURN so that if cancelled, we don't go back to inv.
             prev_state = States.HERO_TURN
+
             state = States.TARGETING
             targeting_item = targeting
             msg_log.add(targeting_item.item.targeting_msg)

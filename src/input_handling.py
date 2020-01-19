@@ -230,7 +230,7 @@ def handle_mouse(state, mouse):
         if mouse.lbutton_pressed:
             return actions.TargetAction(x, y, lclick=True)
         elif mouse.rbutton_pressed:
-            return actions.TargetAction(x, y, rclick=True)
+            return actions.ExitAction(state=state)
 
         # elif mouse.mbutton_pressed:
             # return {'m_click': (x, y)}
