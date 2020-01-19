@@ -182,7 +182,7 @@ def play_game(g, render_eng):
 
         if action:
             # Go with keyboard action
-            process_action(action, g)
+            process_action(action, g.hero, g)
 
         if g.state == States.MAIN_MENU:
             g.redraw = True
@@ -235,7 +235,7 @@ def play_game(g, render_eng):
         # check_for_quit()
 
 
-def process_action(action, g):
+def process_action(action, entity, g):
     log.debug('process_action: {} - State: {}'.format(action, g.state))
     hero_turn_results = []
 
@@ -245,8 +245,7 @@ def process_action(action, g):
         dungeon=g.dungeon,
         stage=g.stage,
         fov_map=g.fov_map,
-        hero=g.hero,     # todo: consolidate to entity
-        entity=g.hero,
+        entity=entity,
         targeting_item=g.targeting_item,
     )
 

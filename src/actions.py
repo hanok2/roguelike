@@ -111,14 +111,14 @@ class WaitAction(Action):
 class PickupAction(Action):
     def perform(self, *args, **kwargs):
         stage = kwargs['stage']
-        hero = kwargs['hero']
+        entity = kwargs['entity']
 
         # todo: Move this functionality to stage....
-        for entity in stage.entities:
-            item_pos_at_our_pos = entity.x == hero.x and entity.y == hero.y
+        for e in stage.entities:
+            item_pos_at_our_pos = e.x == entity.x and e.y == entity.y
 
-            if entity.has_comp('item') and item_pos_at_our_pos:
-                self.results.extend(hero.inv.add_item(entity))
+            if e.has_comp('item') and item_pos_at_our_pos:
+                self.results.extend(entity.inv.add_item(e))
                 break
 
         else:
@@ -133,17 +133,17 @@ class UseItemAction(Action):
     def perform(self, *args, **kwargs):
         stage = kwargs['stage']
         fov_map = kwargs['fov_map']
-        hero = kwargs['hero']
+        entity = kwargs['entity']
         prev_state = kwargs['prev_state']
 
         # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
 
-        item = hero.inv.items[self.inv_index]
+        item = entity.inv.items[self.inv_index]
 
         self.results.extend(
-            hero.inv.use(item, entities=stage.entities, fov_map=fov_map)
+            entity.inv.use(item, entities=stage.entities, fov_map=fov_map)
         )
 
 
@@ -153,28 +153,28 @@ class DropItemAction(Action):
         self.inv_index = inv_index
 
     def perform(self, *args, **kwargs):
-        hero = kwargs['hero']
+        entity = kwargs['entity']
         prev_state = kwargs['prev_state']
 
         # Check this in the input handler??
         if prev_state == States.HERO_DEAD:
             return
 
-        item = hero.inv.items[self.inv_index]
+        item = entity.inv.items[self.inv_index]
 
-        self.results.extend(hero.inv.drop(item))
+        self.results.extend(entity.inv.drop(item))
 
 
 class StairUpAction(Action):
     def perform(self, *args, **kwargs):
         dungeon = kwargs['dungeon']
-        hero = kwargs['hero']
+        entity = kwargs['entity']
 
         stage = dungeon.get_stage()
 
         for entity in stage.entities:
             if entity.has_comp('stair_up'):
-                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                hero_at_stairs = entity.x == entity.x and entity.y == entity.y
                 if hero_at_stairs:
 
                     if dungeon.current_stage == 0:
@@ -201,12 +201,12 @@ class StairUpAction(Action):
 class StairDownAction(Action):
     def perform(self, *args, **kwargs):
         dungeon = kwargs['dungeon']
-        hero = kwargs['hero']
+        entity = kwargs['entity']
         stage = dungeon.get_stage()
 
         for entity in stage.entities:
             if entity.has_comp('stair_down'):
-                hero_at_stairs = entity.x == hero.x and entity.y == hero.y
+                hero_at_stairs = entity.x == entity.x and entity.y == entity.y
 
                 if hero_at_stairs:
                     dungeon.mk_next_stage()
@@ -305,7 +305,7 @@ class TargetAction(Action):
         self.rclick = rclick
 
     def perform(self, *args, **kwargs):
-        hero = kwargs['hero']
+        entity = kwargs['entity']
         targeting_item = kwargs['targeting_item']
         stage = kwargs['stage']
         fov_map = kwargs['fov_map']
@@ -316,7 +316,7 @@ class TargetAction(Action):
 
             # todo: Replace with UseItemAction?
 
-            item_use_results = hero.inv.use(
+            item_use_results = entity.inv.use(
                 targeting_item,
                 entities=stage.entities,
                 fov_map=fov_map,

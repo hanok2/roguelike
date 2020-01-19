@@ -190,7 +190,7 @@ def test_PickupAction__item(walk_map, hero):
     hero.x, hero.y = 1, 0   # Move the player to the same tile as the potion
     walk_map.entities.append(hero)
     pickup = actions.PickupAction()
-    pickup.perform(stage=walk_map, hero=hero)
+    pickup.perform(stage=walk_map, entity=hero)
 
     # todo: Fix this later - use a Stage.get_entities function instead
     potion = walk_map.entities[0]
@@ -205,7 +205,7 @@ def test_PickupAction__multiple_items(walk_map, hero):
     # Add another potion to the same tile
     walk_map.entities.append(factory.mk_entity('healing_potion', 1, 0))
     pickup = actions.PickupAction()
-    pickup.perform(stage=walk_map, hero=hero)
+    pickup.perform(stage=walk_map, entity=hero)
 
     # pickup.results[0] = {'item_added': None, 'msg': INV_FULL_MSG}
     assert pickup.results == 'pickup menu'
@@ -214,7 +214,7 @@ def test_PickupAction__multiple_items(walk_map, hero):
 def test_PickupAction__no_items_at_entity_location(walk_map, hero):
     walk_map.entities.append(hero)
     pickup = actions.PickupAction()
-    pickup.perform(stage=walk_map, hero=hero)
+    pickup.perform(stage=walk_map, entity=hero)
 
     assert pickup.results == [{'msg': 'There is nothing here to pick up.'}]
 
@@ -236,7 +236,7 @@ def test_UseItemAction__valid_item(walk_map, hero):
     use.perform(
         stage=walk_map,
         fov_map=None,
-        hero=hero,
+        entity=hero,
         prev_state=None
     )
     assert use.results == [{
@@ -251,7 +251,7 @@ def test_UseItemAction__hero_is_dead(walk_map, hero):
     use.perform(
         stage=walk_map,
         fov_map=None,
-        hero=hero,
+        entity=hero,
         prev_state=config.States.HERO_DEAD
     )
     assert use.results == []
@@ -263,7 +263,7 @@ def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
         use.perform(
             stage=walk_map,
             fov_map=None,
-            hero=hero,
+            entity=hero,
             prev_state=config.States.HERO_TURN
         )
 
@@ -282,7 +282,7 @@ def test_DropItemAction__hero_is_dead(walk_map, hero):
     drop = actions.DropItemAction(inv_index=0)
     drop.perform(
         stage=walk_map,
-        hero=hero,
+        entity=hero,
         prev_state=config.States.HERO_DEAD
     )
     assert drop.results == []
@@ -295,7 +295,7 @@ def test_DropItemAction__valid_item(walk_map, hero):
     drop = actions.DropItemAction(inv_index=0)  # Assume potion is at index 0
     drop.perform(
         stage=walk_map,
-        hero=hero,
+        entity=hero,
         prev_state=None
     )
     assert drop.results == [{
@@ -309,7 +309,7 @@ def test_DropItemAction__inv_index_out_of_bounds(walk_map, hero):
     with pytest.raises(IndexError):
         drop.perform(
             stage=walk_map,
-            hero=hero,
+            entity=hero,
             prev_state=config.States.HERO_TURN
         )
 
@@ -332,7 +332,7 @@ def test_StairUpAction__not_at_stairs(hero):
     stage.entities.remove(stage.find_stair('<'))
 
     stairup = actions.StairUpAction()
-    stairup.perform(dungeon=d, hero=hero)
+    stairup.perform(dungeon=d, entity=hero)
     assert stairup.results == [{
         'msg': 'There are no stairs here.'
     }]
@@ -341,7 +341,7 @@ def test_StairUpAction__not_at_stairs(hero):
 def test_StairUpAction__top_stage__leaves_game(hero):
     d = dungeon.Dungeon(hero)
     stairup = actions.StairUpAction()
-    stairup.perform(dungeon=d, hero=hero)
+    stairup.perform(dungeon=d, entity=hero)
     assert stairup.results == [{
         'msg': 'You go up the stairs and leave the dungeon forever...',
         'state': config.States.HERO_DEAD
@@ -357,7 +357,7 @@ def test_StairUpAction__success_on_lower_level(hero):
     d.move_hero(1, s.x, s.y)
 
     stairup = actions.StairUpAction()
-    stairup.perform(dungeon=d, hero=hero)
+    stairup.perform(dungeon=d, entity=hero)
 
     assert stairup.results == [{
         'msg': 'You ascend the stairs up.',
@@ -383,7 +383,7 @@ def test_StairDownAction__not_at_stairs(hero):
     stage.entities.remove(stage.find_stair('>'))
 
     stairdown = actions.StairDownAction()
-    stairdown.perform(dungeon=d, hero=hero)
+    stairdown.perform(dungeon=d, entity=hero)
     assert stairdown.results == [{
         'msg': 'There are no stairs here.'
     }]
@@ -398,7 +398,7 @@ def test_StairDownAction__next_stage_DNE(hero):
 
     # Find the stairs down and put the hero there for testing
     stairdown = actions.StairDownAction()
-    stairdown.perform(dungeon=d, hero=hero)
+    stairdown.perform(dungeon=d, entity=hero)
 
     assert len(d.stages) == prev_stages + 1
 
@@ -414,7 +414,7 @@ def test_StairDownAction__next_stage_exists(hero):
 
     # Find the stairs down and put the hero there for testing
     stairdown = actions.StairDownAction()
-    stairdown.perform(dungeon=d, hero=hero)
+    stairdown.perform(dungeon=d, entity=hero)
 
     assert stairdown.results == [{
         'msg': 'You carefully descend the stairs down.',
