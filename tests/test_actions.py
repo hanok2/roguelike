@@ -335,8 +335,7 @@ def test_StairUpAction__success_on_lower_level(hero):
 
     assert stairup.results == [{
         'msg': 'You ascend the stairs up.',
-        'recompute_fov': True,
-        'reset_rendering': True
+        'redraw': True,
     }]
 
 
@@ -393,8 +392,7 @@ def test_StairDownAction__next_stage_exists(hero):
 
     assert stairdown.results == [{
         'msg': 'You carefully descend the stairs down.',
-        'recompute_fov': True,
-        'reset_rendering': True
+        'redraw': True,
     }]
 
 

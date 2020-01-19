@@ -179,8 +179,7 @@ class StairUpAction(Action):
                         stage = dungeon.get_stage()
                         self.results.append({
                             'msg': 'You ascend the stairs up.',
-                            'recompute_fov': True,
-                            'reset_rendering': True
+                            'redraw': True
                         })
                         break
                     else:
@@ -209,8 +208,7 @@ class StairDownAction(Action):
 
                         self.results.append({
                             'msg': 'You carefully descend the stairs down.',
-                            'recompute_fov': True,
-                            'reset_rendering': True
+                            'redraw': True
                         })
                         break
                     else:

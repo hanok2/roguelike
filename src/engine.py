@@ -113,6 +113,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
     stage = dungeon.get_stage()
 
     fov_recompute = True
+    redraw = False
 
     # Initialize fov
     fov_map = initialize_fov(stage)
@@ -135,6 +136,17 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
     log.debug('Entering game loop...')
     while True:
+        if redraw:
+            # Reset the stage
+            stage = dungeon.get_stage()
+
+            fov_map = initialize_fov(stage)
+            fov_recompute = True
+            render_eng.con.clear()
+            # libtcod.console_clear(con)
+            redraw = False
+
+
         if fov_recompute:
             log.debug('fov_recompute...')
             recompute_fov(
@@ -205,7 +217,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         if action:
             # Go with keyboard action
-            next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
+            next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
 
 
         if state == States.MAIN_MENU:
@@ -258,6 +270,7 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
 def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log):
     next_action = None
+    redraw = False
     hero_turn_results = []
 
     # Perform action
@@ -284,6 +297,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
         attack = result.get('attack')
         new_state = result.get('state')
         fov_recompute = result.get('fov_recompute')
+        redraw = result.get('redraw')
         msg = result.get('msg')
         dead_entity = result.get('dead')
         item_added = result.get('item_added')
@@ -304,6 +318,9 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
 
         if fov_recompute:
             fov_recompute = True
+
+        if redraw:
+            redraw = True
 
         if msg:
             log.debug('msg: {}.'.format(msg))
@@ -378,7 +395,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
             state = States.WORLD_TURN
 
 
-    return next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log
+    return next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw
 
 
 def check_for_quit():
