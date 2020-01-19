@@ -269,6 +269,8 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
 
 def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log):
+    log.debug('process_action: {} - State: {}'.format(action, state))
+
     next_action = None
     redraw = False
     hero_turn_results = []
@@ -343,7 +345,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
             if leveled_up:
                 log.debug('Hero level up.')
                 msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
-                prev_state = state
+                prev_state = state  # Should be WORLD_TURN
                 state = States.LEVEL_UP
 
         if dead_entity:
@@ -368,8 +370,8 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
             log.debug('Targeting.')
             # Set to HERO_TURN so that if cancelled, we don't go back to inv.
             prev_state = States.HERO_TURN
-
             state = States.TARGETING
+
             targeting_item = targeting
             msg_log.add(targeting_item.item.targeting_msg)
 
@@ -393,6 +395,7 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
                     msg_log.add('You dequipped the {}'.format(dequipped.name))
 
             state = States.WORLD_TURN
+
 
 
     return next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw

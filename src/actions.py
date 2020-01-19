@@ -244,6 +244,8 @@ class LevelUpAction(Action):
             entity.fighter.base_defense += 1
             self.results.append({'msg': 'Boosted defense!'})
 
+        # Just go back to HERO_TURN by default.
+        # self.results.append({'state': States.HERO_TURN})
         self.results.append({'state': prev_state})
 
 
