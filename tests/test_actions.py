@@ -27,6 +27,32 @@ def walk_map():
     return m
 
 
+""" Tests for ActionResult """
+
+
+def test_ActionResult__action_succeeded():
+    ar = actions.ActionResult(success=True)
+    assert ar.success
+    assert ar.alternative is None
+
+
+def test_ActionResult__action_failed():
+    ar = actions.ActionResult(success=False)
+    assert ar.success is False
+    assert ar.alternative is None
+
+
+def test_ActionResult__action_alternative():
+    ar = actions.ActionResult(alternative=actions.WaitAction())
+    assert ar.success is False
+    assert isinstance(ar.alternative, actions.WaitAction)
+
+
+def test_ActionResult__success_True_and_alterative_raises_exception():
+    with pytest.raises(ValueError):
+        actions.ActionResult(success=True, alternative=actions.WaitAction())
+
+
 """ Tests for WalkAction """
 
 

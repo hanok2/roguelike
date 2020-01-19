@@ -20,6 +20,15 @@ class Action(ABC):
         pass
 
 
+class ActionResult(object):
+    def __init__(self, success=False, alternative=None):
+        if success and alternative:
+            raise ValueError('ActionResult cannot have succeeded and provide an alternative Action!')
+
+        self.success = success
+        self.alternative = alternative
+
+
 class WalkAction(Action):
     def __init__(self, dx, dy):
         super().__init__(consumes_turn=True)
