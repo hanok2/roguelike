@@ -78,6 +78,7 @@ def main():
                 log.debug('Load game selected.')
                 try:
                     dungeon, msg_log, state, turns = load_game(config.savefile)
+                    state = States.HERO_TURN
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_err_msg = True
