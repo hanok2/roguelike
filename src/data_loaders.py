@@ -16,19 +16,13 @@ import shelve
 # read the shelf files produced by later versions of Python running your game script.
 
 
-def save_game(filepath, dungeon, msg_log, state, turns):
+def save_game(filepath, game):
     with shelve.open(filepath, 'n') as data_file:
-        data_file['dungeon'] = dungeon
-        data_file['msg_log'] = msg_log
-        data_file['state'] = state
-        data_file['turns'] = turns
+        data_file['game'] = game
 
 
 def load_game(filepath):
     with shelve.open(filepath, 'r') as data_file:
-        dungeon = data_file['dungeon']
-        msg_log = data_file['msg_log']
-        state = data_file['state']
-        turns = data_file['turns']
+        game = data_file['game']
 
-    return dungeon, msg_log, state, turns
+    return game

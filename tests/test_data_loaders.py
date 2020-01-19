@@ -9,13 +9,14 @@ TEMP_FILE = TEMP_DIR + '/savegame.dat'
 
 
 def test_save_game():
-    dungeon, msg_log, state, turns = game.get_game_data()
+    g = game.Game()
+    # dungeon, msg_log, state, turns = game.get_game_data()
 
     # Check if temp dir exists
     if not os.path.exists(TEMP_DIR):
         os.mkdir(TEMP_DIR)
 
-    data_loaders.save_game(TEMP_FILE, dungeon, msg_log, state, turns)
+    data_loaders.save_game(TEMP_FILE, g)
 
     assert os.path.exists(TEMP_FILE)
 
@@ -25,11 +26,10 @@ def test_save_game():
 
 def test_save_game__calls_shelve(mocker):
     mocker.patch('shelve.open')
-    data_loaders.save_game(TEMP_FILE, dungeon=None, msg_log=None, state=None, turns=0)
+    data_loaders.save_game(TEMP_FILE, game=None)
 
     shelve.open.assert_called_once()
     shelve.open.assert_called_with(TEMP_FILE, 'n')
-
 
 
 def test_load_game__calls_shelve(mocker):

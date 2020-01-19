@@ -16,12 +16,9 @@ def main():
     log.debug('Started new game.')
 
     render_eng = render_functions.RenderEngine()
-
     show_main_menu = True
     show_load_err_msg = False
-
     main_menu_bg_img = tcod.image_load(filename=config.menu_img)
-
     key = tcod.Key()
     mouse = tcod.Mouse()
 
@@ -64,20 +61,14 @@ def main():
                 show_load_err_msg = False
             elif new_game:
                 log.debug('New game selected.')
-
-                # dungeon, msg_log, state, turns = game.get_game_data()
                 _game = game.Game()
 
-                # state = States.HERO_TURN
                 show_main_menu = False
 
             elif load_saved_game:
                 log.debug('Load game selected.')
                 try:
-                    # dungeon, msg_log, state, turns = load_game(config.savefile)
                     _game = load_game(config.savefile)
-
-                    # state = States.HERO_TURN
 
                     show_main_menu = False
                 except FileNotFoundError:
@@ -92,13 +83,10 @@ def main():
                 break
         else:
             # Reset a console to its default colors and the space character.
-
             render_eng.con.clear()
 
             play_game(_game, render_eng)
             show_main_menu = True
-
-        # check_for_quit()
 
 
 def play_game(g, render_eng):
@@ -107,12 +95,11 @@ def play_game(g, render_eng):
     key = tcod.Key()
     mouse = tcod.Mouse()
 
-    # Game loop
-
     # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
     # while not tcod.console_is_window_closed():
 
     log.debug('Entering game loop...')
+    # Game loop
     while True:
         if g.redraw:
             # Reset the stage
@@ -195,12 +182,12 @@ def play_game(g, render_eng):
 
         if action:
             # Go with keyboard action
-            # next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
-
             process_action(action, g)
 
 
         if g.state == States.MAIN_MENU:
+            g.redraw = True
+            g.state = States.HERO_TURN
             save_game(config.savefile, g)
             return
 
@@ -208,6 +195,7 @@ def play_game(g, render_eng):
 
         if g.state == States.WORLD_TURN:
             log.debug('Turn: {}'.format(g.turns))
+
             # Increment turn counter
             # This *may* go elsewhere, but we'll try it here first.
             g.turns += 1
@@ -250,10 +238,8 @@ def play_game(g, render_eng):
 
 def process_action(action, g):
     log.debug('process_action: {} - State: {}'.format(action, g.state))
-
     hero_turn_results = []
 
-    # Perform action
     action.perform(
         state=g.state,
         prev_state=g.prev_state,
@@ -271,7 +257,6 @@ def process_action(action, g):
     if action.consumes_turn:
         g.state = States.WORLD_TURN
 
-    # Process hero results
     for result in hero_turn_results:
         alternate = result.get('alternate')
         attack = result.get('attack')
@@ -376,8 +361,6 @@ def process_action(action, g):
 
 
 def check_for_quit():
-    # Check for quitting
-
     # AttributeError: module 'tcod' has no attribute 'event'
     for event in tcod.event.get():
         if event.type == "QUIT":
