@@ -1,6 +1,6 @@
 import tcod
 from . import config
-from . import game_init
+from . import game
 from . import logger
 from . import render_functions
 from .config import States
@@ -70,7 +70,7 @@ def main():
                 show_load_err_msg = False
             elif new_game:
                 log.debug('New game selected.')
-                dungeon, msg_log, state, turns = game_init.get_game_data()
+                dungeon, msg_log, state, turns = game.get_game_data()
                 state = States.HERO_TURN
                 show_main_menu = False
 

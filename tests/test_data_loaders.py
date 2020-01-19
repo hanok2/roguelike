@@ -2,14 +2,14 @@ import os
 import shelve
 from pytest_mock import mocker
 from ..src import data_loaders
-from ..src import game_init
+from ..src import game
 
 TEMP_DIR = 'temp'
 TEMP_FILE = TEMP_DIR + '/savegame.dat'
 
 
 def test_save_game():
-    dungeon, msg_log, state, turns = game_init.get_game_data()
+    dungeon, msg_log, state, turns = game.get_game_data()
 
     # Check if temp dir exists
     if not os.path.exists(TEMP_DIR):
