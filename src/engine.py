@@ -184,7 +184,6 @@ def play_game(g, render_eng):
             # Go with keyboard action
             process_action(action, g)
 
-
         if g.state == States.MAIN_MENU:
             g.redraw = True
             g.state = States.HERO_TURN
@@ -259,7 +258,6 @@ def process_action(action, g):
 
     for result in hero_turn_results:
         alternate = result.get('alternate')
-        attack = result.get('attack')
         new_state = result.get('state')
         fov_recompute = result.get('fov_recompute')
         redraw = result.get('redraw')
@@ -270,7 +268,6 @@ def process_action(action, g):
         item_dropped = result.get('item_dropped')
         equip = result.get('equip')
         targeting = result.get('targeting')
-        cancel_target = result.get('cancel_target')
         cancel_inv = result.get('cancel_inv')
 
         xp = result.get('xp')
@@ -290,11 +287,6 @@ def process_action(action, g):
         if msg:
             log.debug('msg: {}.'.format(msg))
             g.msg_log.add(msg)
-
-        # if cancel_target:
-            # log.debug('Targeting cancelled.')
-            # state = prev_state
-            # msg_log.add('Targeting cancelled.')
 
         if cancel_inv:
             log.debug('Inventory menu cancelled')
