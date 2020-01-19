@@ -23,7 +23,11 @@ class Game(object):
         self.state = config.States.HERO_TURN
         self.prev_state = self.state
         self.turns = 0
+
+        # Keep track of any targeting items that were selected.
         self.targeting_item = None
+
+        # Keep track of any alternate Actions
         self.next_action = None
 
         self.fov_recompute = True

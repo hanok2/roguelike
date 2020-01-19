@@ -17,12 +17,6 @@ def main():
 
     render_eng = render_functions.RenderEngine()
 
-    # Initialize game data
-    dungeon = None
-    msg_log = None
-    state = None
-    turns = 0
-
     show_main_menu = True
     show_load_err_msg = False
 
@@ -70,15 +64,21 @@ def main():
                 show_load_err_msg = False
             elif new_game:
                 log.debug('New game selected.')
-                dungeon, msg_log, state, turns = game.get_game_data()
-                state = States.HERO_TURN
+
+                # dungeon, msg_log, state, turns = game.get_game_data()
+                _game = game.Game()
+
+                # state = States.HERO_TURN
                 show_main_menu = False
 
             elif load_saved_game:
                 log.debug('Load game selected.')
                 try:
-                    dungeon, msg_log, state, turns = load_game(config.savefile)
-                    state = States.HERO_TURN
+                    # dungeon, msg_log, state, turns = load_game(config.savefile)
+                    _game = load_game(config.savefile)
+
+                    # state = States.HERO_TURN
+
                     show_main_menu = False
                 except FileNotFoundError:
                     show_load_err_msg = True
@@ -95,39 +95,17 @@ def main():
 
             render_eng.con.clear()
 
-            play_game(
-                dungeon,
-                msg_log,
-                state,
-                turns,
-                render_eng
-            )
+            play_game(_game, render_eng)
             show_main_menu = True
 
         # check_for_quit()
 
 
-def play_game(dungeon, msg_log, state, turns, render_eng):
+def play_game(g, render_eng):
     log.debug('Calling play_game...')
-    hero = dungeon.hero
-    stage = dungeon.get_stage()
-
-    fov_recompute = True
-    redraw = False
-
-    # Initialize fov
-    fov_map = initialize_fov(stage)
 
     key = tcod.Key()
     mouse = tcod.Mouse()
-
-    prev_state = state
-
-    # Keep track of any targeting items that were selected.
-    targeting_item = None
-
-    # Keep track of any alternate Actions
-    next_action = None
 
     # Game loop
 
@@ -136,23 +114,23 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
     log.debug('Entering game loop...')
     while True:
-        if redraw:
+        if g.redraw:
             # Reset the stage
-            stage = dungeon.get_stage()
+            g.stage = g.dungeon.get_stage()
 
-            fov_map = initialize_fov(stage)
-            fov_recompute = True
+            g.fov_map = initialize_fov(g.stage)
+            g.fov_recompute = True
             render_eng.con.clear()
             # libtcod.console_clear(con)
-            redraw = False
+            g.redraw = False
 
 
-        if fov_recompute:
+        if g.fov_recompute:
             log.debug('fov_recompute...')
             recompute_fov(
-                fov_map,
-                hero.x,
-                hero.y,
+                g.fov_map,
+                g.hero.x,
+                g.hero.y,
                 config.fov_radius,
                 config.fov_light_walls,
                 config.fov_algorithm
@@ -160,22 +138,22 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         # Render all entities
         render_eng.render_all(
-            dungeon,
-            fov_map,
-            fov_recompute,
-            msg_log,
+            g.dungeon,
+            g.fov_map,
+            g.fov_recompute,
+            g.msg_log,
             mouse,
-            state,
-            turns
+            g.state,
+            g.turns
         )
 
-        fov_recompute = False       # Mandatory
+        g.fov_recompute = False       # Mandatory
 
         # Presents everything on screen
         tcod.console_flush()
 
         # Clear all entities
-        render_eng.clear_all(stage.entities)
+        render_eng.clear_all(g.stage.entities)
 
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
@@ -192,9 +170,9 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
         # Flush True: returns just this
         # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
 
-        if next_action:
-            action = next_action
-            next_action = None
+        if g.next_action:
+            action = g.next_action
+            g.next_action = None
 
         else:
             tcod.sys_wait_for_event(
@@ -207,8 +185,8 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             # Get keyboard/mouse input
             key_char = process_tcod_input(key)
 
-            action = handle_keys(state, key_char)
-            mouse_action = handle_mouse(state, mouse)
+            action = handle_keys(g.state, key_char)
+            mouse_action = handle_mouse(g.state, mouse)
 
             if mouse_action:
                 # Mouse action will take priority over keys (for now)
@@ -217,28 +195,30 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
 
         if action:
             # Go with keyboard action
-            next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
+            # next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
+
+            process_action(action, g)
 
 
-        if state == States.MAIN_MENU:
-            save_game(config.savefile, dungeon, msg_log, state, turns)
+        if g.state == States.MAIN_MENU:
+            save_game(config.savefile, g)
             return
 
         # if mouse_action?
 
-        if state == States.WORLD_TURN:
-            log.debug('Turn: {}'.format(turns))
+        if g.state == States.WORLD_TURN:
+            log.debug('Turn: {}'.format(g.turns))
             # Increment turn counter
             # This *may* go elsewhere, but we'll try it here first.
-            turns += 1
+            g.turns += 1
 
-            for entity in stage.entities:
+            for entity in g.stage.entities:
 
                 if entity.has_comp('ai'):
                     turn_results = entity.ai.take_turn(
-                        hero,
-                        fov_map,
-                        stage,
+                        g.hero,
+                        g.fov_map,
+                        g.stage,
                     )
 
                     for result in turn_results:
@@ -246,52 +226,50 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
                         dead_entity = result.get('dead')
 
                         if msg:
-                            msg_log.add(msg)
+                            g.msg_log.add(msg)
 
                         if dead_entity:
-                            if dead_entity == hero:
-                                msg, state = kill_hero(dead_entity)
+                            if dead_entity == g.hero:
+                                msg, g.state = kill_hero(dead_entity)
                             else:
                                 msg = kill_monster(dead_entity)
 
-                            msg_log.add(msg)
+                            g.msg_log.add(msg)
 
-                            if state == States.HERO_DEAD:
+                            if g.state == States.HERO_DEAD:
                                 break
 
-                    if state == States.HERO_DEAD:
+                    if g.state == States.HERO_DEAD:
                         break
 
             else:
-                state = States.HERO_TURN
+                g.state = States.HERO_TURN
 
         # check_for_quit()
 
 
-def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log):
-    log.debug('process_action: {} - State: {}'.format(action, state))
+def process_action(action, g):
+    log.debug('process_action: {} - State: {}'.format(action, g.state))
 
-    next_action = None
-    redraw = False
     hero_turn_results = []
 
     # Perform action
     action.perform(
-        state=state,
-        prev_state=prev_state,
-        dungeon=dungeon,
-        stage=stage,
-        fov_map=fov_map,
-        hero=hero,     # todo: consolidate to entity
-        entity=hero,
-        targeting_item=targeting_item,
+        state=g.state,
+        prev_state=g.prev_state,
+        dungeon=g.dungeon,
+        stage=g.stage,
+        fov_map=g.fov_map,
+        hero=g.hero,     # todo: consolidate to entity
+        entity=g.hero,
+        targeting_item=g.targeting_item,
     )
 
     hero_turn_results = action.results
 
     # Increment turn if necessary
     if action.consumes_turn:
-        state = States.WORLD_TURN
+        g.state = States.WORLD_TURN
 
     # Process hero results
     for result in hero_turn_results:
@@ -313,20 +291,20 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
         xp = result.get('xp')
 
         if new_state:
-            state = new_state
+            g.state = new_state
 
         if alternate:
-            next_action = alternate
+            g.next_action = alternate
 
         if fov_recompute:
-            fov_recompute = True
+            g.fov_recompute = True
 
         if redraw:
-            redraw = True
+            g.redraw = True
 
         if msg:
             log.debug('msg: {}.'.format(msg))
-            msg_log.add(msg)
+            g.msg_log.add(msg)
 
         # if cancel_target:
             # log.debug('Targeting cancelled.')
@@ -335,70 +313,66 @@ def process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recom
 
         if cancel_inv:
             log.debug('Inventory menu cancelled')
-            state = prev_state
+            g.state = g.prev_state
 
         if xp:
             log.debug('Adding xp.')
-            leveled_up = hero.lvl.add_xp(xp)
+            leveled_up = g.hero.lvl.add_xp(xp)
 
             # next_action =
             if leveled_up:
                 log.debug('Hero level up.')
-                msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl))
-                prev_state = state  # Should be WORLD_TURN
-                state = States.LEVEL_UP
+                g.msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(g.hero.lvl.current_lvl))
+                g.prev_state = g.state  # Should be WORLD_TURN
+                g.state = States.LEVEL_UP
 
         if dead_entity:
             log.debug('Dead entity.')
-            if dead_entity == hero:
+            if dead_entity == g.hero:
                 msg, state = kill_hero(dead_entity)
             else:
                 msg = kill_monster(dead_entity)
 
-            msg_log.add(msg)
+            g.msg_log.add(msg)
 
         if item_added:
             log.debug('Item added.')
-            stage.entities.remove(item_added)
-            state = States.WORLD_TURN
+            g.stage.entities.remove(item_added)
+            g.state = States.WORLD_TURN
 
         if item_consumed:
             log.debug('Item consumed.')
-            state = States.WORLD_TURN
+            g.state = States.WORLD_TURN
 
         if targeting:
             log.debug('Targeting.')
             # Set to HERO_TURN so that if cancelled, we don't go back to inv.
-            prev_state = States.HERO_TURN
-            state = States.TARGETING
+            g.prev_state = States.HERO_TURN
+            g.state = States.TARGETING
 
-            targeting_item = targeting
-            msg_log.add(targeting_item.item.targeting_msg)
+            g.targeting_item = targeting
+            g.msg_log.add(g.targeting_item.item.targeting_msg)
 
         if item_dropped:
             log.debug('Item dropped.')
-            stage.entities.append(item_dropped)
-            state = States.WORLD_TURN
+            g.stage.entities.append(item_dropped)
+            g.state = States.WORLD_TURN
 
         if equip:
             log.debug('Equip.')
-            equip_results = hero.equipment.toggle_equip(equip)
+            equip_results = g.hero.equipment.toggle_equip(equip)
 
             for equip_result in equip_results:
                 equipped = equip_result.get('equipped')
                 dequipped = equip_result.get('dequipped')
 
                 if equipped:
-                    msg_log.add('You equipped the {}'.format(equipped.name))
+                    g.msg_log.add('You equipped the {}'.format(equipped.name))
 
                 if dequipped:
-                    msg_log.add('You dequipped the {}'.format(dequipped.name))
+                    g.msg_log.add('You dequipped the {}'.format(dequipped.name))
 
-            state = States.WORLD_TURN
-
-
-
-    return next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log, redraw
+            g.state = States.WORLD_TURN
 
 
 def check_for_quit():
