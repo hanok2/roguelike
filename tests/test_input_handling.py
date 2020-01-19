@@ -458,16 +458,13 @@ def test_handle_mouse__NOT_TARGETING_returns_None():
     assert result is None
 
 
-def test_handle_mouse__TARGETING_rclick_returns_TargetAction():
+def test_handle_mouse__TARGETING_rclick_returns_ExitAction():
     state = States.TARGETING
     rclick = tcod.Mouse(x=100, y=115, cx=11, cy=19, rbutton_pressed=True)
     result = input_handling.handle_mouse(state, rclick)
 
     # Test cx/cy because that is the cell the cursor is over in the console
-    assert isinstance(result, actions.TargetAction)
-    assert result.x == 11
-    assert result.y == 19
-    assert result.rclick
+    assert isinstance(result, actions.ExitAction)
 
 
 def test_handle_mouse__TARGETING_lclick_returns_TargetAction():
