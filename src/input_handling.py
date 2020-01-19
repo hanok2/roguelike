@@ -212,7 +212,7 @@ def process_tcod_input(key):
     return key_char
 
 
-def handle_mouse(mouse):
+def handle_mouse(state, mouse):
     """ Takes in the mouse object from tcod and returns appropriate info.
 
         x,y: Absolute position of the mouse cursor in pixels relative to the window
@@ -226,15 +226,17 @@ def handle_mouse(mouse):
     """
     (x, y) = (mouse.cx, mouse.cy)
 
-    if mouse.lbutton_pressed:
-        return {'l_click': (x, y)}
-    elif mouse.rbutton_pressed:
-        return {'r_click': (x, y)}
-    elif mouse.mbutton_pressed:
-        return {'m_click': (x, y)}
+    if state == States.TARGETING:
+        if mouse.lbutton_pressed:
+            return actions.TargetAction(x, y, lclick=True)
+        elif mouse.rbutton_pressed:
+            return actions.TargetAction(x, y, rclick=True)
 
-    return {}
+        # elif mouse.mbutton_pressed:
+            # return {'m_click': (x, y)}
+            # return {'m_click': (x, y)}
 
+    return None
 
 def key_to_index(key):
     # Convert the key pressed to an index. a is 0, b is 1, etc.

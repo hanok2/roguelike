@@ -195,9 +195,15 @@ def play_game(dungeon, msg_log, state, turns, render_eng):
             key_char = process_tcod_input(key)
 
             action = handle_keys(state, key_char)
-            mouse_action = handle_mouse(mouse)
+            mouse_action = handle_mouse(state, mouse)
+
+            if mouse_action:
+                # Mouse action will take priority over keys (for now)
+                log.debug('mouse_action: {}'.format(mouse_action))
+                action = mouse_action
 
         if action:
+            # Go with keyboard action
             next_action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log = process_action(action, state, prev_state, dungeon, stage, fov_map, fov_recompute, hero, targeting_item, msg_log)
 
 

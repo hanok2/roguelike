@@ -301,7 +301,7 @@ class TargetAction(Action):
         stage = kwargs['stage']
         fov_map = kwargs['fov_map']
 
-        if self.l_click:
+        if self.lclick:
             # note: Due to the message console - we have to offset the y.
             self.y -= config.msg_height
 
@@ -316,7 +316,7 @@ class TargetAction(Action):
             )
             self.results.extend(item_use_results)
 
-        elif self.r_click:
+        elif self.rclick:
             # todo: Replace with ExitAction?
             self.results.append({'cancel_target': True})
 

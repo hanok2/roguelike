@@ -451,28 +451,48 @@ def test_process_tcod_input__numpad9__returns_u():
 """ Tests for test_handle_mouse()"""
 
 
-def test_handle_mouse__rclick():
-    rclick = tcod.Mouse(x=202, y=116, cx=16, cy=9, rbutton_pressed=True)
-    result = input_handling.handle_mouse(rclick)
+def test_handle_mouse__NOT_TARGETING_returns_None():
+    state = States.HERO_TURN
+    rclick = tcod.Mouse(x=100, y=115, cx=11, cy=19, rbutton_pressed=True)
+    result = input_handling.handle_mouse(state, rclick)
+    assert result is None
+
+
+def test_handle_mouse__TARGETING_rclick_returns_TargetAction():
+    state = States.TARGETING
+    rclick = tcod.Mouse(x=100, y=115, cx=11, cy=19, rbutton_pressed=True)
+    result = input_handling.handle_mouse(state, rclick)
 
     # Test cx/cy because that is the cell the cursor is over in the console
-    assert result == {'r_click': (16, 9)}
+    assert isinstance(result, actions.TargetAction)
+    assert result.x == 11
+    assert result.y == 19
+    assert result.rclick
 
 
-def test_handle_mouse__lclick():
-    mclick = tcod.Mouse(x=202, y=116, cx=16, cy=9, lbutton_pressed=True)
-    result = input_handling.handle_mouse(mclick)
-
-    # Test cx/cy because that is the cell the cursor is over in the console
-    assert result == {'l_click': (16, 9)}
-
-
-def test_handle_mouse__mclick():
-    mclick = tcod.Mouse(x=191, y=102, cx=15, cy=8, mbutton_pressed=True)
-    result = input_handling.handle_mouse(mclick)
+def test_handle_mouse__TARGETING_lclick_returns_TargetAction():
+    state = States.TARGETING
+    mclick = tcod.Mouse(x=200, y=311, cx=16, cy=9, lbutton_pressed=True)
+    result = input_handling.handle_mouse(state, mclick)
 
     # Test cx/cy because that is the cell the cursor is over in the console
-    assert result == {'m_click': (15, 8)}
+    assert isinstance(result, actions.TargetAction)
+    assert result.x == 16
+    assert result.y == 9
+    assert result.lclick
+
+
+@pytest.mark.skip(reason='Middle button click not implemented yet.')
+def test_handle_mouse__TARGETING_mclick_returns_TargetAction():
+    state = States.TARGETING
+    mclick = tcod.Mouse(x=50, y=22, cx=44, cy=2, lbutton_pressed=True)
+    result = input_handling.handle_mouse(state, mclick)
+
+    # Test cx/cy because that is the cell the cursor is over in the console
+    assert isinstance(result, actions.TargetAction)
+    assert result.x == 44
+    assert result.y == 2
+    assert result.mclick
 
 
 """ Tests for key_to_index """
