@@ -240,7 +240,6 @@ def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
     hero.inv.add_item(shield)
 
     use = actions.UseItemAction(inv_index=0)  # Assume shield is at index 0
-
     use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
 
     # assert use.results == [{'alternate': actions.EquipAction}]
@@ -284,6 +283,57 @@ def test_UseItemAction__invalid_item(walk_map, hero):
 
 
 # Use the item - was it consumed?
+
+
+""" Tests for EquipAction """
+
+
+def test_EquipAction__init(hero):
+    use = actions.EquipAction(e=hero, item=None)
+    assert isinstance(use, actions.Action)
+    assert use.consumes_turn
+    assert use.results == []
+
+
+def test_EquipAction__non_equippable_item(hero):
+    potion = factory.mk_entity('healing_potion', 1, 0)
+    hero.inv.add_item(potion)
+
+    use = actions.EquipAction(e=hero, item=potion)  # Assume shield is at index 0
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    # assert use.results[0]['equipped'] is False
+    assert use.results == [{'msg': 'You cannot equip the {}'.format(potion.name)}]
+
+
+def test_EquipAction__already_equipped__dequips_item(hero):
+    shield = factory.mk_entity('shield', 1, 0)
+    hero.inv.add_item(shield)
+    hero.equipment.toggle_equip(shield)  # Equip the thing
+
+    use = actions.EquipAction(e=hero, item=shield)  # Assume shield is at index 0
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    assert use.results == [
+        # {'dequipped': shield},
+        {'msg': 'You dequipped the {}'.format(shield.name)}
+    ]
+
+
+def test_EquipAction__not_equipped__equips_item(hero):
+    shield = factory.mk_entity('shield', 1, 0)
+    hero.inv.add_item(shield)
+
+    use = actions.EquipAction(e=hero, item=shield)  # Assume shield is at index 0
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    assert use.results == [
+        # {'equipped': shield},
+        {'msg': 'You equipped the {}'.format(shield.name)}
+    ]
+
+""" Tests for class GetTargetAction """
+
 
 
 """ Tests for DropItemAction """

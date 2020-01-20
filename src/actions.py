@@ -165,9 +165,34 @@ class UseItemAction(Action):
             )
 
 
-class EquipAction():
+class EquipAction(Action):
     def __init__(self, e, item):
-        pass
+        super().__init__()
+        self.e = e
+        self.item = item
+
+    def perform(self, *args, **kwargs):
+        entity = kwargs['entity']
+        if not self.item.has_comp('equippable'):
+            self.results.append({'msg': 'You cannot equip the {}'.format(self.item.name)})
+        else:
+
+            equip_results = entity.equipment.toggle_equip(self.item)
+
+            for equip_result in equip_results:
+                equipped = equip_result.get('equipped')
+                dequipped = equip_result.get('dequipped')
+
+                if equipped:
+                    self.results.append({'msg': 'You equipped the {}'.format(equipped.name)})
+
+                if dequipped:
+                    self.results.append({'msg': 'You dequipped the {}'.format(dequipped.name)})
+
+
+# class UnequipAction():
+    # def __init__(self, e, item):
+        # pass
 
 
 class GetTargetAction():

@@ -254,6 +254,9 @@ class Equipment(object):
 
         slot = equippable_entity.equippable.slot
 
+        # Refactor this code - should take slot as a parameter or just iterate
+        # through all the slots..
+
         if slot == EquipmentSlots.MAIN_HAND:
             if self.main_hand == equippable_entity:
                 self.main_hand = None
