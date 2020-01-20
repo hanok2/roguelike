@@ -53,6 +53,7 @@ def test_ActionResult__success_True_and_alterative_raises_exception():
         actions.ActionResult(success=True, alternative=actions.WaitAction())
 
 
+
 """ Tests for WalkAction """
 
 
@@ -619,6 +620,32 @@ def test_FullScreenAction__calls_tcod_console_set_fullscreen(mocker):
     fullscreen = actions.FullScreenAction()
     fullscreen.perform()
     tcod.console_set_fullscreen.assert_called_with(fullscreen=not tcod.console_is_fullscreen())
+
+
+
+""" Tests for GetTargetAction """
+
+
+def test_GetTargetAction_init():
+    target = actions.GetTargetAction(item=None)
+    assert isinstance(target, actions.Action)
+    assert target.consumes_turn is False
+    assert target.results == []
+
+
+@pytest.mark.skip(reason='mental block')
+def test_GetTargetAction__state_TARGETING():
+    target = actions.GetTargetAction(item='plumbus')
+
+
+@pytest.mark.skip(reason='mental block')
+def test_GetTargetAction__targeting_item_is_set():
+    target = actions.GetTargetAction(item='plumbus')
+
+
+@pytest.mark.skip(reason='mental block')
+def test_GetTargetAction__targeting_msg():
+    target = actions.GetTargetAction(item='plumbus')
 
 
 """ Tests for TargetAction """

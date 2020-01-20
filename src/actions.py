@@ -4,6 +4,7 @@ from . import config
 from .config import States
 
 
+
 class Action(ABC):
     # todo: Implement a performed boolean - we can't perform an Action more
     # than one time.
@@ -157,7 +158,7 @@ class UseItemAction(Action):
             have_target = kwargs.get('target_x') and kwargs.get('target_y')
 
             if item_comp.targeting and not have_target:
-                self.results.append({'alternate': GetTargetAction(entity, item_entity) })
+                self.results.append({'alternate': GetTargetAction(item_entity) })
 
             # Use the item - was it consumed?
             self.results.extend(
@@ -195,9 +196,6 @@ class EquipAction(Action):
         # pass
 
 
-class GetTargetAction():
-    def __init__(self, e, item):
-        pass
 
 
 class DropItemAction(Action):
@@ -342,6 +340,16 @@ class FullScreenAction(Action):
     def perform(self, *args, **kwargs):
         # Toggle fullscreen on/off
         tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
+
+
+class GetTargetAction(Action):
+    def __init__(self, item):
+        super().__init__(consumes_turn=False)
+        self.item = item
+
+    def perform(self, *args, **kwargs):
+
+        self.results.append({'state': States.TARGETING})
 
 
 class TargetAction(Action):
