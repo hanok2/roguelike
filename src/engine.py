@@ -267,7 +267,6 @@ def process_action(action, entity, g):
         item_dropped = result.get('item_dropped')
         equip = result.get('equip')
         targeting = result.get('targeting')
-        cancel_inv = result.get('cancel_inv')
 
         xp = result.get('xp')
 
@@ -286,10 +285,6 @@ def process_action(action, entity, g):
         if msg:
             log.debug('msg: {}.'.format(msg))
             g.msg_log.add(msg)
-
-        if cancel_inv:
-            log.debug('Inventory menu cancelled')
-            g.state = g.prev_state
 
         if xp:
             log.debug('Adding xp.')
