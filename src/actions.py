@@ -29,6 +29,7 @@ class ActionResult(object):
 
         self.success = success
         self.alternative = alternative
+        self.new_state = None
 
 
 class WalkAction(Action):

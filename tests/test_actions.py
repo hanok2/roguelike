@@ -58,6 +58,21 @@ def test_ActionResult__success_True_and_alterative_raises_exception():
         actions.ActionResult(success=True, alternative=actions.WaitAction())
 
 
+def test_ActionResult__new_state__success_defaults_None():
+    ar = actions.ActionResult(success=True)
+    assert ar.new_state is None
+
+
+def test_ActionResult__new_state__fail_defaults_None():
+    ar = actions.ActionResult(success=False)
+    assert ar.new_state is None
+
+
+def test_ActionResult__new_state__alt_defaults_None():
+    ar = actions.ActionResult(alternative=actions.WaitAction())
+    assert ar.new_state is None
+
+
 
 """ Tests for WalkAction """
 
