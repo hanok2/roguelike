@@ -157,11 +157,11 @@ def play_game(g, render_eng):
         # Flush True: returns just this
         # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
 
-        if g.next_action:
-            action = g.next_action
-            g.next_action = None
+        if not g.action_queue.empty():
+            action = g.action_queue.get()
 
         else:
+            # Nothing is waiting in the action queue - collect more actions
             tcod.sys_wait_for_event(
                 mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
                 k=key,
@@ -273,7 +273,7 @@ def process_action(action, entity, g):
             g.state = new_state
 
         if alternate:
-            g.next_action = alternate
+            g.action_queue.put(alternate)
 
         if fov_recompute:
             g.fov_recompute = True
@@ -289,7 +289,6 @@ def process_action(action, entity, g):
             log.debug('Adding xp.')
             leveled_up = g.hero.lvl.add_xp(xp)
 
-            # next_action =
             if leveled_up:
                 log.debug('Hero level up.')
                 g.msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(g.hero.lvl.current_lvl))

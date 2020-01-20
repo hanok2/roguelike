@@ -1,3 +1,4 @@
+from . import actionqueue
 from . import config
 from . import dungeon
 from . import fov
@@ -27,8 +28,7 @@ class Game(object):
         # Keep track of any targeting items that were selected.
         self.targeting_item = None
 
-        # Keep track of any alternate Actions
-        self.next_action = None
+        self.action_queue = actionqueue.ActionQueue()
 
         self.fov_recompute = True
         self.fov_map = fov.initialize_fov(self.stage)

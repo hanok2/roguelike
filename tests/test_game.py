@@ -1,3 +1,4 @@
+from ..src import actionqueue
 from ..src import config
 from ..src import game
 from ..src import dungeon
@@ -51,9 +52,9 @@ def test_Game_init__targeting_item_is_None():
     assert g.targeting_item is None
 
 
-def test_Game_init__next_action_is_None():
+def test_Game_init__ActionQueue():
     g = game.Game()
-    assert g.next_action is None
+    assert isinstance(g.action_queue, actionqueue.ActionQueue)
 
 
 def test_Game_init__fov_recompute_is_True():
