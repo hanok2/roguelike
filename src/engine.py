@@ -299,8 +299,10 @@ def process_action(action, entity, g):
             log.debug('Dead entity.')
             if dead_entity == g.hero:
                 msg, state = kill_hero(dead_entity)
+                # Add KillPlayerAction here....
             else:
                 msg = kill_monster(dead_entity)
+                # Add KillMonsterAction here....
 
             g.msg_log.add(msg)
 

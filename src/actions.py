@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import tcod
 from . import config
+from . import components
 from .config import States
 
 
@@ -417,19 +418,44 @@ class CharScreenAction(Action):
 
 
 class KillMonsterAction(Action):
-    def __init__(self):
+    def __init__(self, entity):
         super().__init__(consumes_turn=False)
+        if entity.has_comp('human'):
+            raise ValueError('KillPlayerAction requires the entity to be a Monster!')
+
+        self.entity = entity
 
     def perform(self, *args, **kwargs):
-        pass
+        self.entity.char = '%'
+        self.entity.color = tcod.dark_red
+        self.entity.blocks = False
+        self.entity.render_order = config.RenderOrder.CORPSE
+        self.entity.rm_comp('fighter')
+        self.entity.rm_comp('ai')
+
+        # Change to an item so we can pick it up!
+        self.entity.item = components.Item(owner=self.entity)
+
+        death_msg = 'The {} dies!'.format(self.entity.name.capitalize())
+        self.entity.name = 'remains of ' + self.entity.name
+
+        self.results = [{'msg': death_msg}]
 
 
 class KillPlayerAction(Action):
-    def __init__(self):
+    def __init__(self, entity):
         super().__init__(consumes_turn=False)
+        if not entity.has_comp('human'):
+            raise ValueError('KillPlayerAction requires the entity to be a Player!')
+        self.entity = entity
 
     def perform(self, *args, **kwargs):
-        pass
+        self.entity.char = '%'
+        self.entity.color = tcod.dark_red
+        self.results = [{
+            'msg': 'You died!',
+            'state': States.HERO_DEAD
+        }]
 
 
 class AddXPAction(Action):
@@ -437,4 +463,6 @@ class AddXPAction(Action):
         super().__init__(consumes_turn=False)
 
     def perform(self, *args, **kwargs):
+
         pass
+

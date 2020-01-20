@@ -15,6 +15,11 @@ def hero():
 
 
 @pytest.fixture
+def orc():
+    return factory.mk_entity('orc', 0, 0)
+
+
+@pytest.fixture
 def walk_map():
     m = stages.Stage(3, 3)
     # Set all tiles to non-blocking
@@ -723,18 +728,111 @@ def test_CharScreenAction():
     assert show_inv.results == [{'state': config.States.SHOW_STATS}]
 
 
-def test_KillMonsterAction_init():
-    action = actions.KillMonsterAction()
+""" Tests for KillMonsterAction """
+
+
+def test_KillMonsterAction_init(orc):
+    action = actions.KillMonsterAction(entity=orc)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
     assert action.results == []
 
 
-def test_KillPlayerAction_init():
-    action = actions.KillPlayerAction()
+def test_KillMonsterAction_hero_raises_exception(hero):
+    with pytest.raises(ValueError):
+        actions.KillMonsterAction(hero)
+
+
+def test_KillMonsterAction__char_is_corpse(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.char == '%'
+
+
+def test_KillMonsterAction__name_changed_to_remains(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.name == 'remains of Orc'
+
+
+def test_KillMonsterAction__color_is_darkred(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.color == tcod.dark_red
+
+
+def test_KillMonsterAction__blocks_is_False(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.blocks is False
+
+
+def test_KillMonsterAction__renderorder_is_CORPSE(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.render_order == config.RenderOrder.CORPSE
+
+
+def test_KillMonsterAction__fighter_comp_removed(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.has_comp('fighter') is False
+
+
+def test_KillMonsterAction__ai_comp_removed(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.has_comp('ai') is False
+
+
+def test_KillMonsterAction__item_comp_added(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert orc.has_comp('item')
+
+
+def test_KillMonsterAction__returns_death_msg(orc):
+    action = actions.KillMonsterAction(orc)
+    action.perform()
+    assert action.results == [{'msg': 'The Orc dies!'}]
+
+
+""" Tests for KillPlayerAction """
+
+
+def test_KillPlayerAction_init(hero):
+    action = actions.KillPlayerAction(hero)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
     assert action.results == []
+
+
+def test_KillPlayerAction__not_hero_raises_exception():
+    orc = factory.mk_entity('orc', 2, 1)
+
+    with pytest.raises(ValueError):
+        actions.KillPlayerAction(orc)
+
+
+def test_KillPlayerAction_char_is_corpse(hero):
+    action = actions.KillPlayerAction(hero)
+    action.perform()
+    assert hero.char == '%'
+
+
+def test_KillPlayerAction_color_is_darkred(hero):
+    action = actions.KillPlayerAction(hero)
+    action.perform()
+    assert hero.color == tcod.dark_red
+
+
+def test_KillPlayerAction_returns_death_msg_and_dead_status(hero):
+    action = actions.KillPlayerAction(hero)
+    action.perform()
+    assert action.results == [{'msg':'You died!', 'state': config.States.HERO_DEAD}]
+
+
+""" Tests for AddXPAction """
 
 
 def test_AddXPAction_init():
