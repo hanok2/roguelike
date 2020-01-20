@@ -136,15 +136,43 @@ class UseItemAction(Action):
         entity = kwargs['entity']
         prev_state = kwargs['prev_state']
 
-        # Check this in the input handler??
-        if prev_state == States.HERO_DEAD:
-            return
+        item_entity = entity.inv.items[self.inv_index]
+        # item_comp = item_entity.item if item_entity.has_comp('item') else None
+        item_comp = item_entity.item
 
-        item = entity.inv.items[self.inv_index]
+        # is the item equippable?
+        #   yes - return an EquipAction
 
-        self.results.extend(
-            entity.inv.use(item, entities=stage.entities, fov_map=fov_map)
-        )
+        if item_comp.use_func is None:
+            equippable_comp = item_entity.equippable if item_entity.has_comp('equippable') else None
+
+            if equippable_comp:
+                self.results.append({'alternate': EquipAction(entity, item_entity)})
+            else:
+                # This item doesn't have a use function!
+                self.results.append({'msg': 'The {} cannot be used.'.format(item_entity.name)})
+
+        else:
+            # Does the item require targeting?
+            have_target = kwargs.get('target_x') and kwargs.get('target_y')
+
+            if item_comp.targeting and not have_target:
+                self.results.append({'alternate': GetTargetAction(entity, item_entity) })
+
+            # Use the item - was it consumed?
+            self.results.extend(
+                entity.inv.use(item_entity, entities=stage.entities, fov_map=fov_map)
+            )
+
+
+class EquipAction():
+    def __init__(self, e, item):
+        pass
+
+
+class GetTargetAction():
+    def __init__(self, e, item):
+        pass
 
 
 class DropItemAction(Action):

@@ -263,7 +263,6 @@ def process_action(action, entity, g):
         msg = result.get('msg')
         dead_entity = result.get('dead')
         item_added = result.get('item_added')
-        item_consumed = result.get('consumed')
         item_dropped = result.get('item_dropped')
         equip = result.get('equip')
         targeting = result.get('targeting')
@@ -309,10 +308,6 @@ def process_action(action, entity, g):
         if item_added:
             log.debug('Item added.')
             g.stage.entities.remove(item_added)
-            g.state = States.WORLD_TURN
-
-        if item_consumed:
-            log.debug('Item consumed.')
             g.state = States.WORLD_TURN
 
         if targeting:

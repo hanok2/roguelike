@@ -72,12 +72,6 @@ def test_heal__at_max_hp__consumed_is_False(hero, heal):
     assert results[0]['consumed'] is False
 
 
-def test_heal__at_max_hp__cancel_inv_is_True(hero, heal):
-    assert hero.fighter.hp == hero.fighter.max_hp
-    results = heal.use(hero, amt=40)
-    assert results[0]['cancel_inv']
-
-
 def test_heal__at_max_hp__msg(hero, heal):
     assert hero.fighter.hp == hero.fighter.max_hp
     results = heal.use(hero, amt=40)

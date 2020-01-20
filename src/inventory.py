@@ -13,13 +13,11 @@ class Inventory(object):
         results = []
 
         if len(self.items) >= self.capacity:
-            # todo: Move msg to constant
             results.append({
                 'item_added': None,
                 'msg': INV_FULL_MSG
             })
         else:
-            # todo: Move msg to constant
             results.append({
                 'item_added': item,
                 'msg': 'You pick up the {}.'.format(item.name)

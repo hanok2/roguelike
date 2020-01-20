@@ -210,4 +210,18 @@ def mk_entity(entity_name, x, y):
         )
         return item
 
+    elif entity_name == 'rock':
+        item = Entity(
+            name="Rock",
+            x=x, y=y,
+            blocks=False,
+            char='*',
+            color=tcod.gray,
+            render_order=RenderOrder.ITEM,
+        )
+        item.item = Item(item)
+        return item
+
+
+
     raise ValueError('Unknown entity selected: {}'.format(entity_name))

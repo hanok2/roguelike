@@ -28,7 +28,6 @@ class UseHeal(Use):
         if entity.fighter.hp == entity.fighter.max_hp:
             results.append({
                 'consumed': False,
-                'cancel_inv': True,
                 'msg': 'You are already at full health'
             })
         else:

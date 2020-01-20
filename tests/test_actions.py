@@ -229,43 +229,61 @@ def test_UseItemAction__init():
     assert use.results == []
 
 
+def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
+    use = actions.UseItemAction(inv_index=-1)
+    with pytest.raises(IndexError):
+        use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.HERO_TURN)
+
+
+def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
+    shield = factory.mk_entity('shield', 1, 0)
+    hero.inv.add_item(shield)
+
+    use = actions.UseItemAction(inv_index=0)  # Assume shield is at index 0
+
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    # assert use.results == [{'alternate': actions.EquipAction}]
+    result = use.results[0]['alternate']
+    assert isinstance(result, actions.EquipAction)
+
+
+def test_UseItemAction__targets__returns_GetTargetAction(walk_map, hero):
+    confusion_scroll = factory.mk_entity('confusion_scroll', 1, 0)
+    hero.inv.add_item(confusion_scroll)
+
+    use = actions.UseItemAction(inv_index=0)  # Assume shield is at index 0
+
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    result = use.results[0]['alternate']
+    assert isinstance(result, actions.GetTargetAction)
+
+
 def test_UseItemAction__valid_item(walk_map, hero):
     potion = factory.mk_entity('healing_potion', 1, 0)
     hero.inv.add_item(potion)
+
     use = actions.UseItemAction(inv_index=0)  # Assume potion is at index 0
-    use.perform(
-        stage=walk_map,
-        fov_map=None,
-        entity=hero,
-        prev_state=None
-    )
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
     assert use.results == [{
         'consumed': False,
-        'cancel_inv': True,
         'msg': 'You are already at full health'
     }]
 
 
-def test_UseItemAction__hero_is_dead(walk_map, hero):
-    use = actions.UseItemAction(inv_index=0)
-    use.perform(
-        stage=walk_map,
-        fov_map=None,
-        entity=hero,
-        prev_state=config.States.HERO_DEAD
-    )
-    assert use.results == []
+def test_UseItemAction__invalid_item(walk_map, hero):
+    rock = factory.mk_entity('rock', 1, 0)
+    hero.inv.add_item(rock)
+
+    use = actions.UseItemAction(inv_index=0)  # Assume rock is at index 0
+    use.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    assert use.results == [{
+        'msg': 'The {} cannot be used.'.format(rock.name),
+    }]
 
 
-def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
-    use = actions.UseItemAction(inv_index=-1)
-    with pytest.raises(IndexError):
-        use.perform(
-            stage=walk_map,
-            fov_map=None,
-            entity=hero,
-            prev_state=config.States.HERO_TURN
-        )
+# Use the item - was it consumed?
 
 
 """ Tests for DropItemAction """
