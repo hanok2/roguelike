@@ -721,3 +721,24 @@ def test_CharScreenAction():
     show_inv = actions.CharScreenAction(prev_state)
     show_inv.perform()
     assert show_inv.results == [{'state': config.States.SHOW_STATS}]
+
+
+def test_KillMonsterAction_init():
+    action = actions.KillMonsterAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
+    assert action.results == []
+
+
+def test_KillPlayerAction_init():
+    action = actions.KillPlayerAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
+    assert action.results == []
+
+
+def test_AddXPAction_init():
+    action = actions.AddXPAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
+    assert action.results == []

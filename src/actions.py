@@ -196,8 +196,6 @@ class EquipAction(Action):
         # pass
 
 
-
-
 class DropItemAction(Action):
     def __init__(self, inv_index):
         super().__init__()
@@ -416,3 +414,27 @@ class CharScreenAction(Action):
 
     def perform(self, *args, **kwargs):
         self.results = [{'state': States.SHOW_STATS}]
+
+
+class KillMonsterAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        pass
+
+
+class KillPlayerAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        pass
+
+
+class AddXPAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        pass
