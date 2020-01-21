@@ -13,14 +13,34 @@ class Action(ABC):
     def perform(self, *args, **kwargs):
         pass
 
+    def __str__(self):
+        return self.__class__.__name__
 
 class ActionResult(object):
-    def __init__(self, success=False, alt=None, new_state=None, msg=None):
+    # Implement contains for alternate actions?
+    def __init__(self, success=False, alt=[], new_state=None, msg=None):
         self.success = success
-        self.alt = alt
         self.new_state = new_state
         self.msg = msg
 
+        # If we get a single alt item - convert it to a list.
+        if isinstance(alt, list):
+            self.alt = alt
+        else:
+            self.alt = [alt]
+
+
+    def __contains__(self, action):
+        """Checks if the passed action's class is in the list of alt actions."""
+        for a in self.alt:
+            # if a.__class__ == action.__class__:
+            # if a.__class__.__name__ == action.__class__.__name__:
+            # if isinstance(a, action.__class__):
+
+            if isinstance(a, action):
+                return True
+
+        return False
 
 class WalkAction(Action):
     def __init__(self, dx, dy):

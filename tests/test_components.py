@@ -86,7 +86,7 @@ def test_Fighter_take_dmg__lethal_dmg_returns_dead_results(orc):
     f = orc.fighter
     result = f.take_dmg(15)
     assert result.success
-    assert isinstance(result.alt, actions.KillMonsterAction)
+    assert actions.KillMonsterAction in result
 
 
 def test_Fighter_heal__hp_is_recovered():

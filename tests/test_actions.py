@@ -52,51 +52,47 @@ def walk_map():
 
 
 def test_ActionResult__action_succeeded():
-    action = actions.ActionResult(success=True)
-    assert action.success
-    assert action.alt is None
+    result = actions.ActionResult(success=True)
+    assert result.success
+    assert result.alt == []
 
 
 def test_ActionResult__action_failed():
-    action = actions.ActionResult(success=False)
-    assert action.success is False
-    assert action.alt is None
+    result = actions.ActionResult(success=False)
+    assert result.success is False
+    assert result.alt == []
 
 
 def test_ActionResult__action_alt():
-    action = actions.ActionResult(alt=actions.WaitAction())
-    assert action.success is False
-    assert isinstance(action.alt, actions.WaitAction)
+    result = actions.ActionResult(alt=actions.WaitAction())
+    assert result.success is False
+    # assert isinstance(result.alt, actions.WaitAction)
+    assert actions.WaitAction in result
 
 
-@pytest.mark.skip(reason='implement soon')
 def test_ActionResult__list_of_alternative_actions():
-    action = actions.ActionResult(
-        alt=[actions.WaitAction(), actions.WaitAction()]
-    )
-    assert action.success is False
-    assert isinstance(action.alt, actions.WaitAction)
+    list_of_alt_actions = [actions.WaitAction()]
+    result = actions.ActionResult(alt=list_of_alt_actions)
 
+    assert result.success is False
+    assert actions.WaitAction in result
 
-# This restriction is too restrictive!
-# def test_ActionResult__success_True_and_alterative_raises_exception():
-    # with pytest.raises(ValueError):
-        # actions.ActionResult(success=True, alt=actions.WaitAction())
+    assert isinstance(result.alt[0], actions.WaitAction)
 
 
 def test_ActionResult__new_state__success_defaults_None():
-    action = actions.ActionResult(success=True)
-    assert action.new_state is None
+    result = actions.ActionResult(success=True)
+    assert result.new_state is None
 
 
 def test_ActionResult__new_state__fail_defaults_None():
-    action = actions.ActionResult(success=False)
-    assert action.new_state is None
+    result = actions.ActionResult(success=False)
+    assert result.new_state is None
 
 
 def test_ActionResult__new_state__alt_defaults_None():
-    action = actions.ActionResult(alt=actions.WaitAction())
-    assert action.new_state is None
+    result = actions.ActionResult(alt=actions.WaitAction())
+    assert result.new_state is None
 
 
 
@@ -104,10 +100,11 @@ def test_ActionResult__new_state__alt_defaults_None():
 """ Tests for WalkAction """
 
 
-def test_WalkAction__init__consumes_turn_defaults_True():
+def test_WalkAction__init():
     action = actions.WalkAction(dx=1, dy=0)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn
+    assert str(action) == 'WalkAction'
 
 
 def test_WalkAction__into_monster__returns_AttackAction(test_game, walk_map, hero):
@@ -115,7 +112,8 @@ def test_WalkAction__into_monster__returns_AttackAction(test_game, walk_map, her
 
     action = actions.WalkAction(dx=1, dy=0)
     result = action.perform(stage=walk_map, entity=hero, game=test_game)
-    assert isinstance(result.alt, actions.AttackAction)
+    assert actions.AttackAction in result
+    # assert isinstance(result.alt, actions.AttackAction)
     assert result.success is False
 
     # alt action doesn't change consumes_turn
@@ -292,7 +290,8 @@ def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
 
     # assert result == [{'alternate': actions.EquipAction}]
     assert result.success is False
-    assert isinstance(result.alt, actions.EquipAction)
+    # assert isinstance(result.alt, actions.EquipAction)
+    assert actions.EquipAction in result
 
 
 def test_UseItemAction__targets__returns_GetTargetAction(walk_map, hero):
@@ -304,7 +303,9 @@ def test_UseItemAction__targets__returns_GetTargetAction(walk_map, hero):
     result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
 
     assert result.success is False
-    assert isinstance(result.alt, actions.GetTargetAction)
+    assert actions.GetTargetAction in result
+
+    # assert isinstance(result.alt, actions.GetTargetAction)
 
 
 @pytest.mark.skip('lazy')
@@ -509,7 +510,8 @@ def test_StairUpAction__top_stage__returns_LeaveGameAction(test_game, hero):
     # todo: Move these to LeaveGameAction
     # assert result.msg == 'You go up the stairs and leave the dungeon forever...'
     # assert result.state == config.States.HERO_DEAD
-    assert isinstance(result.alt, actions.LeaveGameAction)
+    # assert isinstance(result.alt, actions.LeaveGameAction)
+    assert actions.LeaveGameAction in result
 
 
 def test_StairUpAction__success_on_lower_level(test_game, hero):
