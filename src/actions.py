@@ -572,10 +572,25 @@ class TakeDmgAction(Action):
         return ActionResult(success=True)
 
 
-
 class HealAction(Action):
-    def __init__(self):
+    def __init__(self, entity, amt):
+        if amt < 0:
+            raise ValueError('HealAction: amt must be a positive number!')
+
         super().__init__(consumes_turn=False)
+        self.entity = entity
+        self.amt = amt
 
     def perform(self, *args, **kwargs):
-        pass
+        fighter = self.entity.fighter
+
+        # Can't heal if the entity is not damaged
+        if fighter.hp == fighter.max_hp:
+            return ActionResult(success=False)
+
+        fighter.hp += self.amt
+
+        if fighter.hp > fighter.max_hp:
+            fighter.hp = fighter.max_hp
+
+        return ActionResult(success=True)

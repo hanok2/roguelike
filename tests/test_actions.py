@@ -984,7 +984,46 @@ def test_TakeDmgAction_lethal_dmg_to_hero_returns_KillPlayerAction(hero):
 """ Tests for HealAction """
 
 
-def test_HealAction_init():
-    action = actions.HealAction()
+def test_HealAction_init(orc):
+    action = actions.HealAction(entity=orc, amt=1)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
+
+
+def test_HealAction__success_hp_is_recovered(orc):
+    prev_hp = orc.fighter.hp
+    dmg = 2
+    action = actions.HealAction(entity=orc, amt=dmg)
+
+    # Inflict a little damage for the heal to work
+    orc.fighter.hp -= dmg
+
+    result = action.perform()
+
+    assert result.success
+    assert orc.fighter.hp == prev_hp
+
+
+def test_HealAction__excess_hp_doesnt_go_over_max(orc):
+    amt = orc.fighter.max_hp + 100
+    action = actions.HealAction(entity=orc, amt=amt)
+
+    # Inflict a little damage for the heal to work
+    orc.fighter.hp -= 2
+
+    result = action.perform()
+
+    assert result.success
+    assert orc.fighter.hp == orc.fighter.max_hp
+
+
+def test_HealAction__hp_already_max__returns_False(orc):
+    action = actions.HealAction(entity=orc, amt=10)
+    result = action.perform()
+
+    assert result.success is False
+
+
+def test_HealAction__negative_amt_raises_exception(orc):
+    with pytest.raises(ValueError):
+        actions.HealAction(entity=orc, amt=-1)
