@@ -535,11 +535,22 @@ class KillPlayerAction(Action):
 
 
 class AddXPAction(Action):
-    def __init__(self):
+    def __init__(self, entity, xp):
         super().__init__(consumes_turn=False)
+        self.entity = entity
+        self.xp = xp
 
     def perform(self, *args, **kwargs):
-        pass
+        result = self.entity.lvl.add_xp(self.xp)
+
+        if result:
+            msg = 'Your battle skills grow stronger! You reached level {}!'.format(self.entity.lvl.current_lvl)
+            return ActionResult(
+                success=True,
+                new_state=States.LEVEL_UP,
+                msg=msg
+            )
+        return ActionResult(success=True)
 
 
 class LeaveGameAction(Action):

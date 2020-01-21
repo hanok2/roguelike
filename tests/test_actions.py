@@ -920,14 +920,31 @@ def test_KillPlayerAction_color_is_darkred(hero):
 """ Tests for AddXPAction """
 
 
-def test_AddXPAction_init():
-    action = actions.AddXPAction()
+def test_AddXPAction_init(hero):
+    action = actions.AddXPAction(entity=hero, xp=1)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
 
-# 2 args: entity (gainer) and xp
-# only has success
-# checks if the entity has leveled up, if so - changes state to LEVELUP and has msg
+
+def test_AddXPAction__adds_xp(hero):
+    prev_xp = hero.lvl.current_xp
+    xp_amt = 1
+    action = actions.AddXPAction(entity=hero, xp=1)
+    result = action.perform()
+
+    assert result.success
+    assert hero.lvl.current_xp == prev_xp + xp_amt
+
+
+def test_AddXPAction__leveled_up(hero):
+    xp_amt = hero.lvl.xp_to_next_lvl + 1  # make sure we go over the threshold
+    action = actions.AddXPAction(entity=hero, xp=xp_amt)
+    result = action.perform()
+
+    assert result.success
+    assert result.new_state == config.States.LEVEL_UP
+    assert result.msg == 'Your battle skills grow stronger! You reached level {}!'.format(hero.lvl.current_lvl)
+
 
 """ Tests for LeaveGameAction """
 
