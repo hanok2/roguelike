@@ -112,8 +112,8 @@ def test_WalkAction__into_monster__returns_AttackAction(test_game, walk_map, her
 
     action = actions.WalkAction(dx=1, dy=0)
     result = action.perform(stage=walk_map, entity=hero, game=test_game)
+
     assert actions.AttackAction in result
-    # assert isinstance(result.alt, actions.AttackAction)
     assert result.success is False
 
     # alt action doesn't change consumes_turn
@@ -162,48 +162,52 @@ def test_WalkAction__more_than_1_sq_away__raise_exception(walk_map):
 """ Tests for AttackAction """
 
 
-def test_AttackAction__init(hero):
-    attack = actions.AttackAction(hero, dx=1, dy=1)
+def test_AttackAction__init(hero, orc):
+    attack = actions.AttackAction(attacker=hero, defender=orc)
     assert isinstance(attack, actions.Action)
     assert attack.consumes_turn
 
 
-def test_AttackAction__init__instance_variables(hero):
-    attack = actions.AttackAction(hero, dx=1, dy=0)
-    assert attack.entity == hero
-    assert attack.dx == 1
-    assert attack.dy == 0
+def test_AttackAction__init__instance_variables(hero, orc):
+    attack = actions.AttackAction(attacker=hero, defender=orc)
+    assert attack.attacker == hero
+    assert attack.defender == orc
 
 
-def test_AttackAction__invalid_dx__raises_exception():
+def test_AttackAction__invalid_attacker__raises_exception(orc, potion):
+    # Entities must have Fighter component
     with pytest.raises(ValueError):
-        actions.AttackAction(hero, dx=-2, dy=2)
+        actions.AttackAction(attacker=potion, defender=orc)
 
 
-def test_AttackAction__invalid_dy__raises_exception():
+def test_AttackAction__invalid_defender__raises_exception(hero, potion):
+    # Entities must have Fighter component
     with pytest.raises(ValueError):
-        actions.AttackAction(hero, dx=1, dy=-2)
+        actions.AttackAction(attacker=hero, defender=potion)
 
 
-def test_AttackAction__no_target(hero, walk_map):
-    attack = actions.AttackAction(hero, dx=-1, dy=0)
-    result = attack.perform(stage=walk_map)
-    assert result.success is False
-    assert result.msg == 'There is nothing to attack at that position.'
+def test_AttackAction__dmg_returns_TakeDmgAction(hero, orc):
+    attack = actions.AttackAction(attacker=hero, defender=orc)
+    result = attack.perform()
 
-
-def test_AttackAction__attacking_wall(hero, walk_map):
-    attack = actions.AttackAction(hero, dx=0, dy=1)
-    result = attack.perform(stage=walk_map)
-    assert result.success is False
-    assert result.msg == 'You cannot attack the wall!'
-
-
-def test_AttackAction__valid_target(hero, walk_map):
-    attack = actions.AttackAction(hero, dx=1, dy=0)
-    result = attack.perform(stage=walk_map)
     assert result.success
     assert result.msg == 'Player attacks Orc!'
+    assert actions.TakeDmgAction in result
+
+
+def test_AttackAction__no_dmg(hero, orc):
+    attack = actions.AttackAction(attacker=hero, defender=orc)
+    hero.fighter.base_power = 1
+    dmg = hero.fighter.power - orc.fighter.defense
+
+    assert dmg == 0
+    expected_hp = orc.fighter.hp
+    result = attack.perform(stage=walk_map)
+
+    assert result.msg == 'Player attacks Orc... But does no damage.'
+    assert result.success
+    assert orc.fighter.hp == expected_hp
+
 
 
 """ Tests for WaitAction """
@@ -810,67 +814,67 @@ def test_CharScreenAction():
 
 
 def test_KillMonsterAction_init(orc):
-    action = actions.KillMonsterAction(entity=orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
 
 
 def test_KillMonsterAction_hero_raises_exception(hero):
     with pytest.raises(ValueError):
-        actions.KillMonsterAction(hero)
+        action = actions.KillMonsterAction(attacker=None, defender=hero)
 
 
 def test_KillMonsterAction__success(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     result = action.perform()
     assert result.success
     assert result.msg == 'The Orc dies!'
 
 
 def test_KillMonsterAction__char_is_corpse(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.char == '%'
 
 
 def test_KillMonsterAction__name_changed_to_remains(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.name == 'remains of Orc'
 
 
 def test_KillMonsterAction__color_is_darkred(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.color == tcod.dark_red
 
 
 def test_KillMonsterAction__blocks_is_False(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.blocks is False
 
 
 def test_KillMonsterAction__renderorder_is_CORPSE(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.render_order == config.RenderOrder.CORPSE
 
 
 def test_KillMonsterAction__fighter_comp_removed(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.has_comp('fighter') is False
 
 
 def test_KillMonsterAction__ai_comp_removed(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.has_comp('ai') is False
 
 
 def test_KillMonsterAction__item_comp_added(orc):
-    action = actions.KillMonsterAction(orc)
+    action = actions.KillMonsterAction(attacker=None, defender=orc)
     action.perform()
     assert orc.has_comp('item')
 
@@ -883,7 +887,7 @@ def test_KillMonsterAction__item_comp_added(orc):
 
 
 def test_KillPlayerAction_init(hero):
-    action = actions.KillPlayerAction(hero)
+    action = actions.KillPlayerAction(attacker=None, defender=hero)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
 
@@ -892,29 +896,27 @@ def test_KillPlayerAction__not_hero_raises_exception():
     orc = factory.mk_entity('orc', 2, 1)
 
     with pytest.raises(ValueError):
-        actions.KillPlayerAction(orc)
+        action = actions.KillPlayerAction(attacker=None, defender=orc)
 
 
-def test_KillPlayerAction_success(hero):
-    action = actions.KillPlayerAction(hero)
+def test_KillPlayerAction_success(hero, orc):
+    action = actions.KillPlayerAction(attacker=orc, defender=hero)
     result = action.perform()
     assert result.success
-    assert result.msg == 'You died!'
+    assert result.msg == 'You died!  Killed by the Orc.'
     assert result.new_state == config.States.HERO_DEAD
 
 
-def test_KillPlayerAction_char_is_corpse(hero):
-    action = actions.KillPlayerAction(hero)
+def test_KillPlayerAction_char_is_corpse(hero, orc):
+    action = actions.KillPlayerAction(attacker=orc, defender=hero)
     action.perform()
     assert hero.char == '%'
 
 
-def test_KillPlayerAction_color_is_darkred(hero):
-    action = actions.KillPlayerAction(hero)
+def test_KillPlayerAction_color_is_darkred(hero, orc):
+    action = actions.KillPlayerAction(attacker=orc, defender=hero)
     action.perform()
     assert hero.color == tcod.dark_red
-
-
 
 
 """ Tests for AddXPAction """
@@ -962,13 +964,13 @@ def test_LeaveGameAction_init():
 
 
 def test_TakeDmgAction_init(orc):
-    action = actions.TakeDmgAction(entity=orc, dmg=1)
+    action = actions.TakeDmgAction(attacker=None, defender=orc, dmg=1)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
 
 
 def test_TakeDmgAction_reduces_hp(orc):
-    action = actions.TakeDmgAction(entity=orc, dmg=1)
+    action = actions.TakeDmgAction(attacker=None, defender=orc, dmg=1)
     result = action.perform()
 
     assert result.success
@@ -977,12 +979,12 @@ def test_TakeDmgAction_reduces_hp(orc):
 
 def test_TakeDmgAction_negative_dmg_raises_exception(orc):
     with pytest.raises(ValueError):
-        actions.TakeDmgAction(entity=orc, dmg=-1)
+        actions.TakeDmgAction(attacker=None, defender=orc, dmg=-1)
 
 
 def test_TakeDmgAction_lethal_dmg_to_monster_returns_KillMonsterAction(orc):
     lethal_dmg = orc.fighter.max_hp
-    action = actions.TakeDmgAction(entity=orc, dmg=lethal_dmg)
+    action = actions.TakeDmgAction(attacker=None, defender=orc, dmg=lethal_dmg)
     result = action.perform()
 
     assert result.success
@@ -991,7 +993,7 @@ def test_TakeDmgAction_lethal_dmg_to_monster_returns_KillMonsterAction(orc):
 
 def test_TakeDmgAction_lethal_dmg_to_hero_returns_KillPlayerAction(hero):
     lethal_dmg = hero.fighter.max_hp
-    action = actions.TakeDmgAction(entity=hero, dmg=lethal_dmg)
+    action = actions.TakeDmgAction(attacker=None, defender=hero, dmg=lethal_dmg)
     result = action.perform()
 
     assert result.success

@@ -53,7 +53,6 @@ class Entity(object):
             return True
         return False
 
-
     def move(self, dx, dy):
         # Move the entity by a given amount
         dest_x = self.x + dx

@@ -72,7 +72,7 @@ class WalkAction(Action):
         target = stage.get_blocker_at_loc(dest_x, dest_y)
 
         if target:
-            return ActionResult(alt=AttackAction(entity, self.dx, self.dy))
+            return ActionResult(alt=AttackAction(attacker=entity, defender=target))
 
         # log.debug('Moving.')
         entity.move(self.dx, self.dy)
@@ -88,35 +88,32 @@ class WalkAction(Action):
 
 
 class AttackAction(Action):
-    def __init__(self, entity, dx, dy):
-        if abs(dx) > 1 or abs(dy) > 1:
-            raise ValueError('AttackAction dx or dy cannot be < -1 or > 1.')
-
+    def __init__(self, attacker, defender):
         super().__init__()
-        self.entity = entity
-        self.dx = dx
-        self.dy = dy
+        if not attacker.has_comp('fighter'):
+            raise ValueError('AttackAction requires attacker with Fighter component!')
+        elif not defender.has_comp('fighter'):
+            raise ValueError('AttackAction requires defender with Fighter component!')
+
+        self.attacker = attacker
+        self.defender = defender
 
     def perform(self, *args, **kwargs):
-        stage = kwargs['stage']
-        dest_x = self.entity.x + self.dx
-        dest_y = self.entity.y + self.dy
 
-        if stage.is_blocked(dest_x, dest_y):
+        dmg = self.attacker.fighter.power - self.defender.fighter.defense
+
+        if dmg > 0:
+            msg = '{} attacks {}!'.format(self.attacker.name, self.defender.name)
+
             return ActionResult(
-                success=False,
-                msg='You cannot attack the wall!'
+                success=True,
+                alt=TakeDmgAction(self.attacker, self.defender, dmg),
+                msg=msg
             )
 
-        target = stage.get_blocker_at_loc(dest_x, dest_y)
+        msg = '{} attacks {}... But does no damage.'.format(self.attacker.name, self.defender.name)
+        return ActionResult(success=True, msg=msg)
 
-        if not target:
-            return ActionResult(
-                success=False,
-                msg='There is nothing to attack at that position.'
-            )
-
-        return self.entity.fighter.attack(target)
 
 
 class WaitAction(Action):
@@ -489,26 +486,34 @@ class CharScreenAction(Action):
 
 
 class KillMonsterAction(Action):
-    def __init__(self, entity):
+    def __init__(self, attacker, defender):
         super().__init__(consumes_turn=False)
-        if entity.has_comp('human'):
+        if defender.has_comp('human'):
             raise ValueError('KillPlayerAction requires the entity to be a Monster!')
 
-        self.entity = entity
+        self.attacker = attacker
+        self.defender = defender
 
     def perform(self, *args, **kwargs):
-        self.entity.char = '%'
-        self.entity.color = tcod.dark_red
-        self.entity.blocks = False
-        self.entity.render_order = config.RenderOrder.CORPSE
-        self.entity.rm_comp('fighter')
-        self.entity.rm_comp('ai')
+        self.defender.char = '%'
+        self.defender.color = tcod.dark_red
+        self.defender.blocks = False
+        self.defender.render_order = config.RenderOrder.CORPSE
+        self.defender.rm_comp('fighter')
+        self.defender.rm_comp('ai')
 
         # Change to an item so we can pick it up!
-        self.entity.item = components.Item(owner=self.entity)
+        self.defender.item = components.Item(owner=self.defender)
 
-        death_msg = 'The {} dies!'.format(self.entity.name.capitalize())
-        self.entity.name = 'remains of ' + self.entity.name
+        death_msg = 'The {} dies!'.format(self.defender.name.capitalize())
+        self.defender.name = 'remains of ' + self.defender.name
+
+        if self.attacker:
+            return ActionResult(
+                success=True,
+                alt=AddXPAction(self.attacker, self.defender.fighter.xp),
+                msg=death_msg
+            )
 
         return ActionResult(
             success=True,
@@ -517,19 +522,21 @@ class KillMonsterAction(Action):
 
 
 class KillPlayerAction(Action):
-    def __init__(self, entity):
+    def __init__(self, attacker, defender):
         super().__init__(consumes_turn=False)
-        if not entity.has_comp('human'):
+        if not defender.has_comp('human'):
             raise ValueError('KillPlayerAction requires the entity to be a Player!')
-        self.entity = entity
+
+        self.attacker = attacker
+        self.defender = defender
 
     def perform(self, *args, **kwargs):
-        self.entity.char = '%'
-        self.entity.color = tcod.dark_red
+        self.defender.char = '%'
+        self.defender.color = tcod.dark_red
 
         return ActionResult(
             success=True,
-            msg='You died!',
+            msg='You died!  Killed by the {}.'.format(self.attacker.name),
             new_state=States.HERO_DEAD
         )
 
@@ -562,23 +569,24 @@ class LeaveGameAction(Action):
 
 
 class TakeDmgAction(Action):
-    def __init__(self, entity, dmg):
+    def __init__(self, attacker, defender, dmg):
         super().__init__(consumes_turn=False)
         if dmg < 0:
             raise ValueError('TakeDmgAction: dmg must be a positive number!')
 
-        self.entity = entity
+        self.attacker = attacker
+        self.defender = defender
         self.dmg = dmg
 
     def perform(self, *args, **kwargs):
-        self.entity.fighter.hp -= self.dmg
+        self.defender.fighter.hp -= self.dmg
 
-        if self.entity.fighter.hp <= 0:
+        if self.defender.fighter.hp <= 0:
             # Kill the correct entity
-            if self.entity.has_comp('human'):
-                return ActionResult(success=True, alt=KillPlayerAction(self.entity))
+            if self.defender.has_comp('human'):
+                return ActionResult(success=True, alt=KillPlayerAction(self.attacker, self.defender))
 
-            return ActionResult(success=True, alt=KillMonsterAction(self.entity))
+            return ActionResult(success=True, alt=KillMonsterAction(self.attacker, self.defender))
 
         return ActionResult(success=True)
 
