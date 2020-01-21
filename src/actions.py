@@ -236,13 +236,27 @@ class DropItemAction(Action):
 
     def perform(self, *args, **kwargs):
         entity = kwargs['entity']
-        prev_state = kwargs['prev_state']
-
         item = entity.inv.items[self.inv_index]
 
-        # todo: Refactor drop into this function
-        # self.results.extend(entity.inv.drop(item))
-        entity.inv.drop(item)
+        if item not in entity.inv.items:
+            raise ValueError('Cannot drop an item that is not in inventory!')
+
+        # Dequip equipped items before dropping
+        if item.has_comp('equippable'):
+            if entity.equipment.main_hand == item or entity.equipment.off_hand == item:
+
+                # todo: This might also benefit from an Action replacement
+                entity.equipment.toggle_equip(item)
+
+        item.x = entity.x
+        item.y = entity.y
+
+        entity.inv.rm_item(item)
+
+        return ActionResult(
+            success=True,
+            msg='You dropped the {}.'.format(item.name)
+        )
 
 
 class StairUpAction(Action):
