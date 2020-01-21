@@ -1,6 +1,8 @@
 INV_FULL_MSG = 'You cannot carry any more, your inventory is full.'
 
 class Inventory(object):
+    # Add a contains() method
+
     def __init__(self, owner, capacity):
         if capacity <= 0:
             raise ValueError('capacity needs to be a positive number!')

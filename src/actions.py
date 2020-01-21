@@ -5,31 +5,24 @@ from . import components
 from .config import States
 
 
-
 class Action(ABC):
-    # todo: Implement a performed boolean - we can't perform an Action more
-    # than one time.
-
     def __init__(self, consumes_turn=True):
         self.consumes_turn = consumes_turn
-        self.results = []
 
     @abstractmethod
     def perform(self, *args, **kwargs):
-        # We can return alternate Actions
-        # We can return True or False to indicate success
-        # Do the parameters need to be (*args, **kwargs)?
         pass
 
 
 class ActionResult(object):
-    def __init__(self, success=False, alternative=None):
-        if success and alternative:
+    def __init__(self, success=False, alt=None, new_state=None, msg=None):
+        if success and alt:
             raise ValueError('ActionResult cannot have succeeded and provide an alternative Action!')
 
         self.success = success
-        self.alternative = alternative
-        self.new_state = None
+        self.alt = alt
+        self.new_state = new_state
+        self.msg = msg
 
 
 class WalkAction(Action):
@@ -45,36 +38,36 @@ class WalkAction(Action):
     def perform(self, *args, **kwargs):
         entity = kwargs['entity']
         stage = kwargs['stage']
-        # Do we really need to check state?
+        _game = kwargs['game']
 
-        # log.debug('Attempting move.')
         dest_x = entity.x + self.dx
         dest_y = entity.y + self.dy
 
         # Check for wall
         if stage.is_blocked(dest_x, dest_y):
             # There is a wall blocking our path
-            self.consumes_turn = False
-            self.results.append({'msg': 'You cannot walk into the wall...'})
-            return
+            return ActionResult(
+                success=False,
+                msg='You cannot walk into the wall...'
+            )
 
         # Check for attacker
         target = stage.get_blocker_at_loc(dest_x, dest_y)
 
         if target:
-            self.consumes_turn = False
-            self.results.append({'alternate': AttackAction(entity, self.dx, self.dy)})
-            return
+            return ActionResult(alt=AttackAction(entity, self.dx, self.dy))
 
         # log.debug('Moving.')
         entity.move(self.dx, self.dy)
 
         # Need to redraw FOV
-        self.results.append({'fov_recompute': True})
+        _game.fov_recompute = True
 
         # Add walk into door
         # Add walk into water/lava/etc
         # Add walk over items
+
+        return ActionResult(success=True)
 
 
 class AttackAction(Action):
@@ -93,22 +86,29 @@ class AttackAction(Action):
         dest_y = self.entity.y + self.dy
 
         if stage.is_blocked(dest_x, dest_y):
-            self.results.append({'msg': 'You cannot attack the wall!'})
-            return
+            return ActionResult(
+                success=False,
+                msg='You cannot attack the wall!'
+            )
 
         target = stage.get_blocker_at_loc(dest_x, dest_y)
 
         if target:
+            # Todo - refactor attack code here...
             attack_results = self.entity.fighter.attack(target)
             self.results.extend(attack_results)
-        else:
-            self.results.append({'msg': 'There is nothing to attack at that position.'})
+            return ActionResult(success=True)
+
+        return ActionResult(
+            success=False,
+            msg='There is nothing to attack at that position.'
+        )
 
 
 
 class WaitAction(Action):
     def perform(self, *args, **kwargs):
-        return
+        return ActionResult(success=True)
 
 
 class PickupAction(Action):
@@ -121,51 +121,74 @@ class PickupAction(Action):
             item_pos_at_our_pos = e.x == entity.x and e.y == entity.y
 
             if e.has_comp('item') and item_pos_at_our_pos:
+                # todo: Refactor add item into this.
                 self.results.extend(entity.inv.add_item(e))
-                break
 
-        else:
-            self.results.append({'msg': 'There is nothing here to pick up.'})
+                # todo: Will probably break stuff....
+                return ActionResult(success=True)
+
+        return ActionResult(
+            success=False,
+            msg='There is nothing here to pick up.'
+        )
 
 
 class UseItemAction(Action):
-    def __init__(self, inv_index):
+    # todo: Let UseItemAction work on items NOT in an entity's inventory
+    # todo: Use item on ground
+    # todo: Use item that was thrown, etc.
+
+    def __init__(self, inv_index, target_x=None, target_y=None):
         super().__init__()
         self.inv_index = inv_index
+        self.target_x = target_x
+        self.target_y = target_y
 
     def perform(self, *args, **kwargs):
         stage = kwargs['stage']
         fov_map = kwargs['fov_map']
         entity = kwargs['entity']
-        prev_state = kwargs['prev_state']
-
         item_entity = entity.inv.items[self.inv_index]
-        # item_comp = item_entity.item if item_entity.has_comp('item') else None
         item_comp = item_entity.item
-
-        # is the item equippable?
-        #   yes - return an EquipAction
 
         if item_comp.use_func is None:
             equippable_comp = item_entity.equippable if item_entity.has_comp('equippable') else None
 
+            # If item is equippable, return an EquipAction
             if equippable_comp:
-                self.results.append({'alternate': EquipAction(entity, item_entity)})
-            else:
-                # This item doesn't have a use function!
-                self.results.append({'msg': 'The {} cannot be used.'.format(item_entity.name)})
+                return ActionResult(alt=EquipAction(entity, item_entity))
+
+            # This item doesn't have a use function!
+            return ActionResult(
+                success=False,
+                msg='The {} cannot be used.'.format(item_entity.name)
+            )
 
         else:
-            # Does the item require targeting?
-            have_target = kwargs.get('target_x') and kwargs.get('target_y')
+            have_target = self.target_x and self.target_y
 
+            # If the item requires a target, return a GetTargetAction
             if item_comp.targeting and not have_target:
-                self.results.append({'alternate': GetTargetAction(item_entity) })
+                return ActionResult(alt=GetTargetAction(item_entity))
 
             # Use the item - was it consumed?
-            self.results.extend(
-                entity.inv.use(item_entity, entities=stage.entities, fov_map=fov_map)
+            item_use_results = entity.inv.use(
+                item_entity,
+                entities=stage.entities,
+                fov_map=fov_map,
+                target_x=self.target_x,
+                target_y=self.target_y
             )
+
+            # If the item was consumed - remove it from inventory.
+            for result in item_use_results:
+                if result.get('consumed'):
+                    entity.inv.rm_item(item_entity)
+
+                    return ActionResult(success=True)
+
+            # Not consumed
+            return ActionResult(success=False)
 
 
 class EquipAction(Action):
@@ -177,9 +200,11 @@ class EquipAction(Action):
     def perform(self, *args, **kwargs):
         entity = kwargs['entity']
         if not self.item.has_comp('equippable'):
-            self.results.append({'msg': 'You cannot equip the {}'.format(self.item.name)})
+            return ActionResult(
+                success=False,
+                msg='You cannot equip the {}'.format(self.item.name)
+            )
         else:
-
             equip_results = entity.equipment.toggle_equip(self.item)
 
             for equip_result in equip_results:
@@ -187,10 +212,16 @@ class EquipAction(Action):
                 dequipped = equip_result.get('dequipped')
 
                 if equipped:
-                    self.results.append({'msg': 'You equipped the {}'.format(equipped.name)})
+                    return ActionResult(
+                        success=True,
+                        msg='You equipped the {}'.format(equipped.name)
+                    )
 
                 if dequipped:
-                    self.results.append({'msg': 'You dequipped the {}'.format(dequipped.name)})
+                    return ActionResult(
+                        success=True,
+                        msg='You dequipped the {}'.format(dequipped.name)
+                    )
 
 
 # class UnequipAction():
@@ -207,19 +238,18 @@ class DropItemAction(Action):
         entity = kwargs['entity']
         prev_state = kwargs['prev_state']
 
-        # Check this in the input handler??
-        if prev_state == States.HERO_DEAD:
-            return
-
         item = entity.inv.items[self.inv_index]
 
-        self.results.extend(entity.inv.drop(item))
+        # todo: Refactor drop into this function
+        # self.results.extend(entity.inv.drop(item))
+        entity.inv.drop(item)
 
 
 class StairUpAction(Action):
     def perform(self, *args, **kwargs):
         dungeon = kwargs['dungeon']
         entity = kwargs['entity']
+        game = kwargs['game']
 
         stage = dungeon.get_stage()
 
@@ -229,30 +259,36 @@ class StairUpAction(Action):
                 if hero_at_stairs:
 
                     if dungeon.current_stage == 0:
-                        self.results.append({
-                            'msg': 'You go up the stairs and leave the dungeon forever...',
-                            'state': States.HERO_DEAD
-                        })
-                        break
+
+                        return ActionResult(
+                            success=False,
+                            alt=LeaveGameAction(),
+                            msg='You go up the stairs and leave the dungeon forever...',
+                            new_state=States.HERO_DEAD
+                        )
 
                     elif dungeon.move_upstairs():
                         stage = dungeon.get_stage()
-                        self.results.append({
-                            'msg': 'You ascend the stairs up.',
-                            'redraw': True
-                        })
-                        break
+                        game.redraw = True
+
+                        return ActionResult(
+                            success=True,
+                            msg='You ascend the stairs up.'
+                        )
                     else:
                         raise ValueError("Something weird happened with going upstairs!")
 
-        else:
-            self.results.append({'msg': 'There are no stairs here.'})
+        return ActionResult(
+            success=False,
+            msg='There are no stairs here.'
+        )
 
 
 class StairDownAction(Action):
     def perform(self, *args, **kwargs):
         dungeon = kwargs['dungeon']
         entity = kwargs['entity']
+        game = kwargs['game']
         stage = dungeon.get_stage()
 
         for entity in stage.entities:
@@ -265,17 +301,18 @@ class StairDownAction(Action):
                     if dungeon.move_downstairs():
                         stage = dungeon.get_stage()
                         stage.populate()
-
-                        self.results.append({
-                            'msg': 'You carefully descend the stairs down.',
-                            'redraw': True
-                        })
-                        break
+                        game.redraw = True
+                        return ActionResult(
+                            success=True,
+                            msg='You carefully descend the stairs down.',
+                        )
                     else:
                         raise ValueError("Something weird happened with going downstairs!")
 
-        else:
-            self.results.append({'msg': 'There are no stairs here.'})
+        return ActionResult(
+            success=False,
+            msg='There are no stairs here.'
+        )
 
 
 class LevelUpAction(Action):
@@ -294,19 +331,19 @@ class LevelUpAction(Action):
         if self.stat == 'hp':
             entity.fighter.base_max_hp += 20
             entity.fighter.hp += 20
-            self.results.append({'msg': 'Boosted max HP!'})
+            return ActionResult(success=True, msg='Boosted max HP!', new_state=States.HERO_TURN)
+
 
         elif self.stat == 'str':
             entity.fighter.base_power += 1
-            self.results.append({'msg': 'Boosted strength!'})
+            return ActionResult(success=True, msg='Boosted strength!', new_state=States.HERO_TURN)
 
         elif self.stat == 'def':
             entity.fighter.base_defense += 1
-            self.results.append({'msg': 'Boosted defense!'})
+            return ActionResult(success=True, msg='Boosted defense!', new_state=States.HERO_TURN)
 
-        # Just go back to HERO_TURN by default.
-        # self.results.append({'state': States.HERO_TURN})
-        self.results.append({'state': prev_state})
+        else:
+            raise ValueError('invalid stat!')
 
 
 class ExitAction(Action):
@@ -318,19 +355,17 @@ class ExitAction(Action):
         prev_state = kwargs['prev_state']
 
         if self.state in (States.SHOW_INV, States.DROP_INV, States.SHOW_STATS):
-            self.results.append({'state': prev_state})
+            return ActionResult(success=True, new_state=prev_state)
 
         elif self.state == States.TARGETING:
-            self.results.append({
-                'state': prev_state,
-                'cancel_target': True,
-                'msg': 'Targeting cancelled.',
-            })
+            return ActionResult(
+                success=True,
+                new_state=prev_state,
+                msg='Targeting cancelled.',
+            )
 
         else:
-            self.results.append({'state': States.MAIN_MENU})
-            # save_game(config.savefile, dungeon, msg_log, state, turns)
-            # return True
+            return ActionResult(success=True, new_state=States.MAIN_MENU)
 
 
 class FullScreenAction(Action):
@@ -340,6 +375,7 @@ class FullScreenAction(Action):
     def perform(self, *args, **kwargs):
         # Toggle fullscreen on/off
         tcod.console_set_fullscreen(fullscreen=not tcod.console_is_fullscreen())
+        return ActionResult(success=True)
 
 
 class GetTargetAction(Action):
@@ -348,8 +384,10 @@ class GetTargetAction(Action):
         self.item = item
 
     def perform(self, *args, **kwargs):
-
-        self.results.append({'state': States.TARGETING})
+        return ActionResult(
+            success=True,
+            new_state=States.TARGETING
+        )
 
 
 class TargetAction(Action):
@@ -366,30 +404,20 @@ class TargetAction(Action):
         self.rclick = rclick
 
     def perform(self, *args, **kwargs):
-        entity = kwargs['entity']
         targeting_item = kwargs['targeting_item']
-        stage = kwargs['stage']
-        fov_map = kwargs['fov_map']
+        state = kwargs['state']
 
         if self.lclick:
             # note: Due to the message console - we have to offset the y.
             self.y -= config.msg_height
-
-            # todo: Replace with UseItemAction?
-
-            item_use_results = entity.inv.use(
-                targeting_item,
-                entities=stage.entities,
-                fov_map=fov_map,
-                target_x=self.x,
-                target_y=self.y
-            )
-            self.results.extend(item_use_results)
+            use_item_action = UseItemAction(targeting_item, target_x=self.x, target_y=self.y)
+            return ActionResult(alt=use_item_action)
 
         elif self.rclick:
-            # todo: Replace with ExitAction?
-            self.results.append({'cancel_target': True})
-
+            return ActionResult(
+                success=False,
+                alt=ExitAction(state)
+            )
 
 class ShowInvAction(Action):
     def __init__(self, prev_state):
@@ -397,8 +425,10 @@ class ShowInvAction(Action):
         self.prev_state = prev_state
 
     def perform(self, *args, **kwargs):
-        self.results = [{'state': States.SHOW_INV}]
-
+        return ActionResult(
+            success=True,
+            new_state=States.SHOW_INV
+        )
 
 class DropInvAction(Action):
     def __init__(self, prev_state):
@@ -406,7 +436,10 @@ class DropInvAction(Action):
         self.prev_state = prev_state
 
     def perform(self, *args, **kwargs):
-        self.results = [{'state': States.DROP_INV}]
+        return ActionResult(
+            success=True,
+            new_state=States.DROP_INV
+        )
 
 
 class CharScreenAction(Action):
@@ -415,7 +448,10 @@ class CharScreenAction(Action):
         self.prev_state = prev_state
 
     def perform(self, *args, **kwargs):
-        self.results = [{'state': States.SHOW_STATS}]
+        return ActionResult(
+            success=True,
+            new_state=States.SHOW_STATS
+        )
 
 
 class KillMonsterAction(Action):
@@ -440,7 +476,10 @@ class KillMonsterAction(Action):
         death_msg = 'The {} dies!'.format(self.entity.name.capitalize())
         self.entity.name = 'remains of ' + self.entity.name
 
-        self.results = [{'msg': death_msg}]
+        return ActionResult(
+            success=True,
+            msg=death_msg
+        )
 
 
 class KillPlayerAction(Action):
@@ -453,10 +492,12 @@ class KillPlayerAction(Action):
     def perform(self, *args, **kwargs):
         self.entity.char = '%'
         self.entity.color = tcod.dark_red
-        self.results = [{
-            'msg': 'You died!',
-            'state': States.HERO_DEAD
-        }]
+
+        return ActionResult(
+            success=True,
+            msg='You died!',
+            new_state=States.HERO_DEAD
+        )
 
 
 class AddXPAction(Action):
@@ -464,6 +505,8 @@ class AddXPAction(Action):
         super().__init__(consumes_turn=False)
 
     def perform(self, *args, **kwargs):
-
         pass
 
+
+class LeaveGameAction():
+    pass
