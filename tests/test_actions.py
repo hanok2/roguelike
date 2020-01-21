@@ -69,9 +69,19 @@ def test_ActionResult__action_alt():
     assert isinstance(action.alt, actions.WaitAction)
 
 
-def test_ActionResult__success_True_and_alterative_raises_exception():
-    with pytest.raises(ValueError):
-        actions.ActionResult(success=True, alt=actions.WaitAction())
+@pytest.mark.skip(reason='implement soon')
+def test_ActionResult__list_of_alternative_actions():
+    action = actions.ActionResult(
+        alt=[actions.WaitAction(), actions.WaitAction()]
+    )
+    assert action.success is False
+    assert isinstance(action.alt, actions.WaitAction)
+
+
+# This restriction is too restrictive!
+# def test_ActionResult__success_True_and_alterative_raises_exception():
+    # with pytest.raises(ValueError):
+        # actions.ActionResult(success=True, alt=actions.WaitAction())
 
 
 def test_ActionResult__new_state__success_defaults_None():
@@ -87,6 +97,8 @@ def test_ActionResult__new_state__fail_defaults_None():
 def test_ActionResult__new_state__alt_defaults_None():
     action = actions.ActionResult(alt=actions.WaitAction())
     assert action.new_state is None
+
+
 
 
 """ Tests for WalkAction """

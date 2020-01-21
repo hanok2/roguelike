@@ -182,7 +182,13 @@ def play_game(g, render_eng):
 
         if action:
             # Go with keyboard action
-            process_action(action, g.hero, g)
+            action_result = process_action(action, g.hero, g)
+
+            # Print any messges
+            # If failed - don't consume turn
+            # If succeed - consume turn if required
+            # If new state - change the state
+            # If alternate - Add the new Action to the queue
 
         if g.state == States.MAIN_MENU:
             g.redraw = True
@@ -247,6 +253,7 @@ def process_action(action, entity, g):
         fov_map=g.fov_map,
         entity=entity,
         targeting_item=g.targeting_item,
+        game=g,
     )
 
     hero_turn_results = action.results

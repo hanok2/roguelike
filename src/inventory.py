@@ -1,5 +1,3 @@
-INV_FULL_MSG = 'You cannot carry any more, your inventory is full.'
-
 class Inventory(object):
     # Add a contains() method
 
@@ -12,22 +10,12 @@ class Inventory(object):
         self.items = []
 
     def add_item(self, item):
-        results = []
-
         if len(self.items) >= self.capacity:
-            results.append({
-                'item_added': None,
-                'msg': INV_FULL_MSG
-            })
-        else:
-            results.append({
-                'item_added': item,
-                'msg': 'You pick up the {}.'.format(item.name)
-            })
+            return False
 
-            self.items.append(item)
+        self.items.append(item)
+        return True
 
-        return results
 
     def use(self, item_entity, **kwargs):
         results = []

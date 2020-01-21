@@ -16,9 +16,6 @@ class Action(ABC):
 
 class ActionResult(object):
     def __init__(self, success=False, alt=None, new_state=None, msg=None):
-        if success and alt:
-            raise ValueError('ActionResult cannot have succeeded and provide an alternative Action!')
-
         self.success = success
         self.alt = alt
         self.new_state = new_state
@@ -93,17 +90,13 @@ class AttackAction(Action):
 
         target = stage.get_blocker_at_loc(dest_x, dest_y)
 
-        if target:
-            # Todo - refactor attack code here...
-            attack_results = self.entity.fighter.attack(target)
-            self.results.extend(attack_results)
-            return ActionResult(success=True)
+        if not target:
+            return ActionResult(
+                success=False,
+                msg='There is nothing to attack at that position.'
+            )
 
-        return ActionResult(
-            success=False,
-            msg='There is nothing to attack at that position.'
-        )
-
+        return self.entity.fighter.attack(target)
 
 
 class WaitAction(Action):
@@ -121,11 +114,18 @@ class PickupAction(Action):
             item_pos_at_our_pos = e.x == entity.x and e.y == entity.y
 
             if e.has_comp('item') and item_pos_at_our_pos:
-                # todo: Refactor add item into this.
-                self.results.extend(entity.inv.add_item(e))
+                success = entity.inv.add_item(e)
 
-                # todo: Will probably break stuff....
-                return ActionResult(success=True)
+                if success:
+                    return ActionResult(
+                        success=True,
+                        msg='You pick up the {}.'.format(e.name)
+                    )
+
+                return ActionResult(
+                    success=False,
+                    msg='You cannot carry any more, your inventory is full.'
+                )
 
         return ActionResult(
             success=False,

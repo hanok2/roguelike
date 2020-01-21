@@ -1,4 +1,5 @@
 from random import randint
+from . import actions
 from . import config
 from .config import EquipmentSlots
 
@@ -52,16 +53,12 @@ class Fighter(object):
         if amt < 0:
             raise ValueError('take_dmg amt must be a positive number!')
 
-        results = []
         self.hp -= amt
 
         if self.hp <= 0:
-            results.append({
-                'dead': self.owner,
-                'xp': self.xp
-            })
+            return actions.ActionResult(success=True, alt=actions.KillMonsterAction(self.owner))
 
-        return results
+        return actions.ActionResult(success=True)
 
     def heal(self, amt):
         if amt < 0:
@@ -72,21 +69,18 @@ class Fighter(object):
             self.hp = self.max_hp
 
     def attack(self, target):
-        results = []
-
         dmg = self.power - target.fighter.defense
 
         if dmg > 0:
-            msg = {'msg': '{} attacks {}!'.format(self.owner.name, target.name)}
+            msg = '{} attacks {}!'.format(self.owner.name, target.name)
 
-            results.append(msg)
-            results.extend(target.fighter.take_dmg(dmg))
+            result = target.fighter.take_dmg(dmg)
+            result.msg = msg
+            return result
 
-        else:
-            msg = {'msg': '{} attacks {}... But does no damage.'.format(self.owner.name, target.name), }
-            results.append(msg)
+        msg = '{} attacks {}... But does no damage.'.format(self.owner.name, target.name)
+        return actions.ActionResult(success=True, msg=msg)
 
-        return results
 
 
 class ApproachAI(object):

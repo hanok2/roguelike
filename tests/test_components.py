@@ -1,4 +1,5 @@
 import pytest
+from ..src import actions
 from ..src import components
 from ..src import config
 from ..src import entity
@@ -78,16 +79,14 @@ def test_Fighter_take_dmg__returns_empty_results():
     hp = 10
     f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
     result = f.take_dmg(1)
-    assert not result
+    assert result.success
 
 
-def test_Fighter_take_dmg__lethal_dmg_returns_dead_results():
-    hp = 10
-    f = components.Fighter(owner='bob', hp=hp, defense=0, power=0, xp=0)
+def test_Fighter_take_dmg__lethal_dmg_returns_dead_results(orc):
+    f = orc.fighter
     result = f.take_dmg(15)
-    result = result.pop()  # get the dict from the list
-    assert result['xp'] == 0
-    assert result['dead'] == 'bob'
+    assert result.success
+    assert isinstance(result.alt, actions.KillMonsterAction)
 
 
 def test_Fighter_heal__hp_is_recovered():
@@ -124,9 +123,7 @@ def test_Fighter_attack__target_takes_dmg(hero, orc):
 
 def test_Fighter_attack__dmg_returns_results(hero, orc):
     results = hero.fighter.attack(orc)
-    results = results.pop()  # Get the dict from the list
-    assert len(results) == 1
-    assert results['msg'] == 'Player attacks Orc!'
+    assert results.msg == 'Player attacks Orc!'
 
 
 def test_Fighter_attack__target_doesnt_take_dmg(hero, orc):
@@ -147,9 +144,8 @@ def test_Fighter_attack__no_dmg_returns_results(hero, orc):
     hero.equipment.toggle_equip(hero.inv.items[0])
 
     hero.fighter.base_power = 1
-    results = hero.fighter.attack(orc)
-    results = results.pop()  # Get the dict from the list
-    assert results['msg'] == 'Player attacks Orc... But does no damage.'
+    result = hero.fighter.attack(orc)
+    assert result.msg == 'Player attacks Orc... But does no damage.'
 
 
 """ Tests for class ApproachAI(object): """
