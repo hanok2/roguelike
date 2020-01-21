@@ -551,11 +551,26 @@ class LeaveGameAction(Action):
 
 
 class TakeDmgAction(Action):
-    def __init__(self):
+    def __init__(self, entity, dmg):
         super().__init__(consumes_turn=False)
+        if dmg < 0:
+            raise ValueError('TakeDmgAction: dmg must be a positive number!')
+
+        self.entity = entity
+        self.dmg = dmg
 
     def perform(self, *args, **kwargs):
-        pass
+        self.entity.fighter.hp -= self.dmg
+
+        if self.entity.fighter.hp <= 0:
+            # Kill the correct entity
+            if self.entity.has_comp('human'):
+                return ActionResult(success=True, alt=KillPlayerAction(self.entity))
+
+            return ActionResult(success=True, alt=KillMonsterAction(self.entity))
+
+        return ActionResult(success=True)
+
 
 
 class HealAction(Action):

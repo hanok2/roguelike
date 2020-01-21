@@ -187,8 +187,8 @@ def play_game(g, render_eng):
             # Print any messges
             # If failed - don't consume turn
             # If succeed - consume turn if required
-            # If new state - change the state
-            # If alternate - Add the new Action to the queue
+            # If new state - change the state, and update the prev_state
+            # If alternates actions - Add new Actions to the queue (in order)
 
         if g.state == States.MAIN_MENU:
             g.redraw = True

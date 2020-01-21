@@ -925,29 +925,66 @@ def test_AddXPAction_init():
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
 
+# 2 args: entity (gainer) and xp
+# only has success
+# checks if the entity has leveled up, if so - changes state to LEVELUP and has msg
 
 """ Tests for LeaveGameAction """
 
 
-def test_LeaveGameAction():
+def test_LeaveGameAction_init():
     action = actions.LeaveGameAction()
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
+
+# msg
+# new_state is hero dead
 
 
 """ Tests for TakeDmgAction """
 
 
-def test_TakeDmgAction():
-    action = actions.TakeDmgAction()
+def test_TakeDmgAction_init(orc):
+    action = actions.TakeDmgAction(entity=orc, dmg=1)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
+
+
+def test_TakeDmgAction_reduces_hp(orc):
+    action = actions.TakeDmgAction(entity=orc, dmg=1)
+    result = action.perform()
+
+    assert result.success
+    assert orc.fighter.hp == orc.fighter.max_hp - 1
+
+
+def test_TakeDmgAction_negative_dmg_raises_exception(orc):
+    with pytest.raises(ValueError):
+        actions.TakeDmgAction(entity=orc, dmg=-1)
+
+
+def test_TakeDmgAction_lethal_dmg_to_monster_returns_KillMonsterAction(orc):
+    lethal_dmg = orc.fighter.max_hp
+    action = actions.TakeDmgAction(entity=orc, dmg=lethal_dmg)
+    result = action.perform()
+
+    assert result.success
+    assert actions.KillMonsterAction in result
+
+
+def test_TakeDmgAction_lethal_dmg_to_hero_returns_KillPlayerAction(hero):
+    lethal_dmg = hero.fighter.max_hp
+    action = actions.TakeDmgAction(entity=hero, dmg=lethal_dmg)
+    result = action.perform()
+
+    assert result.success
+    assert actions.KillPlayerAction in result
 
 
 """ Tests for HealAction """
 
 
-def test_HealAction():
+def test_HealAction_init():
     action = actions.HealAction()
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
