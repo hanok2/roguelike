@@ -542,5 +542,25 @@ class AddXPAction(Action):
         pass
 
 
-class LeaveGameAction():
-    pass
+class LeaveGameAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        pass
+
+
+class TakeDmgAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        pass
+
+
+class HealAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        pass

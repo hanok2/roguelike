@@ -924,3 +924,30 @@ def test_AddXPAction_init():
     action = actions.AddXPAction()
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
+
+
+""" Tests for LeaveGameAction """
+
+
+def test_LeaveGameAction():
+    action = actions.LeaveGameAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
+
+
+""" Tests for TakeDmgAction """
+
+
+def test_TakeDmgAction():
+    action = actions.TakeDmgAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
+
+
+""" Tests for HealAction """
+
+
+def test_HealAction():
+    action = actions.HealAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
