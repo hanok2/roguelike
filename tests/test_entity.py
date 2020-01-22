@@ -107,10 +107,12 @@ def test_Entity_move__to_a_negative_x():
     with pytest.raises(ValueError):
         e.move(-1, 2)
 
+
 def test_Entity_move__to_a_negative_y():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
     with pytest.raises(ValueError):
         e.move(1, -2)
+
 
 def test_Entity_move__positive_values():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
@@ -124,27 +126,6 @@ def test_Entity_move__negative_values():
     e.move(-1, 2)
     assert e.x == 9
     assert e.y == 12
-
-
-def test_calc_move__same_point_returns_0_0():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    dx, dy = e.calc_move(0, 0)
-    assert dx == 0
-    assert dy == 0
-
-
-def test_calc_move__south():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    dx, dy = e.calc_move(0, 1)
-    assert dx == 0
-    assert dy == 1
-
-
-def test_calc_move__knights_jump_south():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    dx, dy = e.calc_move(1, 2)
-    assert dx == 0
-    assert dy == 1
 
 
 def test_Entity_move_towards__negative_target_x_raises_exception(open_map):
@@ -236,34 +217,3 @@ def test_Entity_move_towards__target_SW(open_map):
     e.move_towards(4, 6, open_map)
     assert e.x == 4
     assert e.y == 6
-
-
-# def move_astar(self, target, entities, game_map):
-    # Move to map???
-
-
-def test_distance__same_point_returns_0():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    result = e.distance(0, 0)
-    assert result == 0
-
-
-def test_distance__1_tile_away_returns_1():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    result = e.distance(1, 0)
-    assert result == 1
-
-
-def test_distance__1_diagonal_tile_away_returns_something():
-    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
-    result = round(e.distance(1, 1), 2)
-    assert result == 1.41
-
-
-def test_Entity_distance_to(mocker, orc):
-    e = entity.Entity(x=1, y=1, char='@', color=None, name='Player')
-    mocker.patch.object(entity.Entity, 'distance')
-    e.distance_to(orc)
-
-    # Check that it calls Entity.distance with the entity's x/y
-    e.distance.assert_called_once_with(orc.x, orc.y)

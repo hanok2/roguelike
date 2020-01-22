@@ -1,3 +1,4 @@
+import math
 import random
 from . import config
 from . import factory
@@ -233,3 +234,30 @@ class Stage(object):
         dx = dest_x - src_x
         dy = dest_y - src_y
         return dx, dy
+
+    @classmethod
+    def calc_move(self, x1, y1, x2, y2):
+        """Calculates how to get to a target coordinate from the entity's
+            coordinates. Returns a (dx, dy) tuple representing the change in
+            x and y required to get there.
+        """
+        dist = self.distance(x1, y1, x2, y2)
+
+        if dist == 0:
+            return 0, 0
+
+        dx = int(round((x2 - x1) / dist))
+        dy = int(round((y2 - y1) / dist))
+        return dx, dy
+
+    @classmethod
+    def distance(self, x1, y1, x2, y2):
+        """ Returns the distance between the entity and an arbitrary point."""
+        dx = x1 - x2
+        dy = y1 - y2
+        return math.sqrt(dx ** 2 + dy ** 2)
+
+    @classmethod
+    def distance_between_entities(self, e1, e2):
+        """ Returns the distance between the entity and an arbitrary point."""
+        return self.distance(e1.x, e1.y, e2.x, e2.y)

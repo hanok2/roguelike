@@ -1,17 +1,18 @@
 import pytest
 from pytest_mock import mocker
 
-from ..src import stages
 from ..src import config
+from ..src import entity
 from ..src import player
 from ..src import rect
+from ..src import stages
 
 DEFAULT_LENGTH = 50
 INVALID_LENGTH = 2
 
 @pytest.fixture
 def hero():
-    return player.get_hero()
+    return player.Player()
 
 
 """Tests for class Stage(object):"""
@@ -424,49 +425,80 @@ def test_Stage_get_blocker_at_loc__not_blocked_returns_None():
     assert result is None
 
 
-def test_calc_dxdy__N():
+def test_Stage_calc_dxdy__N():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 1, 0)
-    assert dx == 0
-    assert dy == -1
+    assert dx == 0 and dy == -1
 
 
-def test_calc_dxdy__NE():
+def test_Stage_calc_dxdy__NE():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 2, 0)
-    assert dx == 1
-    assert dy == -1
+    assert dx == 1 and dy == -1
 
 
-def test_calc_dxdy__E():
+def test_Stage_calc_dxdy__E():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 2, 1)
-    assert dx == 1
-    assert dy == 0
+    assert dx == 1 and dy == 0
 
 
-def test_calc_dxdy__SE():
+def test_Stage_calc_dxdy__SE():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 2, 2)
-    assert dx == 1
-    assert dy == 1
+    assert dx == 1 and dy == 1
 
 
-def test_calc_dxdy__S():
+def test_Stage_calc_dxdy__S():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 1, 2)
-    assert dx == 0
-    assert dy == 1
+    assert dx == 0 and dy == 1
 
 
-def test_calc_dxdy__SW():
+def test_Stage_calc_dxdy__SW():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 0, 2)
-    assert dx == -1
-    assert dy == 1
+    assert dx == -1 and dy == 1
 
 
-def test_calc_dxdy__W():
+def test_Stage_calc_dxdy__W():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 0, 1)
-    assert dx == -1
-    assert dy == 0
+    assert dx == -1 and dy == 0
 
 
-def test_calc_dxdy__NW():
+def test_Stage_calc_dxdy__NW():
     dx, dy = stages.Stage.calc_dxdy(1, 1, 0, 0)
-    assert dx == -1
-    assert dy == -1
+    assert dx == -1 and dy == -1
+
+
+def test_Stage_calc_move__same_point_returns_0_0():
+    dx, dy = stages.Stage.calc_move(0, 0, 0, 0)
+    assert dx == 0 and dy == 0
+
+
+def test_Stage_calc_move__south():
+    dx, dy = stages.Stage.calc_move(0, 0, 0, 1)
+    assert dx == 0 and dy == 1
+
+
+def test_Stage_calc_move__knights_jump_south():
+    dx, dy = stages.Stage.calc_move(0, 0, 1, 2)
+    assert dx == 0 and dy == 1
+
+
+def test_Stage_distance__same_point_returns_0():
+    result = stages.Stage.distance(0, 0, 0, 0)
+    assert result == 0
+
+
+def test_Stage_distance__1_tile_away_returns_1():
+    result = stages.Stage.distance(0, 0, 1, 0)
+    assert result == 1
+
+
+def test_Stage_distance__1_diagonal_tile_away_returns_something():
+    result = stages.Stage.distance(0, 0, 1, 1)
+    result = round(result, 2)  # Round to 2 decimal places
+    assert result == 1.41
+
+
+def test_Stage_distance_between_entities():
+    hero = entity.Entity(x=0, y=0)
+    orc = entity.Entity(x=0, y=10)
+    result = stages.Stage.distance_between_entities(hero, orc)
+
+    assert result == 10
