@@ -616,8 +616,109 @@ class HealAction(Action):
 
 
 class MoveAStarAction(Action):
-    def __init__(self, entity, target):
-        super().__init__(consumes_turn=False)
+    def __init__(self, stage, entity, target):
+        super().__init__(consumes_turn=True)
+        self.stage = stage
+        self.entity = entity
+        self.target = target
+
+    def perform(self, *args, **kwargs):
+        # Create a FOV map that has the dimensions of the map
+        # DeprecationWarning: Call tcod.map.Map(width, height) instead.
+        # fov = tcod.map_new(self.stage.width, self.stage.height)
+
+        fov = tcod.map.Map(width=self.stage.width, height=self.stage.height)
+
+        # Scan the current map each turn and set all the walls as unwalkable
+        for y1 in range(self.stage.height):
+            for x1 in range(self.stage.width):
+                # DeprecationWarning: Set properties using the m.transparent and m.walkable arrays.
+                # tcod.map_set_properties( fov, x1, y1, not self.stage.tiles[x1][y1].block_sight, not self.stage.tiles[x1][y1].blocked)
+
+                fov.transparent[y1, x1] = not self.stage.tiles[x1][y1].block_sight
+                fov.walkable[y1, x1] = not self.stage.tiles[x1][y1].blocked
+
+        # Scan all the objects to see if there are objects that must be navigated
+        # around. Check also that the object isn't self or the target (so that
+        # the start and the end points are free). The AI class handles the
+        # situation if self is next to the target so it will not use this A* function
+        # anyway
+
+        for entity in self.stage.entities:
+            if entity.blocks and entity != self and entity != self.target:
+                # Set the tile as a wall so it must be navigated around
+                # tcod.map_set_properties(fov, entity.x, entity.y, True, False)
+
+                fov.walkable[entity.y, entity.x] = False
+
+        # Allocate a A* path
+        # The 1.41 is the normal diagonal cost of moving, it can be set as 0.0
+        # if diagonal moves are prohibited
+
+        # PendingDeprecationWarning: This function may be deprecated in the future.
+        my_path = tcod.path_new_using_map(m=fov, dcost=1.41)
+
+        # Compute the path between self's coordinates and the target's coordinates
+
+        # PendingDeprecationWarning: This function may be deprecated in the future.
+        # Returns a boolean...
+        tcod.path_compute(
+            p=my_path,
+            ox=self.entity.x,
+            oy=self.entity.y,
+            dx=self.target.x,
+            dy=self.target.y
+        )
+
+        # Check if the path exists, and in this case, also the path is shorter
+        # than 25 tiles. The path size matters if you want the monster to use
+        # alternative longer paths (for example through other rooms) if for
+        # example the player is in a corridor. It makes sense to keep path size
+        # relatively low to keep the monsters from running around the map if
+        # there's an alternative path really far away
+
+        # PendingDeprecationWarning: This function may be deprecated in the future.
+        print(tcod.path_size(my_path))
+        print(my_path)
+
+        if not tcod.path_is_empty(my_path) and tcod.path_size(my_path) < 25:
+
+            # Find the next coordinates in the computed full path
+
+            # PendingDeprecationWarning: This function may be deprecated in the future.
+            x, y = tcod.path_walk(my_path, True)
+            if x or y:
+
+                # Set self's coordinates to the next path tile
+                dx, dy = self.stage.calc_dxdy(self.entity.x, self.entity.y, x, y)
+                print(dx, dy)
+
+                # DeprecationWarning: libtcod objects are deleted automatically.
+                # tcod.path_delete(my_path)
+
+                return ActionResult(
+                    success=True,
+                    alt=WalkAction(dx, dy)
+                )
+
+        # Keep the old move function as a backup so that if there are no paths
+        # (for example another monster blocks a corridor) it will still try to
+        # move towards the player (closer to the corridor opening)
+        # self.move_towards(self.target.x, self.target.y, self.stage)
+
+        # DeprecationWarning: libtcod objects are deleted automatically.
+        # tcod.path_delete(my_path)
+
+        return ActionResult(
+            success=True,
+            alt=MoveTowardAction(self.stage, self.entity, self.target)
+        )
+
+
+class MoveTowardAction(Action):
+    def __init__(self, stage, entity, target):
+        super().__init__(consumes_turn=True)
+        self.stage = stage
         self.entity = entity
         self.target = target
 

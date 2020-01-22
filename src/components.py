@@ -58,7 +58,7 @@ class ApproachAI(object):
     def get_action(self, g):
         results = []
 
-        if fov_map.fov[self.owner.y, self.owner.x]:
+        if g.fov_map.fov[self.owner.y, self.owner.x]:
             if self.owner.distance_to(g.hero) >= 2:
                 self.owner.move_astar(g.hero, g.stage)
 

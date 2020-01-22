@@ -60,7 +60,7 @@ def fov_stage():
     ]
     # Set up some wall for testing
     for x, y in wall_coordinates:
-        m.tiles[x][y].blocks = True
+        m.tiles[x][y].blocked = True
 
     hero = player.Player(x=0, y=0)
     orc = factory.mk_entity('orc', 1, 0)
@@ -1084,7 +1084,7 @@ def test_MoveAStarAction_init(fov_stage):
         target=hero
     )
     assert isinstance(action, actions.Action)
-    assert action.consumes_turn is False
+    assert action.consumes_turn
 
 
 def test_MoveAStarAction__target_next_sq(fov_stage):
@@ -1097,9 +1097,11 @@ def test_MoveAStarAction__target_next_sq(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    assert str(result.alt) == 'WalkAction'
-    assert result.alt.dx == 1
-    assert result.alt.dy == 0
+    wa = result.alt.pop()  # We need to examine the WalkAction
+
+    assert isinstance(wa, actions.WalkAction)
+    assert wa.dx == 1
+    assert wa.dy == 0
 
 
 def test_MoveAStarAction__target_knights_jump_away(fov_stage):
@@ -1112,9 +1114,11 @@ def test_MoveAStarAction__target_knights_jump_away(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    assert str(result.alt) == 'WalkAction'
-    assert result.alt.dx == -1
-    assert result.alt.dy == 1
+    wa = result.alt.pop()  # We need to examine the WalkAction
+
+    assert isinstance(wa, actions.WalkAction)
+    assert wa.dx == -1
+    assert wa.dy == 1
 
 def test_MoveAStarAction__target_around_wall(fov_stage):
     fov_stage.hero_ref.x = 1
@@ -1126,9 +1130,10 @@ def test_MoveAStarAction__target_around_wall(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    assert str(result.alt) == 'WalkAction'
-    assert result.alt.dx == -1
-    assert result.alt.dy == 1
+    wa = result.alt.pop()  # We need to examine the WalkAction
+    assert isinstance(wa, actions.WalkAction)
+    assert wa.dx == -1
+    assert wa.dy == 1
 
 
 def test_MoveAStarAction__target_behind_wall(fov_stage):
@@ -1141,9 +1146,10 @@ def test_MoveAStarAction__target_behind_wall(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    assert str(result.alt) == 'WalkAction'
-    assert result.alt.dx == -1
-    assert result.alt.dy == 1
+    wa = result.alt.pop()  # We need to examine the WalkAction
+    assert isinstance(wa, actions.WalkAction)
+    assert wa.dx == -1
+    assert wa.dy == 1
 
 
 def test_MoveAStarAction__target_in_opposite_corner(fov_stage):
@@ -1156,14 +1162,15 @@ def test_MoveAStarAction__target_in_opposite_corner(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    assert str(result.alt) == 'WalkAction'
-    assert result.alt.dx == 1
-    assert result.alt.dy == 0
+    wa = result.alt.pop()  # We need to examine the WalkAction
+    assert isinstance(wa, actions.WalkAction)
+    assert wa.dx == 1
+    assert wa.dy == 0
 
 
 def test_MoveAStarAction__target_to_side(fov_stage):
-    fov_stage.hero_ref.x = 1
-    fov_stage.hero_ref.y = 0
+    fov_stage.hero_ref.x = 6
+    fov_stage.hero_ref.y = 1
 
     action = actions.MoveAStarAction(
         stage=fov_stage,
@@ -1171,6 +1178,21 @@ def test_MoveAStarAction__target_to_side(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    assert str(result.alt) == 'WalkAction'
-    assert result.alt.dx == 1
-    assert result.alt.dy == 0
+    wa = result.alt.pop()  # We need to examine the WalkAction
+    assert isinstance(wa, actions.WalkAction)
+    assert wa.dx == 1
+    assert wa.dy == 0
+
+# def test_MoveAStarAction__target_is_same_as_origin(fov_stage):
+
+""" Tests for MoveTowardAction"""
+
+
+def test_MoveTowardAction__init(fov_stage):
+    action = actions.MoveTowardAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn
