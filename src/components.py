@@ -49,39 +49,6 @@ class Fighter(object):
             bonus = 0
         return self.base_defense + bonus
 
-    def take_dmg(self, amt):
-        if amt < 0:
-            raise ValueError('take_dmg amt must be a positive number!')
-
-        self.hp -= amt
-
-        if self.hp <= 0:
-            return actions.ActionResult(success=True, alt=actions.KillMonsterAction(self.owner))
-
-        return actions.ActionResult(success=True)
-
-    def heal(self, amt):
-        if amt < 0:
-            raise ValueError('heal amt must be a positive number!')
-        self.hp += amt
-
-        if self.hp > self.max_hp:
-            self.hp = self.max_hp
-
-    def attack(self, target):
-        dmg = self.power - target.fighter.defense
-
-        if dmg > 0:
-            msg = '{} attacks {}!'.format(self.owner.name, target.name)
-
-            result = target.fighter.take_dmg(dmg)
-            result.msg = msg
-            return result
-
-        msg = '{} attacks {}... But does no damage.'.format(self.owner.name, target.name)
-        return actions.ActionResult(success=True, msg=msg)
-
-
 
 class ApproachAI(object):
     """AI for an entity/monster to approach the hero when within line of sight"""

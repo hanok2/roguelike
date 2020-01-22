@@ -56,96 +56,12 @@ def test_Fighter_init__owner_must_be_Entity():
 
 # def test_Fighter_max_hp():
     # How to test w/o owner?
+
 # def test_Fighter_power():
     # How to test w/o owner?
+
 # def test_Fighter_defense():
     # How to test w/o owner?
-
-
-def test_Fighter_take_dmg__reduces_hp():
-    hp = 10
-    f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
-    f.take_dmg(1)
-    assert f.hp == 9
-
-
-def test_Fighter_take_dmg__negative_dmg_raises_exception():
-    f = components.Fighter(owner=None, hp=10, defense=0, power=0, xp=0)
-    with pytest.raises(ValueError):
-        f.take_dmg(-1)
-
-
-def test_Fighter_take_dmg__returns_empty_results():
-    hp = 10
-    f = components.Fighter(owner=None, hp=hp, defense=0, power=0, xp=0)
-    result = f.take_dmg(1)
-    assert result.success
-
-
-def test_Fighter_take_dmg__lethal_dmg_returns_dead_results(orc):
-    f = orc.fighter
-    result = f.take_dmg(15)
-    assert result.success
-    assert actions.KillMonsterAction in result
-
-
-def test_Fighter_heal__hp_is_recovered():
-    e = entity.Entity()
-    hp = 10
-    f = components.Fighter(owner=e, hp=hp, defense=0, power=0, xp=0)
-    f.take_dmg(1)
-    f.heal(1)
-    assert f.hp == hp
-
-
-def test_Fighter_heal__excess_hp_doesnt_go_over_max():
-    e = entity.Entity()
-    f = components.Fighter(owner=e, hp=10, defense=0, power=0, xp=0)
-    f.heal(100)
-    assert f.hp == f.max_hp
-
-
-def test_Fighter_heal__negative_amt_raises_exception():
-    f = components.Fighter(owner=None, hp=10, defense=0, power=0, xp=0)
-    f.owner = None
-    with pytest.raises(ValueError):
-        f.heal(-1)
-
-def test_Fighter_attack__target_takes_dmg(hero, orc):
-    # unequip hero dagger
-    hero.equipment.toggle_equip(hero.inv.items[0])
-
-    dmg = hero.fighter.power - orc.fighter.defense
-    expected_hp = orc.fighter.hp - dmg
-    hero.fighter.attack(orc)
-    assert orc.fighter.hp == expected_hp
-
-
-def test_Fighter_attack__dmg_returns_results(hero, orc):
-    results = hero.fighter.attack(orc)
-    assert results.msg == 'Player attacks Orc!'
-
-
-def test_Fighter_attack__target_doesnt_take_dmg(hero, orc):
-    # unequip hero dagger
-    hero.equipment.toggle_equip(hero.inv.items[0])
-
-    hero.fighter.base_power = 1
-    dmg = hero.fighter.power - orc.fighter.defense
-    assert dmg == 0
-
-    expected_hp = orc.fighter.hp
-    hero.fighter.attack(orc)
-    assert orc.fighter.hp == expected_hp
-
-
-def test_Fighter_attack__no_dmg_returns_results(hero, orc):
-    # unequip hero dagger
-    hero.equipment.toggle_equip(hero.inv.items[0])
-
-    hero.fighter.base_power = 1
-    result = hero.fighter.attack(orc)
-    assert result.msg == 'Player attacks Orc... But does no damage.'
 
 
 """ Tests for class ApproachAI(object): """

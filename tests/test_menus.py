@@ -40,11 +40,8 @@ def test_lvl_up_options():
     assert options['d'] == 'Defense (+1 defense)'
 
 
-def test_inv_options__SHOW_INV__empty_inv(hero):
-    # Remove starting dagger
-    dagger = hero.inv.items[0]
-    hero.inv.drop(dagger)
-
+def test_inv_options__SHOW_INV__empty_inv():
+    hero = player.Player()
     header, options = menus.inv_options(hero, States.SHOW_INV)
 
     assert header == 'Press the key next to an item to use it, or ESC to cancel.\n'
@@ -80,11 +77,8 @@ def test_inv_options__SHOW_INV__both_hands_equipped(hero):
     }
 
 
-def test_inv_options__DROP_INV__empty_inv(hero):
-    # Remove starting dagger
-    dagger = hero.inv.items[0]
-    hero.inv.drop(dagger)
-
+def test_inv_options__DROP_INV__empty_inv():
+    hero = player.Player()
     header, options = menus.inv_options(hero, States.DROP_INV)
 
     assert header == 'Press the key next to an item to drop it, or ESC to cancel.\n'

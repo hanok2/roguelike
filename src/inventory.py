@@ -62,30 +62,3 @@ class Inventory(object):
             return False
         self.items.remove(item)
         return True
-
-    def chk_equipped(self, item):
-        """ Check if a piece of equipment is equipped. If it is, dequip it before dropping. """
-        if self.owner.equipment.main_hand == item or self.owner.equipment.off_hand == item:
-            return self.owner.equipment.toggle_equip(item)
-        return []
-
-    def drop(self, item):
-        results = []
-        if item not in self.items:
-            raise ValueError('Cannot drop an item that is not in inventory!')
-
-        # Dequip equipped items before dropping
-        if item.has_comp('equippable'):
-            results.extend(self.chk_equipped(item))
-
-        item.x = self.owner.x
-        item.y = self.owner.y
-
-        self.rm_item(item)
-
-        results.append({
-            'item_dropped': item,
-            'msg': 'You dropped the {}.'.format(item.name)
-        })
-
-        return results
