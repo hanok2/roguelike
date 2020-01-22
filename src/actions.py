@@ -613,3 +613,13 @@ class HealAction(Action):
             fighter.hp = fighter.max_hp
 
         return ActionResult(success=True)
+
+
+class MoveAStarAction(Action):
+    def __init__(self, entity, target):
+        super().__init__(consumes_turn=False)
+        self.entity = entity
+        self.target = target
+
+    def perform(self, *args, **kwargs):
+        pass

@@ -47,6 +47,25 @@ def walk_map():
     m.entities.extend([potion, orc])
     return m
 
+@pytest.fixture
+def fov_stage():
+    # todo: When we revamp map - revise this fixture!!!!!!!!!!!!!!!!!!!!!!!!
+    m = stages.Stage(10, 10)
+    # All open
+    m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
+    wall_coordinates = [
+        (1, 1), (2, 1), (3, 1), (4, 1),
+        (1, 2),
+        (1, 3),
+    ]
+    # Set up some wall for testing
+    for x, y in wall_coordinates:
+        m.tiles[x][y].blocks = True
+
+    m.entities.append(factory.mk_entity('orc', 1, 0))
+
+    return m
+
 
 """ Tests for ActionResult """
 
@@ -1046,3 +1065,12 @@ def test_HealAction__hp_already_max__returns_False(orc):
 def test_HealAction__negative_amt_raises_exception(orc):
     with pytest.raises(ValueError):
         actions.HealAction(entity=orc, amt=-1)
+
+
+""" Tests for MoveAStarAction """
+
+
+def test_MoveAStarAction_init(hero, orc):
+    action = actions.MoveAStarAction(entity=orc, target=hero)
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
