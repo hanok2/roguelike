@@ -6,6 +6,7 @@ __pycache__
 savegame.dat
 todo.txt
 Steampunk stuff
+pytest.ini
 
 *.pyc
 .env
