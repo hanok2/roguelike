@@ -55,15 +55,18 @@ class ApproachAI(object):
     def __init__(self, owner):
         self.owner = owner
 
-    def take_turn(self, target, fov_map, game_map):
+    def get_action(self, g):
         results = []
 
         if fov_map.fov[self.owner.y, self.owner.x]:
-            if self.owner.distance_to(target) >= 2:
-                self.owner.move_astar(target, game_map)
+            if self.owner.distance_to(g.hero) >= 2:
+                self.owner.move_astar(g.hero, g.stage)
 
-            elif target.fighter.hp > 0:
-                attack_results = self.owner.fighter.attack(target)
+            elif g.hero.fighter.hp > 0:
+                # attack_results = self.owner.fighter.attack(target)
+
+                attack_results = self.owner.fighter.attack(g.hero)
+
                 results.extend(attack_results)
 
         return results

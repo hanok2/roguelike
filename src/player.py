@@ -1,6 +1,7 @@
 import tcod
 from . import factory
 from . import entity
+from . import input_handling
 from .components import Fighter, Level, Equipment
 from .config import RenderOrder
 from .inventory import Inventory
@@ -36,3 +37,48 @@ class Player(entity.Entity):
         )
         self.fighter = Fighter(self, HERO_HP, HERO_DEF, HERO_POW)
         self.inv = Inventory(owner=self, capacity=HERO_INV_CAPACITY)
+
+        self.key = tcod.Key()
+        self.mouse = tcod.Mouse()
+
+    def get_action(self, g):
+        # Capture new user input
+        # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
+        # tcod.sys_check_for_event(
+            # mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            # k=key,
+            # m=mouse
+        # )
+
+        # Flush False - returns 2 key events
+        # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
+        # tcod.Key(pressed=True, vk=tcod.KEY_TEXT, text='h')
+
+        # Flush True: returns just this
+        # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
+
+
+        # Nothing is waiting in the action queue - collect more actions
+        tcod.sys_wait_for_event(
+            mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
+            k=self.key,
+            m=self.mouse,
+            flush=True
+        )
+
+        # Get keyboard/mouse input
+        key_char = input_handling.process_tcod_input(self.key)
+
+        action = input_handling.handle_keys(g.state, key_char)
+        mouse_action = input_handling.handle_mouse(g.state, self.mouse)
+
+        if mouse_action:
+            # Mouse action will take priority over keys (for now)
+            # log.debug('mouse_action: {}'.format(mouse_action))
+
+            action = mouse_action
+
+        return action
+
+
+

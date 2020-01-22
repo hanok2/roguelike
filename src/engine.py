@@ -91,14 +91,15 @@ def main():
 
 def play_game(g, render_eng):
     log.debug('Calling play_game...')
-
-    key = tcod.Key()
-    mouse = tcod.Mouse()
-
     # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
     # while not tcod.console_is_window_closed():
 
     log.debug('Entering game loop...')
+
+    mouse = tcod.Mouse()
+
+    actors = g.stage.entities
+    actor_index = 0
     # Game loop
     while True:
         if g.redraw:
@@ -110,7 +111,6 @@ def play_game(g, render_eng):
             render_eng.con.clear()
             # libtcod.console_clear(con)
             g.redraw = False
-
 
         if g.fov_recompute:
             log.debug('fov_recompute...')
@@ -142,46 +142,21 @@ def play_game(g, render_eng):
         # Clear all entities
         render_eng.clear_all(g.stage.entities)
 
-        # Capture new user input
-        # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
-        # tcod.sys_check_for_event(
-            # mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
-            # k=key,
-            # m=mouse
-        # )
-
-        # Flush False - returns 2 key events
-        # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
-        # tcod.Key(pressed=True, vk=tcod.KEY_TEXT, text='h')
-
-        # Flush True: returns just this
-        # tcod.Key(pressed=True, vk=tcod.KEY_CHAR, c=ord('h'))
-
+        # Check the action queue for any remaining actions - use them first
         if not g.action_queue.empty():
             action = g.action_queue.get()
 
         else:
-            # Nothing is waiting in the action queue - collect more actions
-            tcod.sys_wait_for_event(
-                mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
-                k=key,
-                m=mouse,
-                flush=True
-            )
+            current_actor = g.stage.entities[actor_index].get_action(g)
 
-            # Get keyboard/mouse input
-            key_char = process_tcod_input(key)
+            # todo: Fix this to be more consistent
 
-            action = handle_keys(g.state, key_char)
-            mouse_action = handle_mouse(g.state, mouse)
-
-            if mouse_action:
-                # Mouse action will take priority over keys (for now)
-                log.debug('mouse_action: {}'.format(mouse_action))
-                action = mouse_action
+            if current_actor.has_comp('human'):
+                action = current_actor.get_action(g)
+            elif current_actor.has_comp('ai'):
+                action = current_actor.ai.get_action(g)
 
         if action:
-            # Go with keyboard action
             process_action(action, g.hero, g)
 
             # Print any messges
@@ -190,6 +165,7 @@ def play_game(g, render_eng):
             # If new state - change the state, and update the prev_state
             # If alternates actions - Add new Actions to the queue (in order)
 
+        # Save and go to main menu
         if g.state == States.MAIN_MENU:
             g.redraw = True
             g.state = States.HERO_TURN
@@ -198,47 +174,7 @@ def play_game(g, render_eng):
 
         # if mouse_action?
 
-        if g.state == States.WORLD_TURN:
-            log.debug('Turn: {}'.format(g.turns))
-
-            # Increment turn counter
-            # This *may* go elsewhere, but we'll try it here first.
-            g.turns += 1
-
-            for entity in g.stage.entities:
-
-                if entity.has_comp('ai'):
-                    turn_results = entity.ai.take_turn(
-                        g.hero,
-                        g.fov_map,
-                        g.stage,
-                    )
-
-                    for result in turn_results:
-                        msg = result.get('msg')
-                        dead_entity = result.get('dead')
-
-                        if msg:
-                            g.msg_log.add(msg)
-
-                        if dead_entity:
-                            if dead_entity == g.hero:
-                                msg, g.state = kill_hero(dead_entity)
-                            else:
-                                msg = kill_monster(dead_entity)
-
-                            g.msg_log.add(msg)
-
-                            if g.state == States.HERO_DEAD:
-                                break
-
-                    if g.state == States.HERO_DEAD:
-                        break
-
-            else:
-                g.state = States.HERO_TURN
-
-        # check_for_quit()
+        actor_index = (actor_index + 1) % len(g.stage.entities)
 
 
 def process_action(action, entity, g):
