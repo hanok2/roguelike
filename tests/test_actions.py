@@ -74,6 +74,14 @@ def fov_stage():
     return m
 
 
+@pytest.fixture
+def open_map():
+    # todo: When we revamp map - remove this fixture!!!!!!!!!!!!!!!!!!!!!!!!
+    m = stages.Stage(10, 10)
+    m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
+    return m
+
+
 """ Tests for ActionResult """
 
 
@@ -1185,14 +1193,110 @@ def test_MoveAStarAction__target_to_side(fov_stage):
 
 # def test_MoveAStarAction__target_is_same_as_origin(fov_stage):
 
+
 """ Tests for MoveTowardAction"""
 
 
-def test_MoveTowardAction__init(fov_stage):
+def test_MoveTowardAction__init(open_map, hero, orc):
     action = actions.MoveTowardAction(
-        stage=fov_stage,
-        entity=fov_stage.orc_ref,
-        target=fov_stage.hero_ref
+        stage=open_map,
+        entity=orc,
+        target=hero
     )
     assert isinstance(action, actions.Action)
     assert action.consumes_turn
+
+
+def test_MoveTowardAction__blocked__fails(open_map, hero, orc):
+    open_map.tiles[6][6].blocked = True
+    open_map.entities.extend([hero, orc])
+    orc.x, orc.y = 5, 5
+    hero.x, hero.y = 7, 7
+
+    action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    result = action.perform()
+
+    assert result.success is False
+
+
+# def test_MoveTowardAction__target_1_sq_N__returns_AttackAction(open_map, hero, orc):
+    # open_map.entities.extend([hero, orc])
+    # orc.x, orc.y = 5, 5
+    # hero.x, hero.y = 5, 4
+    # action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    # result = action.perform()
+    # assert actions.AttackAction in result
+    # assert result.success is False
+    # assert result.alt[0].entity == orc
+    # assert result.alt[0].target == hero
+
+
+def test_MoveTowardAction__target_2_sq_N__returns_WalkAction(open_map, hero, orc):
+    open_map.entities.extend([hero, orc])
+    orc.x, orc.y = 5, 5
+    hero.x, hero.y = 5, 3
+
+    action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    result = action.perform()
+
+    assert actions.WalkAction in result
+    assert result.success is True
+    assert result.alt[0].dx == 0
+    assert result.alt[0].dy == -1
+
+
+def test_MoveTowardAction__target_3_sq_N__returns_WalkAction(open_map, hero, orc):
+    open_map.entities.extend([hero, orc])
+    orc.x, orc.y = 5, 5
+    hero.x, hero.y = 5, 2
+
+    action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    result = action.perform()
+
+    assert actions.WalkAction in result
+    assert result.success is True
+    assert result.alt[0].dx == 0
+    assert result.alt[0].dy == -1
+
+
+
+# def test_MoveTowardAction__target_1_sq_SE_returns_AttackAction(open_map, hero, orc):
+    # open_map.entities.extend([hero, orc])
+    # orc.x, orc.y = 5, 5
+    # hero.x, hero.y = 6, 6
+
+    # action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    # result = action.perform()
+
+    # assert actions.AttackAction in result
+    # assert result.success is False
+    # assert result.alt[0].entity == orc
+    # assert result.alt[0].target == hero
+
+
+def test_MoveTowardAction__target_2_sq_SE_returns_WalkAction(open_map, hero, orc):
+    open_map.entities.extend([hero, orc])
+    orc.x, orc.y = 5, 5
+    hero.x, hero.y = 7, 7
+
+    action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    result = action.perform()
+
+    assert actions.WalkAction in result
+    assert result.success
+    assert result.alt[0].dx == 1
+    assert result.alt[0].dy == 1
+
+
+def test_MoveTowardAction__target_knights_jump_SE_returns_WalkAction(open_map, hero, orc):
+    open_map.entities.extend([hero, orc])
+    orc.x, orc.y = 5, 5
+    hero.x, hero.y = 6, 7
+
+    action = actions.MoveTowardAction(stage=open_map, entity=orc, target=hero)
+    result = action.perform()
+
+    assert actions.WalkAction in result
+    assert result.success
+    assert result.alt[0].dx == 0
+    assert result.alt[0].dy == 1

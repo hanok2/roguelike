@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import tcod
 from . import config
 from . import components
+from . import stages
 from .config import States
 
 
@@ -723,4 +724,22 @@ class MoveTowardAction(Action):
         self.target = target
 
     def perform(self, *args, **kwargs):
-        pass
+        """Very simple movement function to take the most direct path toward the hero.  """
+        dx, dy = stages.Stage.calc_move(
+            self.entity.x,
+            self.entity.y,
+            self.target.x,
+            self.target.y
+        )
+
+        dest_x = self.entity.x + dx
+        dest_y = self.entity.y + dy
+
+        blocked_at = self.stage.is_blocked(dest_x, dest_y)
+        occupied = self.stage.get_blocker_at_loc(dest_x, dest_y)
+
+        if not (blocked_at or occupied):
+            return ActionResult(success=True, alt=WalkAction(dx, dy))
+            # self.move(dx, dy)
+
+        return ActionResult(success=False)
