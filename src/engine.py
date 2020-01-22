@@ -182,7 +182,7 @@ def play_game(g, render_eng):
 
         if action:
             # Go with keyboard action
-            action_result = process_action(action, g.hero, g)
+            process_action(action, g.hero, g)
 
             # Print any messges
             # If failed - don't consume turn
@@ -243,9 +243,8 @@ def play_game(g, render_eng):
 
 def process_action(action, entity, g):
     log.debug('process_action: {} - State: {}'.format(action, g.state))
-    hero_turn_results = []
 
-    action.perform(
+    action_result = action.perform(
         state=g.state,
         prev_state=g.prev_state,
         dungeon=g.dungeon,
@@ -256,97 +255,21 @@ def process_action(action, entity, g):
         game=g,
     )
 
-    hero_turn_results = action.results
-
-    # Increment turn if necessary
-    if action.consumes_turn:
+    if action_result.success and action.consumes_turn:
+        # Increment turn if necessary
         g.state = States.WORLD_TURN
 
-    for result in hero_turn_results:
-        alternate = result.get('alternate')
-        new_state = result.get('state')
-        fov_recompute = result.get('fov_recompute')
-        redraw = result.get('redraw')
-        msg = result.get('msg')
-        dead_entity = result.get('dead')
-        item_added = result.get('item_added')
-        item_dropped = result.get('item_dropped')
-        equip = result.get('equip')
-        targeting = result.get('targeting')
+    if action_result.new_state:
+        g.prev_state = g.state
+        g.state = action_result.new_state
 
-        xp = result.get('xp')
+    if action_result.msg:
+        log.debug('msg: {}.'.format(action_result.msg))
+        g.msg_log.add(action.result.msg)
 
-        if new_state:
-            g.state = new_state
-
-        if alternate:
-            g.action_queue.put(alternate)
-
-        if fov_recompute:
-            g.fov_recompute = True
-
-        if redraw:
-            g.redraw = True
-
-        if msg:
-            log.debug('msg: {}.'.format(msg))
-            g.msg_log.add(msg)
-
-        if xp:
-            log.debug('Adding xp.')
-            leveled_up = g.hero.lvl.add_xp(xp)
-
-            if leveled_up:
-                log.debug('Hero level up.')
-                g.msg_log.add('Your battle skills grow stronger! You reached level {}!'.format(g.hero.lvl.current_lvl))
-                g.prev_state = g.state  # Should be WORLD_TURN
-                g.state = States.LEVEL_UP
-
-        if dead_entity:
-            log.debug('Dead entity.')
-            if dead_entity == g.hero:
-                msg, state = kill_hero(dead_entity)
-                # Add KillPlayerAction here....
-            else:
-                msg = kill_monster(dead_entity)
-                # Add KillMonsterAction here....
-
-            g.msg_log.add(msg)
-
-        if item_added:
-            log.debug('Item added.')
-            g.stage.entities.remove(item_added)
-            g.state = States.WORLD_TURN
-
-        if targeting:
-            log.debug('Targeting.')
-            # Set to HERO_TURN so that if cancelled, we don't go back to inv.
-            g.prev_state = States.HERO_TURN
-            g.state = States.TARGETING
-
-            g.targeting_item = targeting
-            g.msg_log.add(g.targeting_item.item.targeting_msg)
-
-        if item_dropped:
-            log.debug('Item dropped.')
-            g.stage.entities.append(item_dropped)
-            g.state = States.WORLD_TURN
-
-        if equip:
-            log.debug('Equip.')
-            equip_results = g.hero.equipment.toggle_equip(equip)
-
-            for equip_result in equip_results:
-                equipped = equip_result.get('equipped')
-                dequipped = equip_result.get('dequipped')
-
-                if equipped:
-                    g.msg_log.add('You equipped the {}'.format(equipped.name))
-
-                if dequipped:
-                    g.msg_log.add('You dequipped the {}'.format(dequipped.name))
-
-            g.state = States.WORLD_TURN
+    # alternate actions
+    for a in action_result.alt:
+        g.action_queue.put(a)
 
 
 def check_for_quit():
