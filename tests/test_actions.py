@@ -62,7 +62,14 @@ def fov_stage():
     for x, y in wall_coordinates:
         m.tiles[x][y].blocks = True
 
-    m.entities.append(factory.mk_entity('orc', 1, 0))
+    hero = player.Player(x=0, y=0)
+    orc = factory.mk_entity('orc', 1, 0)
+
+    m.entities.append(orc)
+    m.entities.append(hero)
+
+    m.orc_ref = orc
+    m.hero_ref = hero
 
     return m
 
@@ -1070,7 +1077,100 @@ def test_HealAction__negative_amt_raises_exception(orc):
 """ Tests for MoveAStarAction """
 
 
-def test_MoveAStarAction_init(hero, orc):
-    action = actions.MoveAStarAction(entity=orc, target=hero)
+def test_MoveAStarAction_init(fov_stage):
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=orc,
+        target=hero
+    )
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
+
+
+def test_MoveAStarAction__target_next_sq(fov_stage):
+    fov_stage.hero_ref.x = 2
+    fov_stage.hero_ref.y = 0
+
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    result = action.perform()
+    assert str(result.alt) == 'WalkAction'
+    assert result.alt.dx == 1
+    assert result.alt.dy == 0
+
+
+def test_MoveAStarAction__target_knights_jump_away(fov_stage):
+    fov_stage.hero_ref.x = 0
+    fov_stage.hero_ref.y = 2
+
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    result = action.perform()
+    assert str(result.alt) == 'WalkAction'
+    assert result.alt.dx == -1
+    assert result.alt.dy == 1
+
+def test_MoveAStarAction__target_around_wall(fov_stage):
+    fov_stage.hero_ref.x = 1
+    fov_stage.hero_ref.y = 4
+
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    result = action.perform()
+    assert str(result.alt) == 'WalkAction'
+    assert result.alt.dx == -1
+    assert result.alt.dy == 1
+
+
+def test_MoveAStarAction__target_behind_wall(fov_stage):
+    fov_stage.hero_ref.x = 2
+    fov_stage.hero_ref.y = 2
+
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    result = action.perform()
+    assert str(result.alt) == 'WalkAction'
+    assert result.alt.dx == -1
+    assert result.alt.dy == 1
+
+
+def test_MoveAStarAction__target_in_opposite_corner(fov_stage):
+    fov_stage.hero_ref.x = 6
+    fov_stage.hero_ref.y = 5
+
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    result = action.perform()
+    assert str(result.alt) == 'WalkAction'
+    assert result.alt.dx == 1
+    assert result.alt.dy == 0
+
+
+def test_MoveAStarAction__target_to_side(fov_stage):
+    fov_stage.hero_ref.x = 1
+    fov_stage.hero_ref.y = 0
+
+    action = actions.MoveAStarAction(
+        stage=fov_stage,
+        entity=fov_stage.orc_ref,
+        target=fov_stage.hero_ref
+    )
+    result = action.perform()
+    assert str(result.alt) == 'WalkAction'
+    assert result.alt.dx == 1
+    assert result.alt.dy == 0

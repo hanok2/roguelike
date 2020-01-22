@@ -227,3 +227,9 @@ class Stage(object):
         if blockers:
             return blockers.pop()
         return None
+
+    @classmethod
+    def calc_dxdy(cls, src_x, src_y, dest_x, dest_y):
+        dx = dest_x - src_x
+        dy = dest_y - src_y
+        return dx, dy

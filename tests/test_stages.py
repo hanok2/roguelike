@@ -422,3 +422,51 @@ def test_Stage_get_blocker_at_loc__not_blocked_returns_None():
     m = stages.Stage(width=50, height=50)
     result = m.get_blocker_at_loc(0, 0)
     assert result is None
+
+
+def test_calc_dxdy__N():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 1, 0)
+    assert dx == 0
+    assert dy == -1
+
+
+def test_calc_dxdy__NE():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 2, 0)
+    assert dx == 1
+    assert dy == -1
+
+
+def test_calc_dxdy__E():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 2, 1)
+    assert dx == 1
+    assert dy == 0
+
+
+def test_calc_dxdy__SE():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 2, 2)
+    assert dx == 1
+    assert dy == 1
+
+
+def test_calc_dxdy__S():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 1, 2)
+    assert dx == 0
+    assert dy == 1
+
+
+def test_calc_dxdy__SW():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 0, 2)
+    assert dx == -1
+    assert dy == 1
+
+
+def test_calc_dxdy__W():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 0, 1)
+    assert dx == -1
+    assert dy == 0
+
+
+def test_calc_dxdy__NW():
+    dx, dy = stages.Stage.calc_dxdy(1, 1, 0, 0)
+    assert dx == -1
+    assert dy == -1
