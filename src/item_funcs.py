@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from .components import ConfusedBehavior
+from . import actions
+from . import stages
 
 
 class Use(ABC):
@@ -23,21 +25,23 @@ class UseHeal(Use):
 
         entity = args[0]
         amt = kwargs['amt']
-        results = []
 
         if entity.fighter.hp == entity.fighter.max_hp:
-            results.append({
-                'consumed': False,
-                'msg': 'You are already at full health'
-            })
-        else:
-            entity.fighter.heal(amt)
-            results.append({
-                'consumed': True,
-                'msg': 'You drink the healing potion and start to feel better!'
-            })
+            return actions.ActionResult(
+                success=False,
+                msg='You are already at full health',
+                # 'consumed': False,
+            )
 
-        return results
+        # entity.fighter.heal(amt)
+
+        return actions.ActionResult(
+            success=True,
+            msg='You drink the healing potion and start to feel better!',
+            alt=actions.HealAction(entity, amt)
+            # 'consumed': True,
+        )
+
 
 
 class UseLightning(Use):
@@ -48,8 +52,6 @@ class UseLightning(Use):
         dmg = kwargs['dmg']
         max_range = kwargs['max_range']
 
-        results = []
-
         target = None
         closest_distance = max_range + 1
 
@@ -59,32 +61,35 @@ class UseLightning(Use):
             # todo: Break into better boolean
             if entity.has_comp('fighter') and entity != caster and fov_map.fov[entity.y, entity.x]:
 
-                distance = caster.distance_to(entity)
+                # distance = caster.distance_to(entity)
+                distance = stages.Stage.distance_between_entities(caster, entity)
 
                 if distance < closest_distance:
                     target = entity
                     closest_distance = distance
 
         if target:
-            results.append({
-                'consumed': True,
-                'target': target,
-                'msg': 'A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg)
-            })
-            results.extend(target.fighter.take_dmg(dmg))
+            return actions.ActionResult(
+                success=True,
+                msg='A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg),
+                alt=actions.TakeDmgAction(
+                    attacker=caster,
+                    defender=target,
+                    dmg=dmg),
+                # 'consumed': True,
+            )
 
-        else:
-            results.append({
-                'consumed': False,
-                'target': None,
-                'msg': 'No enemy is close enough to strike.'
-            })
+        return actions.ActionResult(
+            success=False,
+            msg='No enemy is close enough to strike.',
+            # 'consumed': False,
+        )
 
-        return results
 
 
 class UseFireball(Use):
     def use(self, *args, **kwargs):
+        caster = args[0]  # First arg is entity
         entities = kwargs['entities']
         fov_map = kwargs['fov_map']
         dmg = kwargs['dmg']
@@ -92,27 +97,29 @@ class UseFireball(Use):
         target_x = kwargs['target_x']
         target_y = kwargs['target_y']
 
-        results = []
-
         if not fov_map.fov[target_y, target_x]:
-            results.append({
-                'consumed': False,
-                'msg': 'You cannot target a tile outside your field of view.'
-            })
-            return results
+            return actions.ActionResult(
+                success=False,
+                msg='You cannot target a tile outside your field of view.'
+            )
 
-        results.append({
-            'consumed': True,
-            'msg': 'The fireball explodes, burning everything within {} tiles!'.format(radius)
-        })
+        result = actions.ActionResult(
+            success=True,
+            msg='The fireball explodes, burning everything within {} tiles!'.format(radius),
+            # 'consumed': True,
+        )
 
         for entity in entities:
-            if entity.distance(target_x, target_y) <= radius and entity.has_comp('fighter'):
+            dist_to_entity = stages.Stage.distance(entity.x, entity.y, target_x, target_y)
 
-                results.append({'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)})
-                results.extend(entity.fighter.take_dmg(dmg))
+            if dist_to_entity <= radius and entity.has_comp('fighter'):
 
-        return results
+                result.alt.append(actions.TakeDmgAction(caster, entity, dmg))
+
+                # results.append({'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)})
+                # results.extend(entity.fighter.take_dmg(dmg))
+
+        return result
 
 
 class UseConfuse(Use):
@@ -125,14 +132,12 @@ class UseConfuse(Use):
         target_x = kwargs['target_x']
         target_y = kwargs['target_y']
 
-        results = []
-
         if not fov_map.fov[target_y, target_x]:
-            results.append({
-                'consumed': False,
-                'msg': 'You cannot target a tile outside your field of view.'
-            })
-            return results
+            return actions.ActionResult(
+                success=False,
+                msg='You cannot target a tile outside your field of view.',
+                # 'consumed': False,
+            )
 
         for entity in entities:
             matches_coordinates = entity.x == target_x and entity.y == target_y
@@ -141,15 +146,14 @@ class UseConfuse(Use):
                 confused_ai = ConfusedBehavior(owner=entity, prev_ai=entity.ai, num_turns=10)
                 entity.ai = confused_ai
 
-                results.append({
-                    'consumed': True,
-                    'msg': 'The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
-                })
-                break
-        else:
-            results.append({
-                'consumed': False,
-                'msg': 'There is no targetable enemy at that location.'
-            })
+                return actions.ActionResult(
+                    success=True,
+                    msg='The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
+                    # 'consumed': True,
+                )
 
-        return results
+        return actions.ActionResult(
+            success=False,
+            msg='There is no targetable enemy at that location.'
+            # 'consumed': False,
+        )

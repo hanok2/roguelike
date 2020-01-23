@@ -740,6 +740,5 @@ class MoveTowardAction(Action):
 
         if not (blocked_at or occupied):
             return ActionResult(success=True, alt=WalkAction(dx, dy))
-            # self.move(dx, dy)
 
         return ActionResult(success=False)
