@@ -230,7 +230,7 @@ def test_cast_fireball__no_target_x_raises_exception(hero, fireball):
         fireball.use(hero, **kwargs)
 
 
-def test_cast_fireball__no_target_y_raises_exception(hero,fireball):
+def test_cast_fireball__no_target_y_raises_exception(hero, fireball):
     kwargs = {'entities':[], 'fov_map':None, 'dmg':10, 'radius':3, 'target_x': 0}
     with pytest.raises(KeyError):
         fireball.use(hero, **kwargs)
@@ -244,9 +244,12 @@ def test_cast_fireball__outside_fov__consumed_False(open_stage, hero, fireball):
     fov.recompute_fov(fov_map, x=0, y=0, radius=5)
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius':3, 'target_x': orc.x, 'target_y': orc.y}
 
-    result = fireball.use(hero, **kwargs)
-    assert result.success is False
-    assert result.msg == 'You cannot target a tile outside your field of view.'
+    results = fireball.use(hero, **kwargs)
+    print(results)
+
+    assert len(results) == 1
+    assert results[0].success is False
+    assert results[0].msg == 'You cannot target a tile outside your field of view.'
 
     # assert results[0]['consumed'] is False
 
@@ -259,9 +262,10 @@ def test_cast_fireball__in_fov__consumed_True(open_stage, hero, fireball):
     radius = 3
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 5, 'target_y': 0}
 
-    result = fireball.use(hero, **kwargs)
-    assert result.success
-    assert result.msg == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+    results = fireball.use(hero, **kwargs)
+    assert len(results) == 1
+    assert results[0].success
+    assert results[0].msg == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
     # assert results[0]['consumed']
 
 
@@ -273,19 +277,20 @@ def test_cast_fireball__close_to_hero(open_stage, hero, fireball):
     radius = 3
     kwargs = {'entities':open_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 1, 'target_y': 0}
 
-    result = fireball.use(hero, **kwargs)
-    assert result.success
-    assert result.msg == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+    results = fireball.use(hero, **kwargs)
+    assert len(results) == 2
 
-    assert actions.TakeDmgAction in result
-    assert result.alt[0].attacker == hero
-    assert result.alt[0].defender == hero
-    assert result.alt[0].dmg == 25
+    assert results[0].success
+    assert results[0].msg == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
 
-    # assert results.alt[0]['msg'] == 'The Player gets burned for 25 hit points!'
+    assert actions.TakeDmgAction in results[1]
+    assert results[1].alt.attacker == hero
+    assert results[1].alt.defender == hero
+    assert results[1].alt.dmg == 25
+    assert results[1].msg == 'The Player gets burned for 25 hit points!'
 
 
-def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero, fireball):
+def test_cast_fireball__orc_mob__hits_4_orcs(orc_stage, hero, fireball):
     orc_stage.entities.append(hero)
     fov_map = fov.initialize_fov(orc_stage)
     fov.recompute_fov(fov_map, x=0, y=0, radius=3)
@@ -294,34 +299,20 @@ def test_cast_fireball__orc_mob__hits_5_orcs(orc_stage, hero, fireball):
     radius = 1
     kwargs = {'entities':orc_stage.entities, 'fov_map':fov_map, 'dmg':25, 'radius': radius, 'target_x': 2, 'target_y': 2}
 
-    result = fireball.use(hero, **kwargs)
-    assert result.success
-    assert result.msg == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+    results= fireball.use(hero, **kwargs)
+    assert len(results) == 5
+    assert results[0].success
+    assert results[0].msg == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
+    # assert results[1]['consumed']
 
-    assert len(result.alt) == 5
-    assert isinstance(result.alt[0], actions.TakeDmgAction)
-    assert isinstance(result.alt[1], actions.TakeDmgAction)
-    assert isinstance(result.alt[2], actions.TakeDmgAction)
-    assert isinstance(result.alt[3], actions.TakeDmgAction)
-    assert isinstance(result.alt[4], actions.TakeDmgAction)
-
-    # assert results[0]['msg'] == 'The fireball explodes, burning everything within {} tiles!'.format(radius)
-    # assert results[0]['consumed']
-    # assert results[1]['msg'] == 'The Orc gets burned for 25 hit points!'
-    # assert results[2]['dead']
-    # assert results[2]['xp'] == orc_xp
-    # assert results[3]['msg'] == 'The Orc gets burned for 25 hit points!'
-    # assert results[4]['dead']
-    # assert results[4]['xp'] == orc_xp
-    # assert results[5]['msg'] == 'The Orc gets burned for 25 hit points!'
-    # assert results[6]['dead']
-    # assert results[6]['xp'] == orc_xp
-    # assert results[7]['msg'] == 'The Orc gets burned for 25 hit points!'
-    # assert results[8]['dead']
-    # assert results[8]['xp'] == orc_xp
-    # assert results[9]['msg'] == 'The Orc gets burned for 25 hit points!'
-    # assert results[10]['dead']
-    # assert results[10]['xp'] == orc_xp
+    assert results[1].msg == 'The Orc gets burned for 25 hit points!'
+    assert actions.TakeDmgAction in results[1]
+    assert results[2].msg == 'The Orc gets burned for 25 hit points!'
+    assert actions.TakeDmgAction in results[2]
+    assert results[3].msg == 'The Orc gets burned for 25 hit points!'
+    assert actions.TakeDmgAction in results[3]
+    assert results[4].msg == 'The Orc gets burned for 25 hit points!'
+    assert actions.TakeDmgAction in results[4]
 
 
 """ Tests for cast_confuse() """

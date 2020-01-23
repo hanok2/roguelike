@@ -98,28 +98,29 @@ class UseFireball(Use):
         target_y = kwargs['target_y']
 
         if not fov_map.fov[target_y, target_x]:
-            return actions.ActionResult(
+            return [actions.ActionResult(
                 success=False,
                 msg='You cannot target a tile outside your field of view.'
-            )
+            )]
 
-        result = actions.ActionResult(
+        action_results = []
+
+        action_results.append(actions.ActionResult(
             success=True,
             msg='The fireball explodes, burning everything within {} tiles!'.format(radius),
             # 'consumed': True,
-        )
+        ))
 
         for entity in entities:
             dist_to_entity = stages.Stage.distance(entity.x, entity.y, target_x, target_y)
 
             if dist_to_entity <= radius and entity.has_comp('fighter'):
+                action_results.append(actions.ActionResult(
+                    alt=actions.TakeDmgAction(caster, entity, dmg),
+                    msg='The {} gets burned for {} hit points!'.format(entity.name, dmg)
+                ))
 
-                result.alt.append(actions.TakeDmgAction(caster, entity, dmg))
-
-                # results.append({'msg': 'The {} gets burned for {} hit points!'.format(entity.name, dmg)})
-                # results.extend(entity.fighter.take_dmg(dmg))
-
-        return result
+        return action_results
 
 
 class UseConfuse(Use):

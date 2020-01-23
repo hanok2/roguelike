@@ -88,30 +88,25 @@ def open_map():
 def test_ActionResult__action_succeeded():
     result = actions.ActionResult(success=True)
     assert result.success
-    assert result.alt == []
+    assert result.alt is None
 
 
 def test_ActionResult__action_failed():
     result = actions.ActionResult(success=False)
     assert result.success is False
-    assert result.alt == []
+    assert result.alt is None
 
 
-def test_ActionResult__action_alt():
+def test_ActionResult__contains_alt_using_class():
     result = actions.ActionResult(alt=actions.WaitAction())
     assert result.success is False
-    # assert isinstance(result.alt, actions.WaitAction)
     assert actions.WaitAction in result
 
 
-def test_ActionResult__list_of_alternative_actions():
-    list_of_alt_actions = [actions.WaitAction()]
-    result = actions.ActionResult(alt=list_of_alt_actions)
-
+def test_ActionResult__contains_alt_using_str():
+    result = actions.ActionResult(alt=actions.WaitAction())
     assert result.success is False
-    assert actions.WaitAction in result
-
-    assert isinstance(result.alt[0], actions.WaitAction)
+    assert 'WaitAction' in result
 
 
 def test_ActionResult__new_state__success_defaults_None():
@@ -127,8 +122,6 @@ def test_ActionResult__new_state__fail_defaults_None():
 def test_ActionResult__new_state__alt_defaults_None():
     result = actions.ActionResult(alt=actions.WaitAction())
     assert result.new_state is None
-
-
 
 
 """ Tests for WalkAction """
@@ -327,8 +320,8 @@ def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
     result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
 
     # assert result == [{'alternate': actions.EquipAction}]
-    assert result.success is False
     # assert isinstance(result.alt, actions.EquipAction)
+    assert result.success is False
     assert actions.EquipAction in result
 
 
@@ -1105,11 +1098,9 @@ def test_MoveAStarAction__target_next_sq(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    wa = result.alt.pop()  # We need to examine the WalkAction
-
-    assert isinstance(wa, actions.WalkAction)
-    assert wa.dx == 1
-    assert wa.dy == 0
+    assert isinstance(result.alt, actions.WalkAction)
+    assert result.alt.dx == 1
+    assert result.alt.dy == 0
 
 
 def test_MoveAStarAction__target_knights_jump_away(fov_stage):
@@ -1122,11 +1113,9 @@ def test_MoveAStarAction__target_knights_jump_away(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    wa = result.alt.pop()  # We need to examine the WalkAction
-
-    assert isinstance(wa, actions.WalkAction)
-    assert wa.dx == -1
-    assert wa.dy == 1
+    assert isinstance(result.alt, actions.WalkAction)
+    assert result.alt.dx == -1
+    assert result.alt.dy == 1
 
 def test_MoveAStarAction__target_around_wall(fov_stage):
     fov_stage.hero_ref.x = 1
@@ -1138,10 +1127,9 @@ def test_MoveAStarAction__target_around_wall(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    wa = result.alt.pop()  # We need to examine the WalkAction
-    assert isinstance(wa, actions.WalkAction)
-    assert wa.dx == -1
-    assert wa.dy == 1
+    assert isinstance(result.alt, actions.WalkAction)
+    assert result.alt.dx == -1
+    assert result.alt.dy == 1
 
 
 def test_MoveAStarAction__target_behind_wall(fov_stage):
@@ -1154,10 +1142,9 @@ def test_MoveAStarAction__target_behind_wall(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    wa = result.alt.pop()  # We need to examine the WalkAction
-    assert isinstance(wa, actions.WalkAction)
-    assert wa.dx == -1
-    assert wa.dy == 1
+    assert isinstance(result.alt, actions.WalkAction)
+    assert result.alt.dx == -1
+    assert result.alt.dy == 1
 
 
 def test_MoveAStarAction__target_in_opposite_corner(fov_stage):
@@ -1170,10 +1157,9 @@ def test_MoveAStarAction__target_in_opposite_corner(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    wa = result.alt.pop()  # We need to examine the WalkAction
-    assert isinstance(wa, actions.WalkAction)
-    assert wa.dx == 1
-    assert wa.dy == 0
+    assert isinstance(result.alt, actions.WalkAction)
+    assert result.alt.dx == 1
+    assert result.alt.dy == 0
 
 
 def test_MoveAStarAction__target_to_side(fov_stage):
@@ -1186,10 +1172,9 @@ def test_MoveAStarAction__target_to_side(fov_stage):
         target=fov_stage.hero_ref
     )
     result = action.perform()
-    wa = result.alt.pop()  # We need to examine the WalkAction
-    assert isinstance(wa, actions.WalkAction)
-    assert wa.dx == 1
-    assert wa.dy == 0
+    assert isinstance(result.alt, actions.WalkAction)
+    assert result.alt.dx == 1
+    assert result.alt.dy == 0
 
 # def test_MoveAStarAction__target_is_same_as_origin(fov_stage):
 
@@ -1227,8 +1212,8 @@ def test_MoveTowardAction__blocked__fails(open_map, hero, orc):
     # result = action.perform()
     # assert actions.AttackAction in result
     # assert result.success is False
-    # assert result.alt[0].entity == orc
-    # assert result.alt[0].target == hero
+    # assert result.alt.entity == orc
+    # assert result.alt.target == hero
 
 
 def test_MoveTowardAction__target_2_sq_N__returns_WalkAction(open_map, hero, orc):
@@ -1241,8 +1226,8 @@ def test_MoveTowardAction__target_2_sq_N__returns_WalkAction(open_map, hero, orc
 
     assert actions.WalkAction in result
     assert result.success is True
-    assert result.alt[0].dx == 0
-    assert result.alt[0].dy == -1
+    assert result.alt.dx == 0
+    assert result.alt.dy == -1
 
 
 def test_MoveTowardAction__target_3_sq_N__returns_WalkAction(open_map, hero, orc):
@@ -1255,8 +1240,8 @@ def test_MoveTowardAction__target_3_sq_N__returns_WalkAction(open_map, hero, orc
 
     assert actions.WalkAction in result
     assert result.success is True
-    assert result.alt[0].dx == 0
-    assert result.alt[0].dy == -1
+    assert result.alt.dx == 0
+    assert result.alt.dy == -1
 
 
 
@@ -1270,8 +1255,8 @@ def test_MoveTowardAction__target_3_sq_N__returns_WalkAction(open_map, hero, orc
 
     # assert actions.AttackAction in result
     # assert result.success is False
-    # assert result.alt[0].entity == orc
-    # assert result.alt[0].target == hero
+    # assert result.alt.entity == orc
+    # assert result.alt.target == hero
 
 
 def test_MoveTowardAction__target_2_sq_SE_returns_WalkAction(open_map, hero, orc):
@@ -1284,8 +1269,8 @@ def test_MoveTowardAction__target_2_sq_SE_returns_WalkAction(open_map, hero, orc
 
     assert actions.WalkAction in result
     assert result.success
-    assert result.alt[0].dx == 1
-    assert result.alt[0].dy == 1
+    assert result.alt.dx == 1
+    assert result.alt.dy == 1
 
 
 def test_MoveTowardAction__target_knights_jump_SE_returns_WalkAction(open_map, hero, orc):
@@ -1298,5 +1283,5 @@ def test_MoveTowardAction__target_knights_jump_SE_returns_WalkAction(open_map, h
 
     assert actions.WalkAction in result
     assert result.success
-    assert result.alt[0].dx == 0
-    assert result.alt[0].dy == 1
+    assert result.alt.dx == 0
+    assert result.alt.dy == 1

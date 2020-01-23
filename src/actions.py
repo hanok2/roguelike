@@ -19,29 +19,24 @@ class Action(ABC):
 
 class ActionResult(object):
     # Implement contains for alternate actions?
-    def __init__(self, success=False, alt=[], new_state=None, msg=None):
+    def __init__(self, success=False, alt=None, new_state=None, msg=None):
         self.success = success
         self.new_state = new_state
         self.msg = msg
 
-        # If we get a single alt item - convert it to a list.
+        # todo: Remove after overhaul
         if isinstance(alt, list):
-            self.alt = alt
-        else:
-            self.alt = [alt]
+            raise ValueError('no lists!!!')
 
+        self.alt = alt
 
     def __contains__(self, action):
         """Checks if the passed action's class is in the list of alt actions."""
-        for a in self.alt:
-            # if a.__class__ == action.__class__:
-            # if a.__class__.__name__ == action.__class__.__name__:
-            # if isinstance(a, action.__class__):
+        if isinstance(action, str):
+            return str(self.alt) == action
 
-            if isinstance(a, action):
-                return True
+        return isinstance(self.alt, action)
 
-        return False
 
 class WalkAction(Action):
     def __init__(self, dx, dy):
