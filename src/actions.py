@@ -172,10 +172,10 @@ class UseItemAction(Action):
                 return ActionResult(alt=EquipAction(entity, item_entity))
 
             # This item doesn't have a use function!
-            return ActionResult(
+            return [ActionResult(
                 success=False,
                 msg='The {} cannot be used.'.format(item_entity.name)
-            )
+            )]
 
         else:
             have_target = self.target_x and self.target_y
@@ -184,24 +184,26 @@ class UseItemAction(Action):
             if item_comp.targeting and not have_target:
                 return ActionResult(alt=GetTargetAction(item_entity))
 
+            kwargs.update(item_comp.func_kwargs)
+            results = item_comp.use_func.use(entity, **kwargs)
+
             # Use the item - was it consumed?
-            item_use_results = entity.inv.use(
-                item_entity,
-                entities=stage.entities,
-                fov_map=fov_map,
-                target_x=self.target_x,
-                target_y=self.target_y
-            )
+            # item_use_results = entity.inv.use(
+                # item_entity,
+                # entities=stage.entities,
+                # fov_map=fov_map,
+                # target_x=self.target_x,
+                # target_y=self.target_y
+            # )
 
             # If the item was consumed - remove it from inventory.
-            for result in item_use_results:
-                if result.get('consumed'):
-                    entity.inv.rm_item(item_entity)
+            if results[0].success:
+                entity.inv.rm_item(item_entity)
 
-                    return ActionResult(success=True)
-
-            # Not consumed
-            return ActionResult(success=False)
+            else:
+                # Not consumed
+                pass
+            return results
 
 
 class EquipAction(Action):

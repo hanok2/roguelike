@@ -27,20 +27,20 @@ class UseHeal(Use):
         amt = kwargs['amt']
 
         if entity.fighter.hp == entity.fighter.max_hp:
-            return actions.ActionResult(
+            return [actions.ActionResult(
                 success=False,
                 msg='You are already at full health',
                 # 'consumed': False,
-            )
+            )]
 
         # entity.fighter.heal(amt)
 
-        return actions.ActionResult(
+        return [actions.ActionResult(
             success=True,
             msg='You drink the healing potion and start to feel better!',
             alt=actions.HealAction(entity, amt)
             # 'consumed': True,
-        )
+        )]
 
 
 
@@ -69,7 +69,7 @@ class UseLightning(Use):
                     closest_distance = distance
 
         if target:
-            return actions.ActionResult(
+            return [actions.ActionResult(
                 success=True,
                 msg='A lighting bolt strikes the {} with a loud thunder! The damage is {}'.format(target.name, dmg),
                 alt=actions.TakeDmgAction(
@@ -77,13 +77,13 @@ class UseLightning(Use):
                     defender=target,
                     dmg=dmg),
                 # 'consumed': True,
-            )
+            )]
 
-        return actions.ActionResult(
+        return [actions.ActionResult(
             success=False,
             msg='No enemy is close enough to strike.',
             # 'consumed': False,
-        )
+        )]
 
 
 
@@ -103,9 +103,9 @@ class UseFireball(Use):
                 msg='You cannot target a tile outside your field of view.'
             )]
 
-        action_results = []
+        results = []
 
-        action_results.append(actions.ActionResult(
+        results.append(actions.ActionResult(
             success=True,
             msg='The fireball explodes, burning everything within {} tiles!'.format(radius),
             # 'consumed': True,
@@ -115,12 +115,12 @@ class UseFireball(Use):
             dist_to_entity = stages.Stage.distance(entity.x, entity.y, target_x, target_y)
 
             if dist_to_entity <= radius and entity.has_comp('fighter'):
-                action_results.append(actions.ActionResult(
+                results.append(actions.ActionResult(
                     alt=actions.TakeDmgAction(caster, entity, dmg),
                     msg='The {} gets burned for {} hit points!'.format(entity.name, dmg)
                 ))
 
-        return action_results
+        return results
 
 
 class UseConfuse(Use):
@@ -133,12 +133,13 @@ class UseConfuse(Use):
         target_x = kwargs['target_x']
         target_y = kwargs['target_y']
 
+
         if not fov_map.fov[target_y, target_x]:
-            return actions.ActionResult(
+            return [actions.ActionResult(
                 success=False,
                 msg='You cannot target a tile outside your field of view.',
                 # 'consumed': False,
-            )
+            )]
 
         for entity in entities:
             matches_coordinates = entity.x == target_x and entity.y == target_y
@@ -147,14 +148,14 @@ class UseConfuse(Use):
                 confused_ai = ConfusedBehavior(owner=entity, prev_ai=entity.ai, num_turns=10)
                 entity.ai = confused_ai
 
-                return actions.ActionResult(
+                return [actions.ActionResult(
                     success=True,
                     msg='The eyes of the {} look vacant, as he starts to stumble around!'.format(entity.name)
                     # 'consumed': True,
-                )
+                )]
 
-        return actions.ActionResult(
+        return [actions.ActionResult(
             success=False,
             msg='There is no targetable enemy at that location.'
             # 'consumed': False,
-        )
+        )]

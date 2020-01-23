@@ -348,9 +348,10 @@ def test_UseItemAction__consumed_item(walk_map, hero):
     hero.inv.add_item(potion)
 
     action = actions.UseItemAction(inv_index=0)  # Assume potion is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    results = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    assert len(results) == 1
 
-    assert result.success
+    assert results.success
     # assert result.msg == 'You are already at full health'
     assert potion not in hero.inv.items
 
@@ -360,10 +361,11 @@ def test_UseItemAction__did_not_consume_item(walk_map, hero):
     hero.inv.add_item(potion)
 
     action = actions.UseItemAction(inv_index=0)  # Assume potion is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    results = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    assert len(results) == 1
 
-    assert result.success is False
-    # assert result.msg == 'You are already at full health'
+    assert results[0].success is False
+    # assert result[0].msg == 'You are already at full health'
     assert potion in hero.inv.items
 
     # assert action.results == [{ 'consumed': False, }]
@@ -374,10 +376,10 @@ def test_UseItemAction__invalid_item(walk_map, hero):
     hero.inv.add_item(rock)
 
     action = actions.UseItemAction(inv_index=0)  # Assume rock is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    results = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
 
-    assert result.success is False
-    assert result.msg == 'The {} cannot be used.'.format(rock.name)
+    assert results[0].success is False
+    assert results[0].msg == 'The {} cannot be used.'.format(rock.name)
 
 
 """ Tests for EquipAction """
