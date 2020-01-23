@@ -33,3 +33,18 @@ class Game(object):
         self.fov_recompute = True
         self.fov_map = fov.initialize_fov(self.stage)
         self.redraw = False
+
+    def load_game(self, data_file):
+        self = data_file['game']
+        self.hero = data_file['hero']
+        self.dungeon = data_file['dungeon']
+        self.stage = data_file['stage']
+        self.msg_log = data_file['msg_log']
+        self.state = data_file['state']
+        self.prev_state = data_file['prev_state']
+        self.turns = data_file['turns']
+        self.targeting_item = data_file['targeting_item']
+        self.action_queue = data_file['action_queue']
+        self.fov_recompute = data_file['fov_recompute']
+        self.fov_map = data_file['fov_map']
+        self.draw = data_file['redraw']

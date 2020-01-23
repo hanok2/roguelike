@@ -25,8 +25,10 @@ def test_save_game():
 
 
 def test_save_game__calls_shelve(mocker):
+    g = game.Game()
+
     mocker.patch('shelve.open')
-    data_loaders.save_game(TEMP_FILE, game=None)
+    data_loaders.save_game(TEMP_FILE, game=g)
 
     shelve.open.assert_called_once()
     shelve.open.assert_called_with(TEMP_FILE, 'n')

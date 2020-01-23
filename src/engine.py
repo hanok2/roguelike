@@ -96,9 +96,11 @@ def play_game(g, render_eng):
 
     log.debug('Entering game loop...')
 
+    key = tcod.Key()
     mouse = tcod.Mouse()
 
     actors = g.stage.entities
+
     actor_index = 0
     # Game loop
     while True:
@@ -152,7 +154,8 @@ def play_game(g, render_eng):
             # todo: Fix this to be more consistent
 
             if current_actor.has_comp('human'):
-                action = current_actor.get_action(g)
+                action = current_actor.get_action(g, key, mouse)
+
             elif current_actor.has_comp('ai'):
                 action = current_actor.ai.get_action(g)
 

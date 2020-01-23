@@ -38,10 +38,8 @@ class Player(entity.Entity):
         self.fighter = Fighter(self, HERO_HP, HERO_DEF, HERO_POW)
         self.inv = Inventory(owner=self, capacity=HERO_INV_CAPACITY)
 
-        self.key = tcod.Key()
-        self.mouse = tcod.Mouse()
 
-    def get_action(self, g):
+    def get_action(self, g, key, mouse):
         # Capture new user input
         # Deprecated since version 9.3: Use the tcod.event.get function to check for events.
         # tcod.sys_check_for_event(
@@ -61,16 +59,16 @@ class Player(entity.Entity):
         # Nothing is waiting in the action queue - collect more actions
         tcod.sys_wait_for_event(
             mask=tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE,
-            k=self.key,
-            m=self.mouse,
+            k=key,
+            m=mouse,
             flush=True
         )
 
         # Get keyboard/mouse input
-        key_char = input_handling.process_tcod_input(self.key)
+        key_char = input_handling.process_tcod_input(key)
 
         action = input_handling.handle_keys(g.state, key_char)
-        mouse_action = input_handling.handle_mouse(g.state, self.mouse)
+        mouse_action = input_handling.handle_mouse(g.state, mouse)
 
         if mouse_action:
             # Mouse action will take priority over keys (for now)
@@ -79,6 +77,3 @@ class Player(entity.Entity):
             action = mouse_action
 
         return action
-
-
-

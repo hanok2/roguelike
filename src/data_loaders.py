@@ -1,4 +1,5 @@
 import shelve
+from . import game
 
 # Flags
 # r: read-only
@@ -18,11 +19,24 @@ import shelve
 
 def save_game(filepath, game):
     with shelve.open(filepath, 'n') as data_file:
-        data_file['game'] = game
+        # data_file['game'] = game
+        data_file['hero'] = game.hero
+        data_file['dungeon'] = game.dungeon
+        data_file['stage'] = game.stage
+        data_file['msg_log'] = game.msg_log
+        data_file['state'] = game.state
+        data_file['prev_state'] = game.prev_state
+        data_file['turns'] = game.turns
+        data_file['targeting_item'] = game.targeting_item
+        data_file['action_queue'] = game.action_queue
+        data_file['fov_recompute'] = game.fov_recompute
+        data_file['fov_map'] = game.fov_map
+        data_file['redraw'] = game.redraw
 
 
 def load_game(filepath):
     with shelve.open(filepath, 'r') as data_file:
-        game = data_file['game']
+        _game = game.Game()
+        _game.load_game(data_file)
 
     return game
