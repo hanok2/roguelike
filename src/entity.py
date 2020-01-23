@@ -62,21 +62,3 @@ class Entity(object):
             raise ValueError('move cannot place entity in a negative x or y: ({}, {})'.format(dest_x, dest_y))
         self.x += dx
         self.y += dy
-
-    def move_towards(self, target_x, target_y, game_map):
-        """Very simple movement function to take the most direct path toward
-            the hero.
-        """
-        if target_x < 0 or target_y < 0:
-            raise ValueError('Target coordinates cannot be negative! ({}, {})'.format(target_x, target_y))
-
-        dx, dy = self.calc_move(target_x, target_y)
-
-        dest_x = self.x + dx
-        dest_y = self.y + dy
-
-        blocked_at = game_map.is_blocked(dest_x, dest_y)
-        occupied = game_map.get_blocker_at_loc(dest_x, dest_y)
-
-        if not (blocked_at or occupied):
-            self.move(dx, dy)
