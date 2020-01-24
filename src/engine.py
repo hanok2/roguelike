@@ -99,9 +99,8 @@ def play_game(g, render_eng):
     key = tcod.Key()
     mouse = tcod.Mouse()
 
-    actors = g.stage.entities
+    current_actor, actor_index = get_next_actor(g.stage, len(g.stage.entities))
 
-    actor_index = 0
     # Game loop
     while True:
         if g.redraw:
@@ -114,7 +113,8 @@ def play_game(g, render_eng):
             # libtcod.console_clear(con)
             g.redraw = False
 
-        if g.fov_recompute:
+        # Only recompute the fov if its the Players turn.
+        if g.fov_recompute and current_actor.has_comp('human'):
             log.debug('fov_recompute...')
             recompute_fov(
                 g.fov_map,
@@ -149,7 +149,7 @@ def play_game(g, render_eng):
             action = g.action_queue.get()
 
         else:
-            current_actor = g.stage.entities[actor_index].get_action(g)
+            current_actor, actor_index = get_next_actor(g.stage, actor_index)
 
             # todo: Fix this to be more consistent
 
@@ -160,13 +160,12 @@ def play_game(g, render_eng):
                 action = current_actor.ai.get_action(g)
 
         if action:
-            process_action(action, g.hero, g)
+            process_action(
+                action=action,
+                entity=current_actor,
+                g=g
+            )
 
-            # Print any messges
-            # If failed - don't consume turn
-            # If succeed - consume turn if required
-            # If new state - change the state, and update the prev_state
-            # If alternates actions - Add new Actions to the queue (in order)
 
         # Save and go to main menu
         if g.state == States.MAIN_MENU:
@@ -177,13 +176,20 @@ def play_game(g, render_eng):
 
         # if mouse_action?
 
-        actor_index = (actor_index + 1) % len(g.stage.entities)
+
+
+def get_next_actor(stage, actor_index):
+    while True:
+        actor_index = (actor_index + 1) % len(stage.entities)
+        current_actor = stage.entities[actor_index]
+        if current_actor.has_comp('ai') or current_actor.has_comp('human'):
+            return current_actor, actor_index
 
 
 def process_action(action, entity, g):
-    log.debug('process_action: {} - State: {}'.format(action, g.state))
+    log.debug('process_action: %s - %s - %s', g.state, str(entity), action)
 
-    action_result = action.perform(
+    action_results = action.perform(
         state=g.state,
         prev_state=g.prev_state,
         dungeon=g.dungeon,
@@ -193,22 +199,35 @@ def process_action(action, entity, g):
         targeting_item=g.targeting_item,
         game=g,
     )
+    if not isinstance(action_results, list):
+        action_results = [action_results]
 
-    if action_result.success and action.consumes_turn:
+    # Use the first ActionResult to determine if we increment turn??
+
+
+    # Process all the ActionResults
+    for r in action_results:
+        log.debug('ActionResult:')
+        log.debug('\tSuccess: %s', r.success)
+        log.debug('\tMsg: %s', r.msg)
+        log.debug('\tAlt: %s', r.alt)
+
         # Increment turn if necessary
-        g.state = States.WORLD_TURN
+        if r.success and action.consumes_turn:
+            # g.state = States.WORLD_TURN
+            # Do what?
+            pass
 
-    if action_result.new_state:
-        g.prev_state = g.state
-        g.state = action_result.new_state
+        if r.new_state:
+            g.prev_state = g.state
+            g.state = r.new_state
 
-    if action_result.msg:
-        log.debug('msg: {}.'.format(action_result.msg))
-        g.msg_log.add(action.result.msg)
+        if r.msg:
+            g.msg_log.add(r.msg)
 
-    # alternate actions
-    for a in action_result.alt:
-        g.action_queue.put(a)
+        # alternate actions
+        if r.alt:
+            g.action_queue.put(r.alt)
 
 
 def check_for_quit():
