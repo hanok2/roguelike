@@ -1,6 +1,7 @@
 from random import randint
 from . import actions
 from . import config
+from . import stages
 from .config import EquipmentSlots
 
 
@@ -56,20 +57,24 @@ class ApproachAI(object):
         self.owner = owner
 
     def get_action(self, g):
-        results = []
-
         if g.fov_map.fov[self.owner.y, self.owner.x]:
-            if self.owner.distance_to(g.hero) >= 2:
-                self.owner.move_astar(g.hero, g.stage)
+            if stages.Stage.distance_between_entities(self.owner, g.hero) >= 2:
+            # if self.owner.distance_to(g.hero) >= 2:
+                return actions.MoveAStarAction(g.stage, self.owner, g.hero)
+
+                # self.owner.move_astar(g.hero, g.stage)
 
             elif g.hero.fighter.hp > 0:
                 # attack_results = self.owner.fighter.attack(target)
+                # attack_results = self.owner.fighter.attack(g.hero)
 
-                attack_results = self.owner.fighter.attack(g.hero)
+                return actions.AttackAction(attacker=self.owner, defender=g.hero)
 
-                results.extend(attack_results)
 
-        return results
+                # results.extend(attack_results)
+
+        return actions.WaitAction()
+
 
 
 class ConfusedBehavior(object):
