@@ -1,7 +1,6 @@
 from random import randint
 from . import actions
 from . import config
-from . import stages
 from .config import EquipmentSlots
 
 
@@ -58,8 +57,10 @@ class ApproachAI(object):
 
     def get_action(self, g):
         if g.fov_map.fov[self.owner.y, self.owner.x]:
-            if stages.Stage.distance_between_entities(self.owner, g.hero) >= 2:
-            # if self.owner.distance_to(g.hero) >= 2:
+
+            # if stages.Stage.distance_between_entities(self.owner, g.hero) >= 2:
+
+            if self.owner.distance_to(g.hero) >= 2:
                 return actions.MoveAStarAction(g.stage, self.owner, g.hero)
 
                 # self.owner.move_astar(g.hero, g.stage)

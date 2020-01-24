@@ -1,7 +1,7 @@
 import math
 import tcod
+from . import stages
 from .config import RenderOrder
-from .components import Item
 
 
 class Entity(object):
@@ -11,6 +11,11 @@ class Entity(object):
 
     def __init__(self, **kwargs):
         self.components = kwargs
+
+    def __str__(self):
+        if self.has_comp('name'):
+            return self.name
+        return 'Unnamed'
 
     def __getattr__(self, name):
         if name in self.components:
@@ -62,3 +67,6 @@ class Entity(object):
             raise ValueError('move cannot place entity in a negative x or y: ({}, {})'.format(dest_x, dest_y))
         self.x += dx
         self.y += dy
+
+    def distance_to(self, other):
+        return stages.Stage.distance_between_entities(self, other)

@@ -37,6 +37,15 @@ def test_Entity_init__kwargs_become_components():
     pass
 
 
+def test_Entity_str__has_name():
+    e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
+    assert str(e) == 'Player'
+
+def test_Entity_str__unnamed():
+    e = entity.Entity(x=0, y=0, char='@', color=None)
+    assert str(e) == 'Unnamed'
+
+
 def test_Entity_init__add_comp__1_kwarg():
     e = entity.Entity(x=0, y=0, char='@', color=None, name='Player')
     e.add_comp(a=1)
