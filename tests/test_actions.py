@@ -486,24 +486,13 @@ def test_DropItemAction__valid_item(walk_map, hero):
     result = action.perform(stage=walk_map, entity=hero, prev_state=None)
     assert result.success
     assert result.msg == 'You dropped the {}.'.format(potion.name)
-
-
-def test_DropItemAction__updates_item_xy(potion, hero):
-    hero.inv.add_item(potion)
-
-    action = actions.DropItemAction(inv_index=0)  # Assume potion is at index 0
-    result = action.perform(stage=walk_map, entity=hero, prev_state=None)
-
+    assert potion not in hero.inv.items
+    assert potion in walk_map.entities
     assert potion.x == hero.x
     assert potion.y == hero.y
 
 
-@pytest.mark.skip(reason='need to mock')
-def test_DropItemAction__equipped_item_called_drop_equipped(sword, hero):
-    pass
-
-
-def test_DropItemAction__equipped_item__results(sword, hero):
+def test_DropItemAction__equipped_item(walk_map, sword, hero):
     hero.inv.add_item(sword)
     hero.equipment.toggle_equip(sword)
 
@@ -512,30 +501,13 @@ def test_DropItemAction__equipped_item__results(sword, hero):
 
     # Should we request the EquipAction??
     # assert results[0]['dequipped'] == sword
-
     assert result.success
     assert result.msg == 'You dropped the Sword.'
 
-
-def test_DropItemAction__equipped_item__updates_item_xy(sword, hero):
-    hero.inv.add_item(sword)
-    hero.equipment.toggle_equip(sword)
-
-    action = actions.DropItemAction(inv_index=0)  # Assume sword is at index 0
-    action.perform(stage=walk_map, entity=hero, prev_state=None)
-
+    assert sword not in hero.inv.items
+    assert sword in walk_map.entities
     assert sword.x == hero.x
     assert sword.y == hero.y
-
-
-def test_DropItemAction__equipped_item__item_dropped(sword, hero):
-    hero.inv.add_item(sword)
-    hero.equipment.toggle_equip(sword)
-
-    action = actions.DropItemAction(inv_index=0)  # Assume sword is at index 0
-    action.perform(stage=walk_map, entity=hero, prev_state=None)
-
-    assert sword not in hero.inv.items
 
 
 """ Tests for StairUpAction """

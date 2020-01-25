@@ -269,6 +269,7 @@ class DropItemAction(Action):
 
     def perform(self, *args, **kwargs):
         entity = kwargs['entity']
+        stage = kwargs['stage']
         item = entity.inv.items[self.inv_index]
 
         if item not in entity.inv.items:
@@ -281,13 +282,18 @@ class DropItemAction(Action):
                 # todo: This might also benefit from an Action replacement
                 entity.equipment.toggle_equip(item)
 
+
+        # Remove from the entity's inventory
+        entity.inv.rm_item(item)
+
+        # Deposit onto the stage where the entity is
         item.x = entity.x
         item.y = entity.y
-
-        entity.inv.rm_item(item)
+        stage.entities.append(item)
 
         return ActionResult(
             success=True,
+            new_state=States.ACTOR_TURN,
             msg='You dropped the {}.'.format(item.name)
         )
 
