@@ -127,7 +127,8 @@ class Stage(object):
         """Populates the stage with monsters and items.
             Possibly adds other entities: stairs/features/etc.
         """
-        self.place_monsters()
+        # self.place_monsters()
+
         for room in self.rooms:
             self.place_items(room)
 
