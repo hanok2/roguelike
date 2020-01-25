@@ -108,29 +108,27 @@ class Engine(object):
 
         log.debug('Entering game loop...')
         # Game loop
+
+        # Change to while not dead or main menu?
         while True:
+            actors = [e for e in self.g.stage.entities if e.has_comp('ai') or e.has_comp('human')]
 
-            # Check the action queue for any remaining actions - use them first
-            if not self.g.action_queue.empty():
-                action = self.g.action_queue.get()
-
-            else:
+            for actor in actors:
                 self.g.state = States.ACTOR_TURN
-                current_actor, actor_index = self.get_next_actor(actor_index)
+                print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
 
-                # todo: Fix this to be more consistent
+                while not self.g.state == States.TURN_CONSUMED:
 
-                if current_actor.has_comp('human'):
-                    action = current_actor.get_action(self.g, self.key, self.mouse)
 
-                elif current_actor.has_comp('ai'):
-                    action = current_actor.ai.get_action(self.g)
+                    if current_actor.has_comp('human'):
+                        action = current_actor.get_action(self.g, self.key, self.mouse)
 
-            if action:
-                self.process_action(
-                    action=action,
-                    entity=current_actor,
-                )
+                    elif current_actor.has_comp('ai'):
+                        action = current_actor.ai.get_action(self.g)
+
+                    self.g.action_queue.put(action)
+
+                    self.resolve_actions(actor)
 
             # Save and go to main menu
             if self.g.state == States.MAIN_MENU:
@@ -149,6 +147,15 @@ class Engine(object):
             current_actor = self.g.stage.entities[actor_index]
             if current_actor.has_comp('ai') or current_actor.has_comp('human'):
                 return current_actor, actor_index
+
+    def resolve_actions(self, actor):
+        print('resolving actions')
+
+        # Check the action queue for any remaining actions - use them first
+        while not self.g.action_queue.empty():
+            action = self.g.action_queue.get()
+
+            self.process_action(action=action, entity=actor)
 
     def process_action(self, action, entity):
         log.debug('process_action: %s - %s - %s', self.g.state, str(entity), action)
