@@ -231,10 +231,3 @@ class Engine(object):
             # alternate actions
             if r.alt:
                 g.action_queue.put(r.alt)
-
-
-def check_for_quit():
-    # AttributeError: module 'tcod' has no attribute 'event'
-    for event in tcod.event.get():
-        if event.type == "QUIT":
-            raise SystemExit()
