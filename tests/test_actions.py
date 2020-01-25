@@ -306,8 +306,14 @@ def test_UseItemAction__init():
     assert action.consumes_turn
 
 
-def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
+def test_UseItemAction__negative_inv_index(walk_map, hero):
     action = actions.UseItemAction(inv_index=-1)
+    with pytest.raises(IndexError):
+        action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.ACTOR_TURN)
+
+
+def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
+    action = actions.UseItemAction(inv_index=100)
     with pytest.raises(IndexError):
         action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.ACTOR_TURN)
 

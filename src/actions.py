@@ -165,6 +165,11 @@ class UseItemAction(Action):
         stage = kwargs['stage']
         fov_map = kwargs['fov_map']
         entity = kwargs['entity']
+
+        # Check item index:
+        if self.inv_index >= len(entity.inv.items):
+            return ActionResult(success=False)
+
         item_entity = entity.inv.items[self.inv_index]
         item_comp = item_entity.item
 

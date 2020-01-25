@@ -119,7 +119,6 @@ class Engine(object):
 
                 while not self.g.state == States.TURN_CONSUMED:
 
-
                     if current_actor.has_comp('human'):
                         action = current_actor.get_action(self.g, self.key, self.mouse)
 
@@ -130,6 +129,10 @@ class Engine(object):
 
                     self.resolve_actions(actor)
 
+                    # Maybe only update on human turn?
+                    self.update_rendering()
+
+
             # Save and go to main menu
             if self.g.state == States.MAIN_MENU:
                 self.g.redraw = True
@@ -139,7 +142,6 @@ class Engine(object):
 
             # if mouse_action?
 
-            self.update_rendering()
 
     def get_next_actor(self, actor_index):
         while True:
@@ -149,11 +151,12 @@ class Engine(object):
                 return current_actor, actor_index
 
     def resolve_actions(self, actor):
-        print('resolving actions')
+        print('Resolving actions')
 
         # Check the action queue for any remaining actions - use them first
         while not self.g.action_queue.empty():
             action = self.g.action_queue.get()
+            print('\t{}'.format(action))
 
             self.process_action(action=action, entity=actor)
 
