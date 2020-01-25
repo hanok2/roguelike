@@ -66,9 +66,13 @@ class WalkAction(Action):
 
         # Check for attacker
         target = stage.get_blocker_at_loc(dest_x, dest_y)
-
         if target:
-            return ActionResult(alt=AttackAction(attacker=entity, defender=target))
+            # return ActionResult(alt=AttackAction(attacker=entity, defender=target))
+
+            return ActionResult(
+                success=False,
+                msg='You cannot walk into the actor!...'
+            )
 
         # log.debug('Moving.')
         entity.move(self.dx, self.dy)

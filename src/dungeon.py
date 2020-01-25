@@ -16,7 +16,7 @@ class Dungeon(object):
         hero_start_x, hero_start_y = self.stages[0].rooms[0].center()
         self.move_hero(0, hero_start_x, hero_start_y)
 
-        self.get_stage().populate()
+        # self.get_stage().populate()
 
     # def current_lvl(self):
         # Find the hero and return the level the hero is on.
