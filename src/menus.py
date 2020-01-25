@@ -55,7 +55,9 @@ def inv_options(hero, state):
         header = 'Press the key next to an item to drop it, or ESC to cancel.\n'
 
     if len(hero.inv.items) == 0:
-        options = ['Inventory is empty.']
+        # options = ['Inventory is empty.']
+        # header = 'Inventory is empty.'
+        options = {'': 'Inventory is empty.'}
     else:
         options = list_inv_items(hero)
         options = default_lettering_dict(options)
