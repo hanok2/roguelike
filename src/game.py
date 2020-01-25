@@ -21,7 +21,7 @@ class Game(object):
         self.dungeon = new_dungeon
         self.stage = self.dungeon.get_stage()
         self.msg_log = msg_log
-        self.state = config.States.HERO_TURN
+        self.state = config.States.ACTOR_TURN
         self.prev_state = self.state
         self.turns = 0
 

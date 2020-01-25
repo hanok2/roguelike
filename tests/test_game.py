@@ -34,7 +34,7 @@ def test_Game_init__msg_log_is_None():
 
 def test_Game_init__state_is_None():
     g = game.Game()
-    assert g.state == config.States.HERO_TURN
+    assert g.state == config.States.ACTOR_TURN
 
 
 def test_Game_init__prev_state_equals_state():

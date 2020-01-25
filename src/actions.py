@@ -364,16 +364,16 @@ class LevelUpAction(Action):
         if self.stat == 'hp':
             entity.fighter.base_max_hp += 20
             entity.fighter.hp += 20
-            return ActionResult(success=True, msg='Boosted max HP!', new_state=States.HERO_TURN)
+            return ActionResult(success=True, msg='Boosted max HP!', new_state=States.ACTOR_TURN)
 
 
         elif self.stat == 'str':
             entity.fighter.base_power += 1
-            return ActionResult(success=True, msg='Boosted strength!', new_state=States.HERO_TURN)
+            return ActionResult(success=True, msg='Boosted strength!', new_state=States.ACTOR_TURN)
 
         elif self.stat == 'def':
             entity.fighter.base_defense += 1
-            return ActionResult(success=True, msg='Boosted defense!', new_state=States.HERO_TURN)
+            return ActionResult(success=True, msg='Boosted defense!', new_state=States.ACTOR_TURN)
 
         else:
             raise ValueError('invalid stat!')

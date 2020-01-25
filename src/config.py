@@ -13,8 +13,8 @@ class RenderOrder(Enum):
 
 class States(Enum):
     # Note: In Python 3.6+, we can use "auto" feature to auto-increment
-    HERO_TURN = auto()
-    WORLD_TURN = auto()
+    ACTOR_TURN = auto()
+    TURN_CONSUMED = auto()
     HERO_DEAD = auto()
     SHOW_INV = auto()
     DROP_INV = auto()

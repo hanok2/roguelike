@@ -309,7 +309,7 @@ def test_UseItemAction__init():
 def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
     action = actions.UseItemAction(inv_index=-1)
     with pytest.raises(IndexError):
-        action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.HERO_TURN)
+        action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.ACTOR_TURN)
 
 
 def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
@@ -449,7 +449,7 @@ def test_DropItemAction__init():
 def test_DropItemAction__inv_index_out_of_bounds(walk_map, hero):
     action = actions.DropItemAction(inv_index=-1)
     with pytest.raises(IndexError):
-        action.perform(stage=walk_map, entity=hero, prev_state=config.States.HERO_TURN)
+        action.perform(stage=walk_map, entity=hero, prev_state=config.States.ACTOR_TURN)
 
 
 def test_DropItemAction__valid_item(walk_map, hero):
@@ -634,7 +634,7 @@ def test_LevelUpAction__invalid_stat():
 
 
 def test_LevelUpAction__boost_hp(hero):
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.LevelUpAction(stat='hp')
     result = action.perform(entity=hero, prev_state=prev_state)
 
@@ -644,7 +644,7 @@ def test_LevelUpAction__boost_hp(hero):
 
 
 def test_LevelUpAction__boost_strength(hero):
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.LevelUpAction(stat='str')
     result = action.perform(entity=hero, prev_state=prev_state)
 
@@ -654,7 +654,7 @@ def test_LevelUpAction__boost_strength(hero):
 
 
 def test_LevelUpAction__boost_defense(hero):
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.LevelUpAction(stat='def')
     result = action.perform(entity=hero, prev_state=prev_state)
 
@@ -673,40 +673,40 @@ def test_ExitAction__init():
     assert action.consumes_turn is False
 
 
-def test_ExitAction__SHOW_INV_returns_to_HERO_TURN():
+def test_ExitAction__SHOW_INV_returns_to_ACTOR_TURN():
     state = config.States.SHOW_INV
     action = actions.ExitAction(state)
 
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     result = action.perform(prev_state=prev_state)
 
     assert result.success
     assert result.new_state == prev_state
 
 
-def test_ExitAction__DROP_INV_returns_to_HERO_TURN():
+def test_ExitAction__DROP_INV_returns_to_ACTOR_TURN():
     state = config.States.DROP_INV
     action = actions.ExitAction(state)
 
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     result = action.perform(prev_state=prev_state)
     assert result.new_state == prev_state
 
 
-def test_ExitAction__SHOW_STATS_returns_to_HERO_TURN():
+def test_ExitAction__SHOW_STATS_returns_to_ACTOR_TURN():
     state = config.States.SHOW_STATS
     action = actions.ExitAction(state)
 
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     result = action.perform(prev_state=prev_state)
     assert result.new_state == prev_state
 
 
-def test_ExitAction__TARGETING_returns_to_HERO_TURN():
+def test_ExitAction__TARGETING_returns_to_ACTOR_TURN():
     state = config.States.TARGETING
     action = actions.ExitAction(state)
 
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     result = action.perform(prev_state=prev_state)
 
     assert result.new_state == prev_state
@@ -714,8 +714,8 @@ def test_ExitAction__TARGETING_returns_to_HERO_TURN():
     # 'cancel_target': True,
 
 
-def test_ExitAction__HERO_TURN_returns_to_MAIN_MENU():
-    state = config.States.HERO_TURN
+def test_ExitAction__ACTOR_TURN_returns_to_MAIN_MENU():
+    state = config.States.ACTOR_TURN
     action = actions.ExitAction(state)
 
     prev_state = config.States.MAIN_MENU
@@ -789,14 +789,14 @@ def test_TargetAction__both_clicks_raises_exception():
 
 
 def test_ShowInvAction__init():
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.ShowInvAction(prev_state)
     assert isinstance(action, actions.Action)
     assert action.consumes_turn is False
 
 
 def test_ShowInvAction():
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.ShowInvAction(prev_state)
     result = action.perform()
     assert result.success
@@ -807,7 +807,7 @@ def test_ShowInvAction():
 
 
 def test_DropInvAction__init():
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.DropInvAction(prev_state)
 
     assert isinstance(action, actions.Action)
@@ -815,7 +815,7 @@ def test_DropInvAction__init():
 
 
 def test_DropInvAction():
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.DropInvAction(prev_state)
     result = action.perform()
     assert result.new_state == config.States.DROP_INV
@@ -825,14 +825,14 @@ def test_DropInvAction():
 
 
 def test_CharScreenAction__init():
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     char_scr = actions.CharScreenAction(prev_state)
     assert isinstance(char_scr, actions.Action)
     assert char_scr.consumes_turn is False
 
 
 def test_CharScreenAction():
-    prev_state = config.States.HERO_TURN
+    prev_state = config.States.ACTOR_TURN
     action = actions.CharScreenAction(prev_state)
     result = action.perform()
     assert result.success

@@ -149,6 +149,7 @@ def play_game(g, render_eng):
             action = g.action_queue.get()
 
         else:
+            g.state = States.ACTOR_TURN
             current_actor, actor_index = get_next_actor(g.stage, actor_index)
 
             # todo: Fix this to be more consistent
@@ -170,7 +171,7 @@ def play_game(g, render_eng):
         # Save and go to main menu
         if g.state == States.MAIN_MENU:
             g.redraw = True
-            g.state = States.HERO_TURN
+            g.state = States.ACTOR_TURN
             save_game(config.savefile, g)
             return
 
@@ -214,9 +215,8 @@ def process_action(action, entity, g):
 
         # Increment turn if necessary
         if r.success and action.consumes_turn:
-            # g.state = States.WORLD_TURN
-            # Do what?
-            pass
+            g.state = States.TURN_CONSUMED
+            g.turns += 1
 
         if r.new_state:
             g.prev_state = g.state
