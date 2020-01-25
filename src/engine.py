@@ -19,6 +19,7 @@ def main():
     show_main_menu = True
     show_load_err_msg = False
     main_menu_bg_img = tcod.image_load(filename=config.menu_img)
+
     key = tcod.Key()
     mouse = tcod.Mouse()
 
@@ -93,6 +94,8 @@ class Engine(object):
     def __init__(self, _game, render_eng):
         self.g = _game
         self.render_eng = render_eng
+        self.key = tcod.Key()
+        self.mouse = tcod.Mouse()
 
     def play_game(self):
         log.debug('Calling play_game...')
@@ -100,55 +103,12 @@ class Engine(object):
         # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
         # while not tcod.console_is_window_closed():
 
-        log.debug('Entering game loop...')
-
-        key = tcod.Key()
-        mouse = tcod.Mouse()
-
         current_actor, actor_index = self.get_next_actor(len(self.g.stage.entities))
+        self.update_rendering()
 
+        log.debug('Entering game loop...')
         # Game loop
         while True:
-            if self.g.redraw:
-                # Reset the stage
-                stage = self.g.dungeon.get_stage()
-
-                self.g.fov_map = initialize_fov(stage)
-                self.g.fov_recompute = True
-                self.render_eng.con.clear()
-                # libtcod.console_clear(con)
-                self.g.redraw = False
-
-            # Only recompute the fov if its the Players turn.
-            if self.g.fov_recompute and current_actor.has_comp('human'):
-                log.debug('fov_recompute...')
-                recompute_fov(
-                    self.g.fov_map,
-                    self.g.hero.x,
-                    self.g.hero.y,
-                    config.fov_radius,
-                    config.fov_light_walls,
-                    config.fov_algorithm
-                )
-
-            # Render all entities
-            self.render_eng.render_all(
-                self.g.dungeon,
-                self.g.fov_map,
-                self.g.fov_recompute,
-                self.g.msg_log,
-                mouse,
-                self.g.state,
-                self.g.turns
-            )
-
-            self.g.fov_recompute = False       # Mandatory
-
-            # Presents everything on screen
-            tcod.console_flush()
-
-            # Clear all entities
-            self.render_eng.clear_all(self.g.stage.entities)
 
             # Check the action queue for any remaining actions - use them first
             if not self.g.action_queue.empty():
@@ -161,7 +121,7 @@ class Engine(object):
                 # todo: Fix this to be more consistent
 
                 if current_actor.has_comp('human'):
-                    action = current_actor.get_action(self.g, key, mouse)
+                    action = current_actor.get_action(self.g, self.key, self.mouse)
 
                 elif current_actor.has_comp('ai'):
                     action = current_actor.ai.get_action(self.g)
@@ -180,6 +140,8 @@ class Engine(object):
                 return
 
             # if mouse_action?
+
+            self.update_rendering()
 
     def get_next_actor(self, actor_index):
         while True:
@@ -229,3 +191,45 @@ class Engine(object):
             # alternate actions
             if r.alt:
                 self.g.action_queue.put(r.alt)
+
+    def update_rendering(self):
+        if self.g.redraw:
+            # Reset the stage
+            stage = self.g.dungeon.get_stage()
+
+            self.g.fov_map = initialize_fov(stage)
+            self.g.fov_recompute = True
+            self.render_eng.con.clear()
+            # libtcod.console_clear(con)
+            self.g.redraw = False
+
+        # Only recompute the fov if its the Players turn.
+        if self.g.fov_recompute:
+            log.debug('fov_recompute...')
+            recompute_fov(
+                self.g.fov_map,
+                self.g.hero.x,
+                self.g.hero.y,
+                config.fov_radius,
+                config.fov_light_walls,
+                config.fov_algorithm
+            )
+
+        # Render all entities
+        self.render_eng.render_all(
+            self.g.dungeon,
+            self.g.fov_map,
+            self.g.fov_recompute,
+            self.g.msg_log,
+            self.mouse,
+            self.g.state,
+            self.g.turns
+        )
+
+        self.g.fov_recompute = False       # Mandatory
+
+        # Presents everything on screen
+        tcod.console_flush()
+
+        # Clear all entities
+        self.render_eng.clear_all(self.g.stage.entities)
