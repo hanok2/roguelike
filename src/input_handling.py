@@ -35,7 +35,8 @@ def handle_keys(state, key):
     elif state == States.SHOW_STATS:
         return handle_char_scr(state, key)
 
-    return None
+    # return {}
+    return actions.NullAction()
 
 
 def handle_hero_turn_keys(state, key):
@@ -85,7 +86,7 @@ def handle_hero_turn_keys(state, key):
     elif key == 'esc':
         return actions.ExitAction(state=state)
 
-    return None
+    return actions.NullAction()
 
 
 def handle_hero_dead_keys(state, key):
@@ -101,7 +102,7 @@ def handle_hero_dead_keys(state, key):
     elif key == 'esc':
         return actions.ExitAction(state=state)
 
-    return None
+    return actions.NullAction()
 
 
 
@@ -121,7 +122,7 @@ def handle_inv_keys(state, key):
         elif state == States.DROP_INV:
             return actions.DropItemAction(inv_index=index)
 
-    return None
+    return actions.NullAction()
 
 
 def handle_main_menu(state, key):
@@ -135,6 +136,7 @@ def handle_main_menu(state, key):
         return {'exit': True}
 
     return {}
+    # return actions.NullAction()
 
 
 def handle_targeting_keys(state, key):
@@ -143,7 +145,7 @@ def handle_targeting_keys(state, key):
     if key == 'esc':
         return actions.ExitAction(state=state)
 
-    return None
+    return actions.NullAction()
 
 
 def handle_lvl_up_menu(state, key):
@@ -154,14 +156,14 @@ def handle_lvl_up_menu(state, key):
     elif key == 'd':               # Defense
         return actions.LevelUpAction('def')
 
-    return None
+    return actions.NullAction()
 
 
 def handle_char_scr(state, key):
     if key == 'esc':
         return actions.ExitAction(state=state)
 
-    return None
+    return actions.NullAction()
 
 
 def process_tcod_input(key):

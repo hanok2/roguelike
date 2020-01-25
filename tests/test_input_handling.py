@@ -8,9 +8,10 @@ from ..src import config
 States = config.States
 
 
-def test_handle_keys__invalid_state__returns_None():
+def test_handle_keys__invalid_state__returns_NullAction():
     result = input_handling.handle_keys(key='a', state=None)
-    assert result is None
+    # assert result == {}
+    assert str(result) == 'NullAction'
 
 
 def test_handle_keys__ACTOR_TURN__calls_handle_hero_turn_keys(mocker):
@@ -159,9 +160,9 @@ def test_handle_hero_turn_keys__escape():
     assert isinstance(result, actions.ExitAction)
 
 
-def test_handle_hero_turn_keys__invalid_key__returns_None():
+def test_handle_hero_turn_keys__invalid_key__returns_NullAction():
     result = input_handling.handle_hero_turn_keys(state=None, key=None)
-    assert result is None
+    assert str(result) == 'NullAction'
 
 
 """ Tests for handle_hero_dead_keys """
@@ -188,9 +189,9 @@ def test_handle_hero_dead_keys__esc():
     assert isinstance(result, actions.ExitAction)
 
 
-def test_handle_hero_dead_keys__invalid_key__returns_None():
+def test_handle_hero_dead_keys__invalid_key__returns_NullAction():
     result = input_handling.handle_hero_dead_keys(state=None, key=None)
-    assert result is None
+    assert str(result) == 'NullAction'
 
 
 """ Tests for handle_inv_keys """
@@ -219,9 +220,9 @@ def test_handle_inv_keys__DROP_INV__returns_DropItemAction():
     assert result.inv_index == 0
 
 
-def test_handle_inv_keys__invalid_key__returns_None():
+def test_handle_inv_keys__invalid_key__returns_NullAction():
     result = input_handling.handle_inv_keys(state=None, key='bla')
-    assert result is None
+    assert str(result) == 'NullAction'
 
 
 """ Tests for test_handle_main_menu(key) """
@@ -271,9 +272,9 @@ def test_handle_targeting_keys__esc__exits_targeting():
     assert isinstance(result, actions.ExitAction)
 
 
-def test_handle_targeting_keys__non_valid():
+def test_handle_targeting_keys__non_valid__returns_NullAction():
     result = input_handling.handle_targeting_keys(state=None, key='z')
-    assert result is None
+    assert str(result) == 'NullAction'
 
 
 """ Tests for test_handle_lvl_up_menu(key)"""
@@ -297,9 +298,9 @@ def test_handle_lvl_up_menu__pick_defense():
     assert result.stat == 'def'
 
 
-def test_handle_lvl_up_menu__invalid():
+def test_handle_lvl_up_menu__invalid_key__returns_NullAction():
     result = input_handling.handle_lvl_up_menu(state=None, key='z')
-    assert result == None
+    assert str(result) == 'NullAction'
 
 
 """ Tests for test_handle_char_scr(key):"""
@@ -310,9 +311,9 @@ def test_handle_char_scr__esc__returns_ExitAction():
     assert isinstance(result, actions.ExitAction)
 
 
-def test_handle_char_scr__invalid():
+def test_handle_char_scr__invalid_key__returns_NullAction():
     result = input_handling.handle_char_scr(state=None, key='z')
-    assert result is None
+    assert str(result) == 'NullAction'
 
 
 """ Tests for process_tcod_input"""

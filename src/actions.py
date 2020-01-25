@@ -38,6 +38,15 @@ class ActionResult(object):
         return isinstance(self.alt, action)
 
 
+class NullAction(Action):
+    def __init__(self):
+        super().__init__(consumes_turn=False)
+
+    def perform(self, *args, **kwargs):
+        return ActionResult(success=False)
+
+
+
 class WalkAction(Action):
     def __init__(self, dx, dy):
         super().__init__(consumes_turn=True)

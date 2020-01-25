@@ -124,6 +124,26 @@ def test_ActionResult__new_state__alt_defaults_None():
     assert result.new_state is None
 
 
+
+""" Tests for NullAction """
+
+
+def test_NullAction__init():
+    action = actions.NullAction()
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn is False
+
+
+def test_NullAction__results():
+    action = actions.NullAction()
+    result = action.perform()
+    assert result.success is False
+    assert result.msg is None
+    assert result.alt is None
+    assert result.new_state is None
+
+
+
 """ Tests for WalkAction """
 
 
@@ -312,10 +332,10 @@ def test_UseItemAction__negative_inv_index(walk_map, hero):
         action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.ACTOR_TURN)
 
 
-def test_UseItemAction__inv_index_out_of_bounds(walk_map, hero):
+def test_UseItemAction__inv_index_out_of_bounds__fails(walk_map, hero):
     action = actions.UseItemAction(inv_index=100)
-    with pytest.raises(IndexError):
-        action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.ACTOR_TURN)
+    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=config.States.ACTOR_TURN)
+    assert result.success is False
 
 
 def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
