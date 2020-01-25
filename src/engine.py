@@ -84,19 +84,19 @@ def main():
         else:
             # Reset a console to its default colors and the space character.
             render_eng.con.clear()
-            engine = Engine()
-            engine.play_game(_game, render_eng)
+            engine = Engine(_game, render_eng)
+            engine.play_game()
             show_main_menu = True
 
 
 class Engine(object):
-    def __init__(self):
-        # self.game = _game
-        # self.render_eng = render_eng
-        self.name = 'engine'
+    def __init__(self, _game, render_eng):
+        self.g = _game
+        self.render_eng = render_eng
 
-    def play_game(self, g, render_eng):
+    def play_game(self):
         log.debug('Calling play_game...')
+
         # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
         # while not tcod.console_is_window_closed():
 
@@ -105,103 +105,101 @@ class Engine(object):
         key = tcod.Key()
         mouse = tcod.Mouse()
 
-        current_actor, actor_index = self.get_next_actor(g.stage, len(g.stage.entities))
+        current_actor, actor_index = self.get_next_actor(len(self.g.stage.entities))
 
         # Game loop
         while True:
-            if g.redraw:
+            if self.g.redraw:
                 # Reset the stage
-                g.stage = g.dungeon.get_stage()
+                stage = self.g.dungeon.get_stage()
 
-                g.fov_map = initialize_fov(g.stage)
-                g.fov_recompute = True
-                render_eng.con.clear()
+                self.g.fov_map = initialize_fov(stage)
+                self.g.fov_recompute = True
+                self.render_eng.con.clear()
                 # libtcod.console_clear(con)
-                g.redraw = False
+                self.g.redraw = False
 
             # Only recompute the fov if its the Players turn.
-            if g.fov_recompute and current_actor.has_comp('human'):
+            if self.g.fov_recompute and current_actor.has_comp('human'):
                 log.debug('fov_recompute...')
                 recompute_fov(
-                    g.fov_map,
-                    g.hero.x,
-                    g.hero.y,
+                    self.g.fov_map,
+                    self.g.hero.x,
+                    self.g.hero.y,
                     config.fov_radius,
                     config.fov_light_walls,
                     config.fov_algorithm
                 )
 
             # Render all entities
-            render_eng.render_all(
-                g.dungeon,
-                g.fov_map,
-                g.fov_recompute,
-                g.msg_log,
+            self.render_eng.render_all(
+                self.g.dungeon,
+                self.g.fov_map,
+                self.g.fov_recompute,
+                self.g.msg_log,
                 mouse,
-                g.state,
-                g.turns
+                self.g.state,
+                self.g.turns
             )
 
-            g.fov_recompute = False       # Mandatory
+            self.g.fov_recompute = False       # Mandatory
 
             # Presents everything on screen
             tcod.console_flush()
 
             # Clear all entities
-            render_eng.clear_all(g.stage.entities)
+            self.render_eng.clear_all(self.g.stage.entities)
 
             # Check the action queue for any remaining actions - use them first
-            if not g.action_queue.empty():
-                action = g.action_queue.get()
+            if not self.g.action_queue.empty():
+                action = self.g.action_queue.get()
 
             else:
-                g.state = States.ACTOR_TURN
-                current_actor, actor_index = self.get_next_actor(g.stage, actor_index)
+                self.g.state = States.ACTOR_TURN
+                current_actor, actor_index = self.get_next_actor(actor_index)
 
                 # todo: Fix this to be more consistent
 
                 if current_actor.has_comp('human'):
-                    action = current_actor.get_action(g, key, mouse)
+                    action = current_actor.get_action(self.g, key, mouse)
 
                 elif current_actor.has_comp('ai'):
-                    action = current_actor.ai.get_action(g)
+                    action = current_actor.ai.get_action(self.g)
 
             if action:
                 self.process_action(
                     action=action,
                     entity=current_actor,
-                    g=g
                 )
 
-
             # Save and go to main menu
-            if g.state == States.MAIN_MENU:
-                g.redraw = True
-                g.state = States.ACTOR_TURN
-                save_game(config.savefile, g)
+            if self.g.state == States.MAIN_MENU:
+                self.g.redraw = True
+                self.g.state = States.ACTOR_TURN
+                save_game(config.savefile, self.g)
                 return
 
             # if mouse_action?
 
-    def get_next_actor(self, stage, actor_index):
+    def get_next_actor(self, actor_index):
         while True:
-            actor_index = (actor_index + 1) % len(stage.entities)
-            current_actor = stage.entities[actor_index]
+            actor_index = (actor_index + 1) % len(self.g.stage.entities)
+            current_actor = self.g.stage.entities[actor_index]
             if current_actor.has_comp('ai') or current_actor.has_comp('human'):
                 return current_actor, actor_index
 
-    def process_action(self, action, entity, g):
-        log.debug('process_action: %s - %s - %s', g.state, str(entity), action)
+    def process_action(self, action, entity):
+        log.debug('process_action: %s - %s - %s', self.g.state, str(entity), action)
 
         action_results = action.perform(
-            state=g.state,
-            prev_state=g.prev_state,
-            dungeon=g.dungeon,
-            stage=g.stage,
-            fov_map=g.fov_map,
+            state=self.g.state,
+            prev_state=self.g.prev_state,
+            dungeon=self.g.dungeon,
+            stage=self.g.stage,
+            fov_map=self.g.fov_map,
             entity=entity,
-            targeting_item=g.targeting_item,
-            game=g,
+            targeting_item=self.g.targeting_item,
+            game=self.g,
         )
         if not isinstance(action_results, list):
             action_results = [action_results]
@@ -218,16 +216,16 @@ class Engine(object):
 
             # Increment turn if necessary
             if r.success and action.consumes_turn:
-                g.state = States.TURN_CONSUMED
-                g.turns += 1
+                self.g.state = States.TURN_CONSUMED
+                self.g.turns += 1
 
             if r.new_state:
-                g.prev_state = g.state
-                g.state = r.new_state
+                self.g.prev_state = self.g.state
+                self.g.state = r.new_state
 
             if r.msg:
-                g.msg_log.add(r.msg)
+                self.g.msg_log.add(r.msg)
 
             # alternate actions
             if r.alt:
-                g.action_queue.put(r.alt)
+                self.g.action_queue.put(r.alt)
