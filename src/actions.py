@@ -419,6 +419,10 @@ class ExitAction(Action):
 
         else:
             return ActionResult(success=True, new_state=States.MAIN_MENU)
+            # return ActionResult(
+                # success=True,
+                # alt=MainMenuAction()
+            # )
 
 
 class FullScreenAction(Action):

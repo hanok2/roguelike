@@ -117,7 +117,7 @@ class Engine(object):
                 self.g.state = States.ACTOR_TURN
                 print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
 
-                while not self.g.state == States.TURN_CONSUMED:
+                while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
 
                     if current_actor.has_comp('human'):
                         action = current_actor.get_action(self.g, self.key, self.mouse)
@@ -135,8 +135,10 @@ class Engine(object):
 
             # Save and go to main menu
             if self.g.state == States.MAIN_MENU:
+                log.info('trying to enter the MAIN_MENU')
+
                 self.g.redraw = True
-                self.g.state = States.ACTOR_TURN
+                self.g.state = States.ACTOR_TURN  # Maybe previous state instead?
                 save_game(config.savefile, self.g)
                 return
 
@@ -192,8 +194,11 @@ class Engine(object):
                 self.g.turns += 1
 
             if r.new_state:
+
                 self.g.prev_state = self.g.state
                 self.g.state = r.new_state
+
+                log.info('%s -> %s', self.g.prev_state, self.g.state)
 
             if r.msg:
                 self.g.msg_log.add(r.msg)
