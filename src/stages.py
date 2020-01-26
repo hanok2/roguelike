@@ -224,7 +224,8 @@ class Stage(object):
             Otherwise, returns None.
         """
         blockers = [e for e in self.entities if e.x == x and e.y == y]
-        blockers = [e for e in blockers if e.has_comp('blocks')]
+        # blockers = [e for e in blockers if e.has_comp('blocks')]
+        blockers = [e for e in blockers if e.blocks]
 
         if blockers:
             return blockers.pop()
