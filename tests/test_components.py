@@ -1,11 +1,10 @@
 import pytest
-from ..src import actions
 from ..src import components
 from ..src import config
-from ..src import entity
 from ..src import factory
 from ..src import player
 
+Slots = config.Slots
 
 @pytest.fixture
 def hero():
@@ -222,9 +221,8 @@ def test_Equippable_init__negative_max_hp_bonus_raises_exception():
 
 def test_Equipment_init():
     e = components.Equipment()
-
-    assert e.main_hand is None
-    assert e.off_hand is None
+    assert len(e.slots) == len(config.Slots)
+    assert all(True for slot in config.Slots if slot in e.slots)
 
 
 def test_Equipment_max_hp_bonus__nothing_equipped_returns_0():
@@ -234,19 +232,26 @@ def test_Equipment_max_hp_bonus__nothing_equipped_returns_0():
 
 def test_Equipment_max_hp_bonus__main_hand_bonus():
     ring = factory.mk_entity('ring of hp', 0, 0)
-    e = components.Equipment(main_hand=ring)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = ring
+
     assert e.max_hp_bonus == ring.equippable.max_hp_bonus
 
 
 def test_Equipment_max_hp_bonus__off_hand_bonus():
     ring = factory.mk_entity('ring of hp', 0, 0)
-    e = components.Equipment(off_hand=ring)
+    e = components.Equipment()
+    e.slots[Slots.OFF_HAND] = ring
+
     assert e.max_hp_bonus == ring.equippable.max_hp_bonus
 
 
 def test_Equipment_max_hp_bonus__both_hands_bonus():
     ring = factory.mk_entity('ring of hp', 0, 0)
-    e = components.Equipment(main_hand=ring, off_hand=ring)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = ring
+    e.slots[Slots.OFF_HAND] = ring
+
     assert e.max_hp_bonus == ring.equippable.max_hp_bonus * 2
 
 
@@ -257,19 +262,26 @@ def test_Equipment_power_bonus__nothing_equipped_returns_0():
 
 def test_Equipment_power_bonus__main_hand_bonus():
     sword = factory.mk_entity('sword', 0, 0)
-    e = components.Equipment(main_hand=sword)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = sword
+
     assert e.power_bonus == sword.equippable.power_bonus
 
 
 def test_Equipment_power_bonus__off_hand_bonus():
     sword = factory.mk_entity('sword', 0, 0)
-    e = components.Equipment(off_hand=sword)
+    e = components.Equipment()
+    e.slots[Slots.OFF_HAND] = sword
+
     assert e.power_bonus == sword.equippable.power_bonus
 
 
 def test_Equipment_power_bonus__both_hands_bonus():
     sword = factory.mk_entity('sword', 0, 0)
-    e = components.Equipment(main_hand=sword, off_hand=sword)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = sword
+    e.slots[Slots.OFF_HAND] = sword
+
     assert e.power_bonus == sword.equippable.power_bonus * 2
 
 
@@ -280,24 +292,33 @@ def test_Equipment_defense_bonus__nothing_equipped_returns_0():
 
 def test_Equipment_defense_bonus__main_hand_bonus():
     shield = factory.mk_entity('shield', 0, 0)
-    e = components.Equipment(main_hand=shield)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = shield
+
     assert e.defense_bonus == shield.equippable.defense_bonus
 
 
 def test_Equipment_defense_bonus__off_hand_bonus():
     shield = factory.mk_entity('shield', 0, 0)
-    e = components.Equipment(off_hand=shield)
+    e = components.Equipment()
+    e.slots[Slots.OFF_HAND] = shield
+
     assert e.defense_bonus == shield.equippable.defense_bonus
 
 
 def test_Equipment_defense_bonus__both_hands_bonus():
     shield = factory.mk_entity('shield', 0, 0)
-    e = components.Equipment(main_hand=shield, off_hand=shield)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = shield
+    e.slots[Slots.OFF_HAND] = shield
+
     assert e.defense_bonus == shield.equippable.defense_bonus * 2
 
 
 def test_Equipment__is_equipped__equipped_returns_True(sword):
-    e = components.Equipment(main_hand=sword)
+    e = components.Equipment()
+    e.slots[Slots.MAIN_HAND] = sword
+
     assert e.is_equipped(sword)
 
 
@@ -316,7 +337,7 @@ def test_Equipment_equip__success__item_is_in_slot():
     shield = factory.mk_entity('shield', 0, 0)
     e = components.Equipment()
     e.equip(shield)
-    assert e.off_hand == shield
+    assert e.slots[Slots.OFF_HAND] == shield
 
 
 def test_Equipment_equip__same_equipped_item_returns_True():
@@ -333,7 +354,7 @@ def test_Equipment_equip__another_item_while_equipped():
     e.equip(sword)
 
     assert e.equip(dagger)
-    assert e.main_hand == dagger
+    assert e.slots[Slots.MAIN_HAND] == dagger
 
 
 def test_Equipment_equip__both_slots():
@@ -343,8 +364,8 @@ def test_Equipment_equip__both_slots():
 
     assert e.equip(sword)
     assert e.equip(shield)
-    assert e.main_hand == sword
-    assert e.off_hand == shield
+    assert e.slots[Slots.MAIN_HAND] == sword
+    assert e.slots[Slots.OFF_HAND] == shield
 
 
 def test_Equipment_equip__invalid_item_raises_AttributeError():
@@ -367,8 +388,8 @@ def test_Equipment_unequip__success__item_is_not_in_slot():
     e.equip(shield)
     e.unequip(shield)
 
-    assert e.main_hand != shield
-    assert e.off_hand != shield
+    assert e.slots[Slots.MAIN_HAND] != shield
+    assert e.slots[Slots.OFF_HAND] != shield
 
 
 def test_Equipment_unequip__unequipped_item_returns_False():

@@ -23,10 +23,10 @@ def list_inv_items(hero):
     options = []
 
     for item in hero.inv.items:
-        if hero.equipment.main_hand == item:
-            options.append('{} (on main hand)'.format(item.name))
-        elif hero.equipment.off_hand == item:
-            options.append('{} (on off hand)'.format(item.name))
+        if hero.equipment.is_equipped(item):
+            slot = item.equippable.slot.value
+
+            options.append('{} (on {})'.format(item.name, slot))
         else:
             options.append(item.name)
 

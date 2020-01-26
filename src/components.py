@@ -1,7 +1,7 @@
 from random import randint
 from . import actions
 from . import config
-from .config import EquipmentSlots
+from .config import Slots
 
 
 class Fighter(object):
@@ -178,55 +178,44 @@ class Equipment(object):
         in both the main hand and off hand that increases attack, for instance, then
         we'll get the bonus the same either way.
     """
-    def __init__(self, main_hand=None, off_hand=None):
-        self.main_hand = main_hand
-        self.off_hand = off_hand
-
+    def __init__(self):
+        self.slots = {slot: None for slot in config.Slots}
 
     @property
     def max_hp_bonus(self):
         bonus = 0
-        if self.main_hand and self.main_hand.equippable:
-            bonus += self.main_hand.equippable.max_hp_bonus
-        if self.off_hand and self.off_hand.equippable:
-            bonus += self.off_hand.equippable.max_hp_bonus
+        for item in self.slots.values():
+            if item and item.equippable:
+                bonus += item.equippable.max_hp_bonus
         return bonus
 
     @property
     def power_bonus(self):
         bonus = 0
-        if self.main_hand and self.main_hand.equippable:
-            bonus += self.main_hand.equippable.power_bonus
-        if self.off_hand and self.off_hand.equippable:
-            bonus += self.off_hand.equippable.power_bonus
+        for item in self.slots.values():
+            if item and item.equippable:
+                bonus += item.equippable.power_bonus
         return bonus
 
     @property
     def defense_bonus(self):
         bonus = 0
-        if self.main_hand and self.main_hand.equippable:
-            bonus += self.main_hand.equippable.defense_bonus
-        if self.off_hand and self.off_hand.equippable:
-            bonus += self.off_hand.equippable.defense_bonus
+        for item in self.slots.values():
+            if item and item.equippable:
+                bonus += item.equippable.defense_bonus
         return bonus
 
     def is_equipped(self, equippable):
-        if self.main_hand == equippable:
-            return True
-        elif self.off_hand == equippable:
-            return True
+        for item in self.slots.values():
+            if item == equippable:
+                return True
 
         return False
 
     def equip(self, equippable):
         slot = equippable.equippable.slot
-
-        if slot == EquipmentSlots.MAIN_HAND:
-            self.main_hand = equippable
-            return True
-
-        elif slot == EquipmentSlots.OFF_HAND:
-            self.off_hand = equippable
+        if slot in self.slots:
+            self.slots[slot] = equippable
             return True
 
         return False
@@ -237,12 +226,8 @@ class Equipment(object):
 
         slot = equippable.equippable.slot
 
-        if slot == EquipmentSlots.MAIN_HAND:
-            self.main_hand = None
-            return True
-
-        elif slot == EquipmentSlots.OFF_HAND:
-            self.off_hand = None
+        if slot in self.slots:
+            self.slots[slot] = None
             return True
 
         return False

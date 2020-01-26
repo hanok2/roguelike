@@ -16,7 +16,7 @@ def get_hero():
 
     dagger = factory.mk_entity('dagger', 0, 0)
     hero.inv.add_item(dagger)
-    hero.equipment.toggle_equip(dagger)
+    hero.equipment.equip(dagger)
 
     return hero
 

@@ -67,7 +67,7 @@ def test_inv_options__SHOW_INV__main_hand_equipped(hero):
 def test_inv_options__SHOW_INV__both_hands_equipped(hero):
     shield = factory.mk_entity('shield', x=0, y=0)
     hero.inv.add_item(shield)
-    hero.equipment.toggle_equip(shield)
+    hero.equipment.equip(shield)
 
     header, options = menus.inv_options(hero, States.SHOW_INV)
 
@@ -104,7 +104,7 @@ def test_inv_options__DROP_INV__main_hand_equipped(hero):
 def test_inv_options__DROP_INV__both_hands_equipped(hero):
     shield = factory.mk_entity('shield', x=0, y=0)
     hero.inv.add_item(shield)
-    hero.equipment.toggle_equip(shield)
+    hero.equipment.equip(shield)
 
     header, options = menus.inv_options(hero, States.DROP_INV)
 

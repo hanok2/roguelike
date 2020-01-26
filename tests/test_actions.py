@@ -357,7 +357,7 @@ def test_UseItemAction__equipped_equippable__returns_UnequipAction(walk_map, her
     hero.inv.add_item(shield)
 
     # Equip it for testing
-    hero.equipment.toggle_equip(shield)  # Equip the thing
+    hero.equipment.equip(shield)  # Equip the thing
 
     action = actions.UseItemAction(inv_index=0)  # Assume shield is at index 0
     result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
@@ -446,7 +446,7 @@ def test_EquipAction__non_equippable_item(hero):
 def test_EquipAction__already_equipped__fails(hero):
     shield = factory.mk_entity('shield', 1, 0)
     hero.inv.add_item(shield)
-    hero.equipment.toggle_equip(shield)  # Equip the thing
+    hero.equipment.equip(shield)  # Equip the thing
 
     action = actions.EquipAction(e=hero, item=shield)  # Assume shield is at index 0
     result = action.perform()
@@ -515,7 +515,7 @@ def test_UnequipAction__init(hero):
 def test_UnequipAction__equipped_item__dequips_item(hero):
     shield = factory.mk_entity('shield', 1, 0)
     hero.inv.add_item(shield)
-    hero.equipment.toggle_equip(shield)  # Equip the thing
+    hero.equipment.equip(shield)  # Equip the thing
 
     action = actions.UnequipAction(e=hero, item=shield)  # Assume shield is at index 0
     results = action.perform()
@@ -577,7 +577,7 @@ def test_DropItemAction__valid_item(walk_map, hero):
 
 def test_DropItemAction__equipped_item(walk_map, sword, hero):
     hero.inv.add_item(sword)
-    hero.equipment.toggle_equip(sword)
+    hero.equipment.equip(sword)
 
     action = actions.DropItemAction(inv_index=0)  # Assume sword is at index 0
     result = action.perform(stage=walk_map, entity=hero, prev_state=None)

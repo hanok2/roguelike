@@ -1,7 +1,7 @@
 import tcod
 from . import config
 from . import item_funcs
-from .config import RenderOrder, EquipmentSlots
+from .config import RenderOrder, Slots
 from .components import Fighter, ApproachAI, Item, Equippable
 from .entity import Entity
 from .random_utils import rnd_choice_from_dict, from_dungeon_lvl
@@ -111,7 +111,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
-        item.equippable = Equippable(owner=item, slot=EquipmentSlots.MAIN_HAND, power_bonus=3)
+        item.equippable = Equippable(owner=item, slot=Slots.MAIN_HAND, power_bonus=3)
         return item
 
     elif entity_name == 'dagger':
@@ -124,7 +124,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
-        item.equippable = Equippable(owner=item, slot=EquipmentSlots.MAIN_HAND, power_bonus=2)
+        item.equippable = Equippable(owner=item, slot=Slots.MAIN_HAND, power_bonus=2)
         return item
 
     elif entity_name == 'shield':
@@ -137,7 +137,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
-        item.equippable = Equippable(owner=item, slot=EquipmentSlots.OFF_HAND, defense_bonus=2)
+        item.equippable = Equippable(owner=item, slot=Slots.OFF_HAND, defense_bonus=2)
         return item
 
     elif entity_name == 'ring of hp':
@@ -150,7 +150,7 @@ def mk_entity(entity_name, x, y):
             render_order=RenderOrder.ITEM,
         )
         item.item = Item(owner=item)
-        item.equippable = Equippable(owner=item, slot=EquipmentSlots.OFF_HAND, max_hp_bonus=50)
+        item.equippable = Equippable(owner=item, slot=Slots.OFF_HAND, max_hp_bonus=50)
         return item
 
     elif entity_name == 'fireball_scroll':

@@ -1,9 +1,9 @@
 from enum import Enum, auto
 import tcod
 
-class EquipmentSlots(Enum):
-    MAIN_HAND = 1
-    OFF_HAND = 2
+class Slots(Enum):
+    MAIN_HAND = 'main hand'
+    OFF_HAND = 'off hand'
 
 class RenderOrder(Enum):
     STAIRS = auto()
