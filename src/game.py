@@ -35,7 +35,6 @@ class Game(object):
         self.redraw = False
 
     def load_game(self, data_file):
-        self = data_file['game']
         self.hero = data_file['hero']
         self.dungeon = data_file['dungeon']
         self.stage = data_file['stage']

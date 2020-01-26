@@ -45,7 +45,7 @@ def main():
             render_eng.render_main_menu(main_menu_bg_img)
 
             if show_load_err_msg:
-                render_eng.render_msg_box(render_eng, 'No save game to load', 50)
+                render_eng.render_msg_box('No save game to load', 50)
 
             # Update the display to represent the root consoles current state.
             tcod.console_flush()
@@ -68,11 +68,11 @@ def main():
 
             elif load_saved_game:
                 log.debug('Load game selected.')
-                try:
-                    _game = load_game(config.savefile)
+                _game = load_game(config.savefile)
 
+                if _game:
                     show_main_menu = False
-                except FileNotFoundError:
+                else:
                     show_load_err_msg = True
 
             elif options:
@@ -137,8 +137,8 @@ class Engine(object):
             if self.g.state == States.MAIN_MENU:
                 log.info('trying to enter the MAIN_MENU')
 
-                self.g.redraw = True
                 self.g.state = States.ACTOR_TURN  # Maybe previous state instead?
+                self.g.redraw = True
                 save_game(config.savefile, self.g)
                 return
 
@@ -216,6 +216,7 @@ class Engine(object):
             self.g.fov_recompute = True
             self.render_eng.con.clear()
             # libtcod.console_clear(con)
+
             self.g.redraw = False
 
         # Only recompute the fov if its the Players turn.

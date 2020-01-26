@@ -341,7 +341,7 @@ class RenderEngine(object):
         self.render_menu('', options, 24)
 
     def render_msg_box(self, header, width):
-        self.render_menu(self.con, header, [], width, config.scr_width, config.scr_height)
+        self.render_menu(header, {}, width)
 
     def render_char_scr(self, hero):
         """ Displays a windows showing the hero's current stats and experience."""

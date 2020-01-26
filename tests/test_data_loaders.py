@@ -36,6 +36,11 @@ def test_save_game__calls_shelve(mocker):
 
 def test_load_game__calls_shelve(mocker):
     mocker.patch('shelve.open')
-    data_loaders.load_game('savegame.dat')
+    data_loaders.load_game('tests/testsavefile.dat')
 
-    shelve.open.assert_called_with('savegame.dat', 'r')
+    shelve.open.assert_called_with('tests/testsavefile.dat', 'r')
+
+
+def test_load_game__file_DNE__returns_None():
+    result = data_loaders.load_game('fuckwat.dat')
+    assert result is None

@@ -1,4 +1,5 @@
 import shelve
+import os
 from . import game
 
 # Flags
@@ -35,8 +36,11 @@ def save_game(filepath, game):
 
 
 def load_game(filepath):
-    with shelve.open(filepath, 'r') as data_file:
-        _game = game.Game()
-        _game.load_game(data_file)
+    if os.path.exists(filepath):
+        with shelve.open(filepath, 'r') as data_file:
+            _game = game.Game()
+            _game.load_game(data_file)
+        return _game
 
-    return game
+    # Could not find file
+    return None
