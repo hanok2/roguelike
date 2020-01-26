@@ -306,19 +306,72 @@ def test_Equipment__is_equipped__not_equipped_returns_False(sword):
     assert not e.is_equipped(sword)
 
 
-def test_Equipment_toggle_equip__nothing_equipped():
+def test_Equipment_equip__success__returns_True():
     shield = factory.mk_entity('shield', 0, 0)
     e = components.Equipment()
-    results = e.toggle_equip(shield)
-
-    # Nothing equipped - equipping returns the slot
-    assert results == [{'equipped': e.off_hand}]
+    assert e.equip(shield)
 
 
-def test_Equipment_toggle_equip__unequips_item():
+def test_Equipment_equip__success__item_is_in_slot():
     shield = factory.mk_entity('shield', 0, 0)
-    e = components.Equipment(off_hand=shield)
-    results = e.toggle_equip(shield)
+    e = components.Equipment()
+    e.equip(shield)
+    assert e.off_hand == shield
 
-    # Dequipping an item returns the item
-    assert results == [{'dequipped': shield}]
+
+def test_Equipment_equip__same_equipped_item_returns_True():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment()
+    e.equip(shield)
+    assert e.equip(shield)
+
+
+def test_Equipment_equip__another_item_while_equipped():
+    sword = factory.mk_entity('sword', 0, 0)
+    dagger = factory.mk_entity('dagger', 0, 0)
+    e = components.Equipment()
+    e.equip(sword)
+
+    assert e.equip(dagger)
+    assert e.main_hand == dagger
+
+
+def test_Equipment_equip__both_slots():
+    sword = factory.mk_entity('sword', 0, 0)
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment()
+
+    assert e.equip(sword)
+    assert e.equip(shield)
+    assert e.main_hand == sword
+    assert e.off_hand == shield
+
+
+def test_Equipment_equip__invalid_item_raises_AttributeError():
+    potion = factory.mk_entity('healing_potion', 0, 0)
+    e = components.Equipment()
+    with pytest.raises(AttributeError):
+        e.equip(potion)
+
+
+def test_Equipment_unequip__success__returns_True():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment()
+    e.equip(shield)
+    assert e.unequip(shield)
+
+
+def test_Equipment_unequip__success__item_is_not_in_slot():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment()
+    e.equip(shield)
+    e.unequip(shield)
+
+    assert e.main_hand != shield
+    assert e.off_hand != shield
+
+
+def test_Equipment_unequip__unequipped_item_returns_False():
+    shield = factory.mk_entity('shield', 0, 0)
+    e = components.Equipment()
+    assert e.unequip(shield) is False

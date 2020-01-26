@@ -218,44 +218,31 @@ class Equipment(object):
 
         return False
 
-    def toggle_equip(self, equippable_entity):
-        """toggle_equip is what we'll call when we're either equipping or dequipping
-            an item. If the item was not previously equipped, we equip it, removing
-            any previously equipped item. If it's equipped already, we'll assume
-            the player meant to remove it, and just dequip it.
-
-            The two variables main_hand and off_hand will hold the entities that
-            we're equipping. If they are set to None, then that means nothing is
-            equipped to that slot.
-        """
-
-        results = []
-
-        slot = equippable_entity.equippable.slot
-
-        # Refactor this code - should take slot as a parameter or just iterate
-        # through all the slots..
+    def equip(self, equippable):
+        slot = equippable.equippable.slot
 
         if slot == EquipmentSlots.MAIN_HAND:
-            if self.main_hand == equippable_entity:
-                self.main_hand = None
-                results.append({'dequipped': equippable_entity})
-            else:
-                if self.main_hand:
-                    results.append({'dequipped': self.main_hand})
-
-                self.main_hand = equippable_entity
-                results.append({'equipped': equippable_entity})
+            self.main_hand = equippable
+            return True
 
         elif slot == EquipmentSlots.OFF_HAND:
-            if self.off_hand == equippable_entity:
-                self.off_hand = None
-                results.append({'dequipped': equippable_entity})
-            else:
-                if self.off_hand:
-                    results.append({'dequipped': self.off_hand})
+            self.off_hand = equippable
+            return True
 
-                self.off_hand = equippable_entity
-                results.append({'equipped': equippable_entity})
+        return False
 
-        return results
+    def unequip(self, equippable):
+        if not self.is_equipped(equippable):
+            return False
+
+        slot = equippable.equippable.slot
+
+        if slot == EquipmentSlots.MAIN_HAND:
+            self.main_hand = None
+            return True
+
+        elif slot == EquipmentSlots.OFF_HAND:
+            self.off_hand = None
+            return True
+
+        return False

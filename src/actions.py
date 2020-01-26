@@ -239,7 +239,6 @@ class EquipAction(Action):
         self.item = item
 
     def perform(self, *args, **kwargs):
-        entity = kwargs['entity']
         if not self.item.has_comp('equippable'):
             return ActionResult(
                 success=False,
@@ -250,24 +249,35 @@ class EquipAction(Action):
                 success=False,
                 msg='You cannot equip something that is already equipped!'
             )
-        else:
-            equip_results = entity.equipment.toggle_equip(self.item)
 
-            for equip_result in equip_results:
-                equipped = equip_result.get('equipped')
-                dequipped = equip_result.get('dequipped')
+        results = []
 
-                if equipped:
-                    return ActionResult(
-                        success=True,
-                        msg='You equipped the {}'.format(equipped.name)
-                    )
+        slot = self.item.equippable.slot
 
-                if dequipped:
-                    return ActionResult(
-                        success=False,
-                        msg='You dequipped the {}'.format(dequipped.name)
-                    )
+        # Check if there is another item equipped in the same slot
+        if slot == config.EquipmentSlots.MAIN_HAND:
+            if self.e.equipment.main_hand:
+                results.append(ActionResult(msg='You unequip the {} from your main hand.'.format(self.e.equipment.main_hand)))
+
+            # Equip the item to the main hand
+            result = self.e.equipment.equip(self.item)
+            if result:
+                results.append(ActionResult(success=True, msg='You equip the {} to your main hand.'.format(self.e.equipment.main_hand)))
+            else:
+                results.append(ActionResult(success=False, msg='You cannot equip the {} to your main hand!'.format(self.e.equipment.main_hand)))
+
+        elif slot == config.EquipmentSlots.OFF_HAND:
+            if self.e.equipment.off_hand:
+                results.append(ActionResult(msg='You unequip the {} from your off hand.'.format(self.e.equipment.off_hand)))
+
+            # Equip the item to the off-hand
+            result = self.e.equipment.equip(self.item)
+            if result:
+                results.append(ActionResult(success=True, msg='You equip the {} to your off hand.'.format(self.e.equipment.off_hand)))
+            else:
+                results.append(ActionResult(success=False, msg='You cannot equip the {} to your off hand!'.format(self.e.equipment.off_hand)))
+
+        return results
 
 
 class UnequipAction(Action):
@@ -277,30 +287,30 @@ class UnequipAction(Action):
         self.item = item
 
     def perform(self, *args, **kwargs):
-        entity = kwargs['entity']
         if not self.e.equipment.is_equipped(self.item):
             return ActionResult(
                 success=False,
-                msg='You cannot unequip something that not equipped!'
+                msg='You cannot unequip something that is not equipped!'
             )
-        else:
-            equip_results = entity.equipment.toggle_equip(self.item)
 
-            for equip_result in equip_results:
-                equipped = equip_result.get('equipped')
-                dequipped = equip_result.get('dequipped')
+        results = []
+        slot = self.item.equippable.slot
 
-                if equipped:
-                    return ActionResult(
-                        success=False,
-                        msg='You equipped the {}'.format(equipped.name)
-                    )
+        result = self.e.equipment.unequip(self.item)
 
-                if dequipped:
-                    return ActionResult(
-                        success=True,
-                        msg='You dequipped the {}'.format(dequipped.name)
-                    )
+        if slot == config.EquipmentSlots.MAIN_HAND:
+            if result:
+                results.append(ActionResult(success=True, msg='You unequip the {} from your main hand.'.format(self.e.item)))
+            else:
+                results.append(ActionResult(success=False, msg='You cannot unequip the {} from your main hand!'.format(self.item)))
+
+        elif slot == config.EquipmentSlots.OFF_HAND:
+            if result:
+                results.append(ActionResult(success=True, msg='You unequip the {} from your off hand.'.format(self.item)))
+            else:
+                results.append(ActionResult(success=False, msg='You cannot unequip the {} from your off hand!'.format(self.item)))
+
+        return results
 
 
 class DropItemAction(Action):

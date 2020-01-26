@@ -437,9 +437,8 @@ def test_EquipAction__non_equippable_item(hero):
     hero.inv.add_item(potion)
 
     action = actions.EquipAction(e=hero, item=potion)  # Assume shield is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    result = action.perform()
 
-    # assert action.results[0]['equipped'] is False
     assert result.success is False
     assert result.msg == 'You cannot equip the {}'.format(potion.name)
 
@@ -450,11 +449,10 @@ def test_EquipAction__already_equipped__fails(hero):
     hero.equipment.toggle_equip(shield)  # Equip the thing
 
     action = actions.EquipAction(e=hero, item=shield)  # Assume shield is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    result = action.perform()
 
     assert result.success is False
     assert result.msg == 'You cannot equip something that is already equipped!'
-    # {'dequipped': shield}, ]
 
 
 def test_EquipAction__not_equipped__equips_item(hero):
@@ -462,11 +460,46 @@ def test_EquipAction__not_equipped__equips_item(hero):
     hero.inv.add_item(shield)
 
     action = actions.EquipAction(e=hero, item=shield)  # Assume shield is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    results = action.perform()
 
-    assert result.success
-    assert result.msg == 'You equipped the {}'.format(shield.name)
+    assert len(results) == 1
+    assert results[0].success
+    assert results[0].msg == 'You equip the {} to your off hand.'.format(shield.name)
     # {'equipped': shield},
+
+
+def test_EquipAction__replace_another_item_in_same_slot(hero):
+    dagger = factory.mk_entity('dagger', 1, 0)
+    sword = factory.mk_entity('sword', 1, 0)
+    hero.equipment.equip(dagger)
+
+    action = actions.EquipAction(e=hero, item=sword)
+    results = action.perform()
+
+    assert len(results) == 2
+    assert results[0].msg == 'You unequip the Dagger from your main hand.'
+    assert results[1].success
+    assert results[1].msg == 'You equip the Sword to your main hand.'
+
+
+def test_EquipAction__equip_both_slots(hero):
+    dagger = factory.mk_entity('dagger', 1, 0)
+    shield = factory.mk_entity('shield', 1, 0)
+
+    action = actions.EquipAction(e=hero, item=dagger)
+    results = action.perform()
+
+    assert len(results) == 1
+    assert results[0].success
+    assert results[0].msg == 'You equip the Dagger to your main hand.'
+
+    action = actions.EquipAction(e=hero, item=shield)
+    results = action.perform()
+
+    assert len(results) == 1
+    assert results[0].success
+    assert results[0].msg == 'You equip the Shield to your off hand.'
+
 
 
 
@@ -479,16 +512,17 @@ def test_UnequipAction__init(hero):
     assert action.consumes_turn
 
 
-def test_UnequipAction__already_equipped__dequips_item(hero):
+def test_UnequipAction__equipped_item__dequips_item(hero):
     shield = factory.mk_entity('shield', 1, 0)
     hero.inv.add_item(shield)
     hero.equipment.toggle_equip(shield)  # Equip the thing
 
     action = actions.UnequipAction(e=hero, item=shield)  # Assume shield is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    results = action.perform()
 
-    assert result.success
-    assert result.msg == 'You dequipped the {}'.format(shield.name)
+    assert len(results) == 1
+    assert results[0].success
+    assert results[0].msg == 'You unequip the {} from your off hand.'.format(shield.name)
 
 
 def test_UnequipAction__not_equipped__fails(hero):
@@ -496,10 +530,10 @@ def test_UnequipAction__not_equipped__fails(hero):
     hero.inv.add_item(shield)
 
     action = actions.UnequipAction(e=hero, item=shield)  # Assume shield is at index 0
-    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+    result = action.perform()
 
     assert result.success is False
-    assert result.msg == 'You cannot unequip something that not equipped!'
+    assert result.msg == 'You cannot unequip something that is not equipped!'
 
 
 
