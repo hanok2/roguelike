@@ -5,9 +5,8 @@ from . import logger
 from . import render_functions
 from .config import States
 from .data_loaders import load_game, save_game
-from .death_functions import kill_monster, kill_hero
 from .fov import initialize_fov, recompute_fov
-from .input_handling import handle_keys, handle_mouse, handle_main_menu, process_tcod_input
+from .input_handling import handle_main_menu, process_tcod_input
 
 log = logger.setup_logger()
 
@@ -137,8 +136,10 @@ class Engine(object):
             if self.g.state == States.MAIN_MENU:
                 log.info('trying to enter the MAIN_MENU')
 
-                self.g.state = States.ACTOR_TURN  # Maybe previous state instead?
+                # self.g.state = States.ACTOR_TURN  # Maybe previous state instead?
+                self.g.state = self.g.prev_state # Maybe previous state instead?
                 self.g.redraw = True
+                self.g.fov_recompute = True
                 save_game(config.savefile, self.g)
                 return
 
@@ -232,15 +233,7 @@ class Engine(object):
             )
 
         # Render all entities
-        self.render_eng.render_all(
-            self.g.dungeon,
-            self.g.fov_map,
-            self.g.fov_recompute,
-            self.g.msg_log,
-            self.mouse,
-            self.g.state,
-            self.g.turns
-        )
+        self.render_eng.render_all(self.g, self.mouse)
 
         self.g.fov_recompute = False       # Mandatory
 

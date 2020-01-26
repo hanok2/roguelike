@@ -26,18 +26,16 @@ class RenderEngine(object):
         self.panel = tcod.console.Console(width=config.scr_width, height=config.panel_height)
         self.msg_panel = tcod.console.Console(width=config.scr_width, height=config.msg_height)
 
-    def render_all(self, dungeon, fov_map, fov_recompute, msg_log, mouse, state, turns):
-        stage = dungeon.get_stage()
-
+    def render_all(self, g, mouse):
         # Draw all the tiles in the stage
-        if fov_recompute:
-            self.render_tiles(stage, fov_map)
+        if g.fov_recompute:
+            self.render_tiles(g)
 
         # Draw all entities in the list
-        sorted_entities = sorted(stage.entities, key=lambda x: x.render_order.value)
+        sorted_entities = sorted(g.stage.entities, key=lambda x: x.render_order.value)
 
         for entity in sorted_entities:
-            self.draw_entity(entity, fov_map, stage)
+            self.draw_entity(entity, g.fov_map, g.stage)
 
         # Display console
         self.con.blit(
@@ -50,17 +48,17 @@ class RenderEngine(object):
         )
 
         # Display inventory menu if necessary
-        if state in (States.SHOW_INV, States.DROP_INV):
-            header, options = menus.inv_options(dungeon.hero, state)
+        if g.state in (States.SHOW_INV, States.DROP_INV):
+            header, options = menus.inv_options(g.hero, g.state)
             self.render_menu(header, options, width=50)
 
-        elif state == States.LEVEL_UP:
+        elif g.state == States.LEVEL_UP:
             # Render the level-up menu
             header, options = menus.lvl_up_options()
             self.render_menu(header, options, width=40)
 
-        elif state == States.SHOW_STATS:
-            self.render_char_scr(dungeon.hero)
+        elif g.state == States.SHOW_STATS:
+            self.render_char_scr(g.hero)
 
         self.panel.default_bg = tcod.black
         self.panel.clear()
@@ -68,17 +66,17 @@ class RenderEngine(object):
         self.msg_panel.default_bg = tcod.black
         self.msg_panel.clear()
 
-        self.render_status_bar(dungeon, fov_map, mouse, turns)
-        self.render_console_messages(msg_log)
+        self.render_status_bar(g, mouse)
+        self.render_console_messages(g.msg_log)
 
-    def render_tiles(self, stage, fov_map):
+    def render_tiles(self, g):
         # visible = fov_map.fov[:]
 
-        for y in range(stage.height):
-            for x in range(stage.width):
-                visible = fov_map.fov[y, x]
+        for y in range(g.stage.height):
+            for x in range(g.stage.width):
+                visible = g.fov_map.fov[y, x]
 
-                wall = stage.tiles[x][y].block_sight
+                wall = g.stage.tiles[x][y].block_sight
 
                 # Tiles within field-of-vision
                 if visible:
@@ -100,10 +98,10 @@ class RenderEngine(object):
                         )
 
                     # It's visible therefore explored
-                    stage.tiles[x][y].explored = True
+                    g.stage.tiles[x][y].explored = True
 
                 # Tiles outside field-of-vision
-                elif stage.tiles[x][y].explored:
+                elif g.stage.tiles[x][y].explored:
                     if wall:
                         tcod.console_put_char_ex(
                             con=self.con,
@@ -198,14 +196,11 @@ class RenderEngine(object):
             height=config.msg_height,
         )
 
-    def render_status_bar(self, dungeon, fov_map, mouse, turns):
-        hero = dungeon.hero
-        stage = dungeon.get_stage()
-
+    def render_status_bar(self, g, mouse):
         # Display dungeon level
         self.panel.print(
             x=1, y=1,
-            string='DungeonLvl: {}'.format(stage.dungeon_lvl),
+            string='DungeonLvl: {}'.format(g.stage.dungeon_lvl),
             alignment=tcod.LEFT,
         )
 
@@ -214,8 +209,8 @@ class RenderEngine(object):
             1, 2,
             config.bar_width,
             'HP',
-            hero.fighter.hp,
-            hero.fighter.max_hp,
+            g.hero.fighter.hp,
+            g.hero.fighter.max_hp,
             tcod.light_red,
             tcod.darker_red
         )
@@ -225,8 +220,8 @@ class RenderEngine(object):
             1, 4,
             config.bar_width,
             'XP',
-            hero.lvl.current_xp,
-            hero.lvl.xp_to_next_lvl,
+            g.hero.lvl.current_xp,
+            g.hero.lvl.xp_to_next_lvl,
             tcod.light_blue,
             tcod.darker_blue
         )
@@ -234,22 +229,22 @@ class RenderEngine(object):
         # Display level
         self.panel.print(
             x=22, y=2,
-            string='Lvl:{}'.format(hero.lvl.current_lvl),
+            string='Lvl:{}'.format(g.hero.lvl.current_lvl),
         )
 
         # Display power
-        self.panel.print(x=29, y=2, string='Pow:{}'.format(hero.fighter.power))
+        self.panel.print(x=29, y=2, string='Pow:{}'.format(g.hero.fighter.power))
 
         # Display defense
-        self.panel.print(x=36, y=2, string='Def:{}'.format(hero.fighter.defense))
+        self.panel.print(x=36, y=2, string='Def:{}'.format(g.hero.fighter.defense))
 
         # todo: Display turns
-        self.panel.print(x=55, y=2, string='Turn: {}'.format(turns))
+        self.panel.print(x=55, y=2, string='Turn: {}'.format(g.turns))
 
         # Display entity under mouse
         self.panel.print(
             x=1, y=0,
-            string=get_names_under_mouse(mouse, stage.entities, fov_map),
+            string=get_names_under_mouse(mouse, g.stage.entities, g.fov_map),
             alignment=tcod.LEFT,
         )
 
