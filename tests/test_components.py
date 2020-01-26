@@ -6,13 +6,20 @@ from ..src import entity
 from ..src import factory
 from ..src import player
 
+
 @pytest.fixture
 def hero():
     return player.get_hero()
 
+
 @pytest.fixture
 def orc():
     return factory.mk_entity('orc', 0, 0)
+
+
+@pytest.fixture
+def sword():
+    return factory.mk_entity('sword', 0, 0)
 
 
 """ Tests for class Fighter(object): """
@@ -287,6 +294,16 @@ def test_Equipment_defense_bonus__both_hands_bonus():
     shield = factory.mk_entity('shield', 0, 0)
     e = components.Equipment(main_hand=shield, off_hand=shield)
     assert e.defense_bonus == shield.equippable.defense_bonus * 2
+
+
+def test_Equipment__is_equipped__equipped_returns_True(sword):
+    e = components.Equipment(main_hand=sword)
+    assert e.is_equipped(sword)
+
+
+def test_Equipment__is_equipped__not_equipped_returns_False(sword):
+    e = components.Equipment()
+    assert not e.is_equipped(sword)
 
 
 def test_Equipment_toggle_equip__nothing_equipped():

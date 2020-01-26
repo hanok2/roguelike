@@ -341,17 +341,29 @@ def test_UseItemAction__inv_index_out_of_bounds__fails(walk_map, hero):
     assert result.success is False
 
 
-def test_UseItemAction__equippable__returns_EquipAction(walk_map, hero):
+def test_UseItemAction__non_equipped_equippable__returns_EquipAction(walk_map, hero):
     shield = factory.mk_entity('shield', 1, 0)
     hero.inv.add_item(shield)
 
     action = actions.UseItemAction(inv_index=0)  # Assume shield is at index 0
     result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
 
-    # assert result == [{'alternate': actions.EquipAction}]
-    # assert isinstance(result.alt, actions.EquipAction)
     assert result.success is False
     assert actions.EquipAction in result
+
+
+def test_UseItemAction__equipped_equippable__returns_UnequipAction(walk_map, hero):
+    shield = factory.mk_entity('shield', 1, 0)
+    hero.inv.add_item(shield)
+
+    # Equip it for testing
+    hero.equipment.toggle_equip(shield)  # Equip the thing
+
+    action = actions.UseItemAction(inv_index=0)  # Assume shield is at index 0
+    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    assert result.success is False
+    assert actions.UnequipAction in result
 
 
 def test_UseItemAction__targets__returns_GetTargetAction(walk_map, hero):
@@ -432,7 +444,7 @@ def test_EquipAction__non_equippable_item(hero):
     assert result.msg == 'You cannot equip the {}'.format(potion.name)
 
 
-def test_EquipAction__already_equipped__dequips_item(hero):
+def test_EquipAction__already_equipped__fails(hero):
     shield = factory.mk_entity('shield', 1, 0)
     hero.inv.add_item(shield)
     hero.equipment.toggle_equip(shield)  # Equip the thing
@@ -440,8 +452,8 @@ def test_EquipAction__already_equipped__dequips_item(hero):
     action = actions.EquipAction(e=hero, item=shield)  # Assume shield is at index 0
     result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
 
-    assert result.success
-    assert result.msg == 'You dequipped the {}'.format(shield.name)
+    assert result.success is False
+    assert result.msg == 'You cannot equip something that is already equipped!'
     # {'dequipped': shield}, ]
 
 
@@ -455,6 +467,40 @@ def test_EquipAction__not_equipped__equips_item(hero):
     assert result.success
     assert result.msg == 'You equipped the {}'.format(shield.name)
     # {'equipped': shield},
+
+
+
+""" Tests for UnequipAction """
+
+
+def test_UnequipAction__init(hero):
+    action = actions.UnequipAction(e=hero, item=None)
+    assert isinstance(action, actions.Action)
+    assert action.consumes_turn
+
+
+def test_UnequipAction__already_equipped__dequips_item(hero):
+    shield = factory.mk_entity('shield', 1, 0)
+    hero.inv.add_item(shield)
+    hero.equipment.toggle_equip(shield)  # Equip the thing
+
+    action = actions.UnequipAction(e=hero, item=shield)  # Assume shield is at index 0
+    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    assert result.success
+    assert result.msg == 'You dequipped the {}'.format(shield.name)
+
+
+def test_UnequipAction__not_equipped__fails(hero):
+    shield = factory.mk_entity('shield', 1, 0)
+    hero.inv.add_item(shield)
+
+    action = actions.UnequipAction(e=hero, item=shield)  # Assume shield is at index 0
+    result = action.perform(stage=walk_map, fov_map=None, entity=hero, prev_state=None)
+
+    assert result.success is False
+    assert result.msg == 'You cannot unequip something that not equipped!'
+
 
 
 """ Tests for class GetTargetAction """

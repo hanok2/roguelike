@@ -182,6 +182,7 @@ class Equipment(object):
         self.main_hand = main_hand
         self.off_hand = off_hand
 
+
     @property
     def max_hp_bonus(self):
         bonus = 0
@@ -208,6 +209,14 @@ class Equipment(object):
         if self.off_hand and self.off_hand.equippable:
             bonus += self.off_hand.equippable.defense_bonus
         return bonus
+
+    def is_equipped(self, equippable):
+        if self.main_hand == equippable:
+            return True
+        elif self.off_hand == equippable:
+            return True
+
+        return False
 
     def toggle_equip(self, equippable_entity):
         """toggle_equip is what we'll call when we're either equipping or dequipping

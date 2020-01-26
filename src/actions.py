@@ -17,6 +17,7 @@ class Action(ABC):
     def __str__(self):
         return self.__class__.__name__
 
+
 class ActionResult(object):
     # Implement contains for alternate actions?
     def __init__(self, success=False, alt=None, new_state=None, msg=None):
@@ -190,14 +191,17 @@ class UseItemAction(Action):
             equippable_comp = item_entity.equippable if item_entity.has_comp('equippable') else None
 
             # If item is equippable, return an EquipAction
-            if equippable_comp:
-                return ActionResult(alt=EquipAction(entity, item_entity))
+            if not equippable_comp:
+                # This item doesn't have a use function!
+                return [ActionResult(
+                    success=False,
+                    msg='The {} cannot be used.'.format(item_entity.name)
+                )]
 
-            # This item doesn't have a use function!
-            return [ActionResult(
-                success=False,
-                msg='The {} cannot be used.'.format(item_entity.name)
-            )]
+            if entity.equipment.is_equipped(item_entity):
+                return ActionResult(alt=UnequipAction(entity, item_entity))
+
+            return ActionResult(alt=EquipAction(entity, item_entity))
 
         else:
             have_target = self.target_x and self.target_y
@@ -241,6 +245,11 @@ class EquipAction(Action):
                 success=False,
                 msg='You cannot equip the {}'.format(self.item.name)
             )
+        elif self.e.equipment.is_equipped(self.item):
+            return ActionResult(
+                success=False,
+                msg='You cannot equip something that is already equipped!'
+            )
         else:
             equip_results = entity.equipment.toggle_equip(self.item)
 
@@ -256,14 +265,42 @@ class EquipAction(Action):
 
                 if dequipped:
                     return ActionResult(
-                        success=True,
+                        success=False,
                         msg='You dequipped the {}'.format(dequipped.name)
                     )
 
 
-# class UnequipAction():
-    # def __init__(self, e, item):
-        # pass
+class UnequipAction(Action):
+    def __init__(self, e, item):
+        super().__init__()
+        self.e = e
+        self.item = item
+
+    def perform(self, *args, **kwargs):
+        entity = kwargs['entity']
+        if not self.e.equipment.is_equipped(self.item):
+            return ActionResult(
+                success=False,
+                msg='You cannot unequip something that not equipped!'
+            )
+        else:
+            equip_results = entity.equipment.toggle_equip(self.item)
+
+            for equip_result in equip_results:
+                equipped = equip_result.get('equipped')
+                dequipped = equip_result.get('dequipped')
+
+                if equipped:
+                    return ActionResult(
+                        success=False,
+                        msg='You equipped the {}'.format(equipped.name)
+                    )
+
+                if dequipped:
+                    return ActionResult(
+                        success=True,
+                        msg='You dequipped the {}'.format(dequipped.name)
+                    )
 
 
 class DropItemAction(Action):
