@@ -89,7 +89,7 @@ class Dungeon(object):
 
         # Is it a wall?
         src_stage = self.stages[dest_stage_index]
-        if src_stage.tiles[dest_x][dest_y].blocked:
+        if src_stage.tiles[dest_x][dest_y].blocks:
             return False
 
         # Is there a blocking monster there?

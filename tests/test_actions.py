@@ -40,7 +40,7 @@ def walk_map():
     m = stages.Stage(3, 3)
     # Set all tiles to non-blocking
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
-    m.tiles[1][2].blocked = True  # Add a wall
+    m.tiles[1][2].blocks = True  # Add a wall
 
     orc = factory.mk_entity('orc', 2, 1)
     potion = factory.mk_entity('healing_potion', 1, 0)
@@ -62,7 +62,7 @@ def fov_stage():
     ]
     # Set up some wall for testing
     for x, y in wall_coordinates:
-        m.tiles[x][y].blocked = True
+        m.tiles[x][y].blocks = True
 
     hero = player.Player(x=0, y=0)
     orc = factory.mk_entity('orc', 1, 0)
@@ -1196,7 +1196,7 @@ def test_MoveTowardAction__init(open_map, hero, orc):
 
 
 def test_MoveTowardAction__blocked__fails(open_map, hero, orc):
-    open_map.tiles[6][6].blocked = True
+    open_map.tiles[6][6].blocks = True
     open_map.entities.extend([hero, orc])
     orc.x, orc.y = 5, 5
     hero.x, hero.y = 7, 7

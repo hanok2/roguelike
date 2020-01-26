@@ -38,8 +38,8 @@ class Stage(object):
     def initialize_tiles(self):
         return [[Tile(True) for y in range(self.height)] for x in range(self.width)]
 
-    def is_blocked(self, x, y):
-        if self.tiles[x][y].blocked:
+    def blocks(self, x, y):
+        if self.tiles[x][y].blocks:
             return True
         return False
 
@@ -62,7 +62,7 @@ class Stage(object):
 
             for y in range(rect.y1 + WALL_OFFSET, rect.y2 - WALL_OFFSET):
 
-                self.tiles[x][y].blocked = False
+                self.tiles[x][y].blocks = False
                 self.tiles[x][y].block_sight = False
 
     def mk_tunnel_simple(self, room1, room2, horz_first=True):
@@ -80,12 +80,12 @@ class Stage(object):
 
     def dig_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.tiles[x][y].blocked = False
+            self.tiles[x][y].blocks = False
             self.tiles[x][y].block_sight = False
 
     def dig_v_tunnel(self, y1, y2, x):
         for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.tiles[x][y].blocked = False
+            self.tiles[x][y].blocks = False
             self.tiles[x][y].block_sight = False
 
     def mk_stage(self):
@@ -154,7 +154,7 @@ class Stage(object):
         valid_tiles = []
         for x in range(self.width):
             for y in range(self.height):
-                if not self.tiles[x][y].blocked:
+                if not self.tiles[x][y].blocks:
                     valid_tiles.append((x, y))
 
         # Return a random valid tile
@@ -203,7 +203,7 @@ class Stage(object):
                 self.entities.append(item)
 
     def place_stairs_down(self, x, y):
-        if self.tiles[x][y].blocked:
+        if self.tiles[x][y].blocks:
             raise ValueError('Stairs cannot go on Wall tile!')
 
         stair_down = stairs.StairDown(x, y, floor=self.dungeon_lvl + 1)
@@ -211,7 +211,7 @@ class Stage(object):
         return stair_down
 
     def place_stairs_up(self, x, y):
-        if self.tiles[x][y].blocked:
+        if self.tiles[x][y].blocks:
             raise ValueError('Stairs cannot go on Wall tile!')
 
         stair_up = stairs.StairUp(x, y, floor=self.dungeon_lvl - 1)

@@ -66,7 +66,7 @@ class WalkAction(Action):
         dest_y = entity.y + self.dy
 
         # Check for wall
-        if stage.is_blocked(dest_x, dest_y):
+        if stage.blocks(dest_x, dest_y):
             # There is a wall blocking our path
             return ActionResult(
                 success=False,
@@ -663,10 +663,10 @@ class MoveAStarAction(Action):
         for y1 in range(self.stage.height):
             for x1 in range(self.stage.width):
                 # DeprecationWarning: Set properties using the m.transparent and m.walkable arrays.
-                # tcod.map_set_properties( fov, x1, y1, not self.stage.tiles[x1][y1].block_sight, not self.stage.tiles[x1][y1].blocked)
+                # tcod.map_set_properties( fov, x1, y1, not self.stage.tiles[x1][y1].block_sight, not self.stage.tiles[x1][y1].blocks)
 
                 fov.transparent[y1, x1] = not self.stage.tiles[x1][y1].block_sight
-                fov.walkable[y1, x1] = not self.stage.tiles[x1][y1].blocked
+                fov.walkable[y1, x1] = not self.stage.tiles[x1][y1].blocks
 
         # Scan all the objects to see if there are objects that must be navigated
         # around. Check also that the object isn't self or the target (so that
@@ -764,7 +764,7 @@ class MoveTowardAction(Action):
         dest_x = self.entity.x + dx
         dest_y = self.entity.y + dy
 
-        blocked_at = self.stage.is_blocked(dest_x, dest_y)
+        blocked_at = self.stage.blocks(dest_x, dest_y)
         occupied = self.stage.get_blocker_at_loc(dest_x, dest_y)
 
         if not (blocked_at or occupied):

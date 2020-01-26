@@ -81,14 +81,14 @@ def test_Stage_initialize_tiles():
 
 def test_Stage_is_blocked_wall_returns_true():
     m = stages.Stage(width=3, height=3)
-    result = m.is_blocked(0, 0)
+    result = m.blocks(0, 0)
     assert result is True
 
 def test_Stage_is_blocked_not_wall_returns_False():
     x, y = 1, 1  # Dig out
     m = stages.Stage(width=3, height=3)
-    m.tiles[x][y].blocked = False
-    result = m.is_blocked(x, y)
+    m.tiles[x][y].blocks = False
+    result = m.blocks(x, y)
     assert result is False
 
 
@@ -122,10 +122,10 @@ def test_Stage_dig_room_4x4():
     r = rect.Rect(0, 0, 4, 4)
     m.dig_room(r)
 
-    assert m.tiles[0][0].blocked is True  # Wall
-    assert m.tiles[1][1].blocked is False  # Floor
-    assert m.tiles[2][2].blocked is False  # Floor
-    assert m.tiles[3][3].blocked is True  # Wall
+    assert m.tiles[0][0].blocks is True  # Wall
+    assert m.tiles[1][1].blocks is False  # Floor
+    assert m.tiles[2][2].blocks is False  # Floor
+    assert m.tiles[3][3].blocks is True  # Wall
 
 
 def test_Stage_dig_room_room_4x3():
@@ -133,10 +133,10 @@ def test_Stage_dig_room_room_4x3():
     r = rect.Rect(0, 0, 4, 3)
     m.dig_room(r)
 
-    assert m.tiles[0][0].blocked is True  # Wall
-    assert m.tiles[1][1].blocked is False  # Floor
-    assert m.tiles[2][1].blocked is False  # Floor
-    assert m.tiles[2][3].blocked is True # Wall
+    assert m.tiles[0][0].blocks is True  # Wall
+    assert m.tiles[1][1].blocks is False  # Floor
+    assert m.tiles[2][1].blocks is False  # Floor
+    assert m.tiles[2][3].blocks is True # Wall
 
 
 def test_Stage_dig_room_5x5():
@@ -144,11 +144,11 @@ def test_Stage_dig_room_5x5():
     r = rect.Rect(0, 0, 5, 5)
     m.dig_room(r)
 
-    assert m.tiles[0][0].blocked is True  # Wall
-    assert m.tiles[1][1].blocked is False  # Floor
-    assert m.tiles[2][2].blocked is False  # Floor
-    assert m.tiles[3][3].blocked is False  # Floor
-    assert m.tiles[4][4].blocked is True  # Wall
+    assert m.tiles[0][0].blocks is True  # Wall
+    assert m.tiles[1][1].blocks is False  # Floor
+    assert m.tiles[2][2].blocks is False  # Floor
+    assert m.tiles[3][3].blocks is False  # Floor
+    assert m.tiles[4][4].blocks is True  # Wall
 
 
 def test_Stage_mk_tunnel_simple_horz_first():
@@ -162,11 +162,11 @@ def test_Stage_mk_tunnel_simple_horz_first():
 
     # Test the horizontal tunnel
     for x in range(cx1, cx2 + 1):
-        assert m.tiles[x][cy1].blocked is False # Floor
+        assert m.tiles[x][cy1].blocks is False # Floor
 
     # Test the vertical tunnel
     for y in range(cy1, cy2 + 1):
-        assert m.tiles[cx2][y].blocked is False # Floor
+        assert m.tiles[cx2][y].blocks is False # Floor
 
 
 def test_Stage_mk_tunnel_simple_vert_first():
@@ -180,43 +180,43 @@ def test_Stage_mk_tunnel_simple_vert_first():
 
     # Test the vertical tunnel
     for y in range(cy1, cy2 + 1):
-        assert m.tiles[cx1][y].blocked is False # Floor
+        assert m.tiles[cx1][y].blocks is False # Floor
 
     # Test the horizontal tunnel
     for x in range(cx1, cx2 + 1):
-        assert m.tiles[x][cy2].blocked is False # Floor
+        assert m.tiles[x][cy2].blocks is False # Floor
 
 
 def test_Stage_dig_h_tunnel():
     m = stages.Stage(width=10, height=10)
     m.dig_h_tunnel(x1=0, x2=8, y=0)
-    assert m.tiles[0][0].blocked is False
-    assert m.tiles[8][0].blocked is False
-    assert m.tiles[9][0].blocked is True
+    assert m.tiles[0][0].blocks is False
+    assert m.tiles[8][0].blocks is False
+    assert m.tiles[9][0].blocks is True
 
 
 def test_Stage_dig_h_tunnel_reversed_parameters():
     m = stages.Stage(width=10, height=10)
     m.dig_h_tunnel(x1=8, x2=0, y=0)
-    assert m.tiles[0][0].blocked is False
-    assert m.tiles[8][0].blocked is False
-    assert m.tiles[9][0].blocked is True
+    assert m.tiles[0][0].blocks is False
+    assert m.tiles[8][0].blocks is False
+    assert m.tiles[9][0].blocks is True
 
 
 def test_Stage_dig_v_tunnel():
     m = stages.Stage(width=10, height=10)
     m.dig_v_tunnel(y1=0, y2=8, x=0)
-    assert m.tiles[0][0].blocked is False
-    assert m.tiles[0][8].blocked is False
-    assert m.tiles[0][9].blocked is True
+    assert m.tiles[0][0].blocks is False
+    assert m.tiles[0][8].blocks is False
+    assert m.tiles[0][9].blocks is True
 
 
 def test_Stage_dig_v_tunnel_reversed_parameters():
     m = stages.Stage(width=10, height=10)
     m.dig_v_tunnel(y1=8, y2=0, x=0)
-    assert m.tiles[0][0].blocked is False
-    assert m.tiles[0][8].blocked is False
-    assert m.tiles[0][9].blocked is True
+    assert m.tiles[0][0].blocks is False
+    assert m.tiles[0][8].blocks is False
+    assert m.tiles[0][9].blocks is True
 
 def test_Stage_mk_stage__has_at_least_2_rooms():
     m = stages.Stage(width=50, height=50)
@@ -297,7 +297,7 @@ def test_get_random_open_spot__all_wall_returns_None():
 
 def test_get_random_open_spot__single_spot():
     m = stages.Stage(width=10, height=10)
-    m.tiles[0][0].blocked = False
+    m.tiles[0][0].blocks = False
     assert m.get_random_open_spot() == (0, 0)
 
 
@@ -308,7 +308,7 @@ def test_Stage_get_random_non_wall_loc__default_stage_returns_None():
 
 def test_Stage_get_random_non_wall_loc__returns_non_wall():
     m = stages.Stage(width=10, height=10)
-    m.tiles[0][0].blocked = False
+    m.tiles[0][0].blocks = False
     result = m.get_random_non_wall_loc()
     assert result == (0, 0)
 
@@ -344,7 +344,7 @@ def test_Stage_place_monsters__all_wall_tiles():
 
     # Check that no entities are on Wall tiles
     for e in m.entities:
-        assert m.tiles[e.x][e.y].blocked is False
+        assert m.tiles[e.x][e.y].blocks is False
 
 
 def test_Stage_place_monsters_no_entities_appear_in_Wall():
@@ -354,7 +354,7 @@ def test_Stage_place_monsters_no_entities_appear_in_Wall():
 
     # Check that no entities are on Wall tiles
     for e in m.entities:
-        assert m.tiles[e.x][e.y].blocked is False
+        assert m.tiles[e.x][e.y].blocks is False
 
 
 def test_Stage_place_items_no_entities_appear_in_Wall():
@@ -365,7 +365,7 @@ def test_Stage_place_items_no_entities_appear_in_Wall():
 
     # Check that no entities are on Wall tiles
     for e in m.entities:
-        assert m.tiles[e.x][e.y].blocked is False
+        assert m.tiles[e.x][e.y].blocks is False
 
 
 def test_Stage_place_stairs_down_on_floor__valid_pos():
