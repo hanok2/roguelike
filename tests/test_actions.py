@@ -45,6 +45,8 @@ def walk_map():
     orc = factory.mk_entity('orc', 2, 1)
     potion = factory.mk_entity('healing_potion', 1, 0)
     m.entities.extend([potion, orc])
+    m.potion_ref = potion  # Easy ref for testing
+
     return m
 
 @pytest.fixture
@@ -288,11 +290,12 @@ def test_PickupAction__item(walk_map, hero):
     result = action.perform(stage=walk_map, entity=hero)
 
     # todo: Fix this later - use a Stage.get_entities function instead
-    potion = walk_map.entities[0]
+    potion = walk_map.potion_ref
     assert potion.name == 'Healing potion'
 
     assert result.success
     assert result.msg == 'You pick up the Healing potion.'
+    assert potion not in walk_map.entities
     # [{'item_added': potion,
 
 

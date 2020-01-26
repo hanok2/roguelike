@@ -140,9 +140,13 @@ class PickupAction(Action):
             item_pos_at_our_pos = e.x == entity.x and e.y == entity.y
 
             if e.has_comp('item') and item_pos_at_our_pos:
+                # Add to entity's inventory
                 success = entity.inv.add_item(e)
 
                 if success:
+                    # Remove from stage
+                    stage.entities.remove(e)
+
                     return ActionResult(
                         success=True,
                         msg='You pick up the {}.'.format(e.name)
