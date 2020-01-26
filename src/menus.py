@@ -55,12 +55,12 @@ def inv_options(hero, state):
         header = 'Press the key next to an item to drop it, or ESC to cancel.\n'
 
     if len(hero.inv.items) == 0:
-        # options = ['Inventory is empty.']
-        # header = 'Inventory is empty.'
-        options = {'': 'Inventory is empty.'}
+        options = ['Inventory is empty.']
     else:
         options = list_inv_items(hero)
-        options = default_lettering_dict(options)
+        options_dict = default_lettering_dict(options)
+
+        options = ['({}) {}'.format(k, v) for k, v in options_dict.items()]
 
     return header, options
 
@@ -78,9 +78,9 @@ def hero_info(hero):
     return info
 
 def main_menu_options():
-    return {
-        'n': 'New game',
-        'c': 'Continue last game',
-        'o': 'Options',
-        'q': 'Quit'
-    }
+    return [
+        '(n) New game',
+        '(c) Continue last game',
+        '(o) Options',
+        '(q) Quit'
+    ]

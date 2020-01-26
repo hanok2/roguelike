@@ -290,14 +290,8 @@ class RenderEngine(object):
         # Print all the options
         y = header_height
 
-        for k, v in options.items():
-            text = '({}) {}'.format(k, v)
-
-            window.print(
-                x=0, y=y,
-                string=text,
-                alignment=tcod.LEFT
-            )
+        for text in options:
+            window.print(x=0, y=y, string=text, alignment=tcod.LEFT)
             y += 1
 
         x = int(config.scr_width / 2 - width / 2)
@@ -336,7 +330,7 @@ class RenderEngine(object):
         self.render_menu('', options, 24)
 
     def render_msg_box(self, header, width):
-        self.render_menu(header, {}, width)
+        self.render_menu(header, [], width)
 
     def render_char_scr(self, hero):
         """ Displays a windows showing the hero's current stats and experience."""

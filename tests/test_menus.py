@@ -58,10 +58,10 @@ def test_inv_options__SHOW_INV__main_hand_equipped(hero):
     hero.inv.add_item(potion)
 
     header, options = menus.inv_options(hero, States.SHOW_INV)
-    assert options == {
-        'a': 'Dagger (on main hand)',
-        'b': 'Healing potion'
-    }
+    assert options == [
+        '(a) Dagger (on main hand)',
+        '(b) Healing potion'
+    ]
 
 
 def test_inv_options__SHOW_INV__both_hands_equipped(hero):
@@ -71,10 +71,10 @@ def test_inv_options__SHOW_INV__both_hands_equipped(hero):
 
     header, options = menus.inv_options(hero, States.SHOW_INV)
 
-    assert options == {
-        'a': 'Dagger (on main hand)',
-        'b': 'Shield (on off hand)'
-    }
+    assert options == [
+        '(a) Dagger (on main hand)',
+        '(b) Shield (on off hand)'
+    ]
 
 
 def test_inv_options__DROP_INV__empty_inv():
@@ -95,10 +95,10 @@ def test_inv_options__DROP_INV__main_hand_equipped(hero):
     hero.inv.add_item(potion)
 
     header, options = menus.inv_options(hero, States.DROP_INV)
-    assert options == {
-        'a': 'Dagger (on main hand)',
-        'b': 'Healing potion'
-    }
+    assert options == [
+        '(a) Dagger (on main hand)',
+        '(b) Healing potion'
+    ]
 
 
 def test_inv_options__DROP_INV__both_hands_equipped(hero):
@@ -108,10 +108,10 @@ def test_inv_options__DROP_INV__both_hands_equipped(hero):
 
     header, options = menus.inv_options(hero, States.DROP_INV)
 
-    assert options == {
-        'a': 'Dagger (on main hand)',
-        'b': 'Shield (on off hand)'
-    }
+    assert options == [
+        '(a) Dagger (on main hand)',
+        '(b) Shield (on off hand)'
+    ]
 
 
 def test_hero_info(hero):
@@ -130,8 +130,9 @@ def test_hero_info(hero):
 def test_main_menu_options():
     result = menus.main_menu_options()
     assert len(result) == 4
-
-    assert result['n'] == 'New game'
-    assert result['c'] == 'Continue last game'
-    assert result['o'] == 'Options'
-    assert result['q'] == 'Quit'
+    assert result == [
+        '(n) New game',
+        '(c) Continue last game',
+        '(o) Options',
+        '(q) Quit'
+    ]
