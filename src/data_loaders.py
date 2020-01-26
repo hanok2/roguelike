@@ -20,7 +20,6 @@ from . import game
 
 def save_game(filepath, game):
     with shelve.open(filepath, 'n') as data_file:
-        # data_file['game'] = game
         data_file['hero'] = game.hero
         data_file['dungeon'] = game.dungeon
         data_file['stage'] = game.stage

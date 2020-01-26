@@ -46,4 +46,8 @@ class Game(object):
         self.action_queue = data_file['action_queue']
         self.fov_recompute = data_file['fov_recompute']
         self.fov_map = data_file['fov_map']
-        self.draw = data_file['redraw']
+        self.redraw = data_file['redraw']
+
+        # Fix double hero - on load we have a problem with a copy on the stage
+        self.stage.rm_hero()
+        self.stage.entities.append(self.hero)

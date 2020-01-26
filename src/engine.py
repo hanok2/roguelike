@@ -96,62 +96,62 @@ class Engine(object):
         self.key = tcod.Key()
         self.mouse = tcod.Mouse()
 
+
     def play_game(self):
         log.debug('Calling play_game...')
 
         # Deprecated since version 9.3: Use the tcod.event module to check for "QUIT" type events.
         # while not tcod.console_is_window_closed():
 
-        current_actor, actor_index = self.get_next_actor(len(self.g.stage.entities))
-        self.update_rendering()
+        # self.update_rendering()
 
         log.debug('Entering game loop...')
         # Game loop
 
         # Change to while not dead or main menu?
         while True:
-            actors = [e for e in self.g.stage.entities if e.has_comp('ai') or e.has_comp('human')]
-
-            for actor in actors:
-                self.g.state = States.ACTOR_TURN
-                print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
-
-                while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
-
-                    if current_actor.has_comp('human'):
-                        action = current_actor.get_action(self.g, self.key, self.mouse)
-
-                    elif current_actor.has_comp('ai'):
-                        action = current_actor.ai.get_action(self.g)
-
-                    self.g.action_queue.put(action)
-
-                    self.resolve_actions(actor)
-
-                    # Maybe only update on human turn?
-                    self.update_rendering()
-
+            # Player goes first
+            self.player_turn()
 
             # Save and go to main menu
             if self.g.state == States.MAIN_MENU:
                 log.info('trying to enter the MAIN_MENU')
 
                 # self.g.state = States.ACTOR_TURN  # Maybe previous state instead?
-                self.g.state = self.g.prev_state # Maybe previous state instead?
+                self.g.state = self.g.prev_state
                 self.g.redraw = True
                 self.g.fov_recompute = True
                 save_game(config.savefile, self.g)
                 return
 
-            # if mouse_action?
+            # All other entities on the stage get a turn
+            self.world_turn()
+
+            self.g.fov_recompute = True
+
+    def get_actors(self):
+        return [e for e in self.g.stage.entities if e.has_comp('ai')]
+
+    def player_turn(self):
+        log.info('Turn: %s: Player', self.g.turns)
+
+        while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
+            self.update_rendering()
+            action = self.g.hero.get_action(self.g, self.key, self.mouse)
+
+            self.g.action_queue.put(action)
+            self.resolve_actions(self.g.hero)
 
 
-    def get_next_actor(self, actor_index):
-        while True:
-            actor_index = (actor_index + 1) % len(self.g.stage.entities)
-            current_actor = self.g.stage.entities[actor_index]
-            if current_actor.has_comp('ai') or current_actor.has_comp('human'):
-                return current_actor, actor_index
+    def world_turn(self):
+        self.g.state = States.ACTOR_TURN
+
+        for actor in self.get_actors():
+            print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
+
+            action = actor.ai.get_action(self.g)
+            self.g.action_queue.put(action)
+            self.resolve_actions(actor)
 
     def resolve_actions(self, actor):
         print('Resolving actions')
@@ -178,9 +178,6 @@ class Engine(object):
         )
         if not isinstance(action_results, list):
             action_results = [action_results]
-
-        # Use the first ActionResult to determine if we increment turn??
-
 
         # Process all the ActionResults
         for r in action_results:
@@ -209,7 +206,10 @@ class Engine(object):
                 self.g.action_queue.put(r.alt)
 
     def update_rendering(self):
+        log.info('update_rendering:')
+
         if self.g.redraw:
+            log.info('redraw:')
             # Reset the stage
             stage = self.g.dungeon.get_stage()
 
@@ -222,7 +222,7 @@ class Engine(object):
 
         # Only recompute the fov if its the Players turn.
         if self.g.fov_recompute:
-            log.debug('fov_recompute...')
+            log.info('fov_recompute:')
             recompute_fov(
                 self.g.fov_map,
                 self.g.hero.x,
