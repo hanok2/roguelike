@@ -135,12 +135,16 @@ class Engine(object):
     def player_turn(self):
         log.info('Turn: %s: Player', self.g.turns)
 
+        self.g.state = States.ACTOR_TURN
+
         while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
             self.update_rendering()
             action = self.g.hero.get_action(self.g, self.key, self.mouse)
 
             self.g.action_queue.put(action)
             self.resolve_actions(self.g.hero)
+
+        self.g.turns += 1
 
 
     def world_turn(self):
@@ -189,7 +193,6 @@ class Engine(object):
             # Increment turn if necessary
             if r.success and action.consumes_turn:
                 self.g.state = States.TURN_CONSUMED
-                self.g.turns += 1
 
             if r.new_state:
 
