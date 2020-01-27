@@ -86,6 +86,8 @@ fov_algorithm = 0              # 0 is default alg tcod uses
 fov_light_walls = True          # Light up walls we see
 fov_radius = 5                # How far can we see?
 
+energy_per_turn = 100
+
 colors = {
     # 'dark_wall': tcod.Color(0, 0, 100),
     # 'dark_ground': tcod.Color(50, 50, 150),

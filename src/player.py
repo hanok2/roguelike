@@ -1,4 +1,5 @@
 import tcod
+from . import components
 from . import factory
 from . import entity
 from . import input_handling
@@ -34,6 +35,7 @@ class Player(entity.Entity):
             lvl=Level(),
             render_order=RenderOrder.ACTOR,
             blocks=True,
+            energymeter=components.EnergyMeter(threshold=100)
         )
         self.fighter = Fighter(self, HERO_HP, HERO_DEF, HERO_POW)
         self.inv = Inventory(owner=self, capacity=HERO_INV_CAPACITY)

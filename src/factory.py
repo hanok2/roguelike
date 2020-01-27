@@ -1,5 +1,5 @@
 import tcod
-from . import config
+from . import components
 from . import item_funcs
 from .config import RenderOrder, Slots
 from .components import Fighter, ApproachAI, Item, Equippable
@@ -54,6 +54,7 @@ def mk_entity(entity_name, x, y):
             color=tcod.desaturated_green,
             blocks=True,
             render_order=RenderOrder.ACTOR,
+            energymeter=components.EnergyMeter(threshold=75)
         )
         spider.fighter = Fighter(owner=spider, hp=5, defense=0, power=2, xp=5)
         spider.ai = ApproachAI(spider)
@@ -68,6 +69,7 @@ def mk_entity(entity_name, x, y):
             color=tcod.desaturated_green,
             blocks=True,
             render_order=RenderOrder.ACTOR,
+            energymeter=components.EnergyMeter(threshold=110)
         )
         orc.fighter = Fighter(owner=orc, hp=10, defense=1, power=3, xp=35)
         orc.ai = ApproachAI(orc)
@@ -82,6 +84,7 @@ def mk_entity(entity_name, x, y):
             color=tcod.darker_green,
             blocks=True,
             render_order=RenderOrder.ACTOR,
+            energymeter=components.EnergyMeter(threshold=200)
         )
         troll.fighter = Fighter(owner=troll, hp=10, defense=2, power=4, xp=100)
         troll.ai = ApproachAI(troll)

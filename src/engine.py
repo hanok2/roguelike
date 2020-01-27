@@ -134,29 +134,38 @@ class Engine(object):
         return [e for e in self.g.stage.entities if e.has_comp('ai')]
 
     def player_turn(self):
+        self.g.state = States.ACTOR_TURN
         log.info('Turn: %s: Player', self.g.turns)
+        self.g.hero.energymeter.add_energy(config.energy_per_turn)
 
-        # self.g.state = States.ACTOR_TURN
 
-        while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
-            self.update_rendering()
-            action = self.g.hero.get_action(self.g, self.key, self.mouse)
+        while self.g.hero.energymeter.burn_turn():
+            while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
+                self.update_rendering()
+                action = self.g.hero.get_action(self.g, self.key, self.mouse)
 
-            self.g.action_queue.put(action)
-            self.resolve_actions(self.g.hero)
+                self.g.action_queue.put(action)
+                self.resolve_actions(self.g.hero)
 
-        self.g.turns += 1
+            if self.g.state == States.MAIN_MENU:
+                break
+
+            self.g.turns += 1
 
 
     def world_turn(self):
-        # self.g.state = States.ACTOR_TURN
+        self.g.state = States.ACTOR_TURN
 
         for actor in self.get_actors():
-            print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
+            actor.energymeter.add_energy(config.energy_per_turn)
 
-            action = actor.ai.get_action(self.g)
-            self.g.action_queue.put(action)
-            self.resolve_actions(actor)
+            while actor.energymeter.burn_turn():
+
+                print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
+
+                action = actor.ai.get_action(self.g)
+                self.g.action_queue.put(action)
+                self.resolve_actions(actor)
 
     def resolve_actions(self, actor):
         print('Resolving actions')
@@ -167,9 +176,6 @@ class Engine(object):
             print('\t{}'.format(action))
 
             self.process_action(action=action, entity=actor)
-
-        if self.g.state == States.TURN_CONSUMED:
-            self.g.state = States.ACTOR_TURN
 
 
     def process_action(self, action, entity):

@@ -82,6 +82,10 @@ def test_Player__Equipment():
     assert p.equipment
 
 
+def test_Player__EnergyMeter():
+    p = player.Player()
+    assert p.energymeter
+
 def test_Player__Human():
     p = player.Player()
     assert p.human
