@@ -125,6 +125,7 @@ class Engine(object):
                 return
 
             # All other entities on the stage get a turn
+            # if not self.g.state == States.HERO_DEAD:
             self.world_turn()
 
             self.g.fov_recompute = True
@@ -135,7 +136,7 @@ class Engine(object):
     def player_turn(self):
         log.info('Turn: %s: Player', self.g.turns)
 
-        self.g.state = States.ACTOR_TURN
+        # self.g.state = States.ACTOR_TURN
 
         while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
             self.update_rendering()
@@ -148,7 +149,7 @@ class Engine(object):
 
 
     def world_turn(self):
-        self.g.state = States.ACTOR_TURN
+        # self.g.state = States.ACTOR_TURN
 
         for actor in self.get_actors():
             print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
@@ -166,6 +167,10 @@ class Engine(object):
             print('\t{}'.format(action))
 
             self.process_action(action=action, entity=actor)
+
+        if self.g.state == States.TURN_CONSUMED:
+            self.g.state = States.ACTOR_TURN
+
 
     def process_action(self, action, entity):
         log.debug('process_action: %s - %s - %s', self.g.state, str(entity), action)
@@ -195,11 +200,13 @@ class Engine(object):
                 self.g.state = States.TURN_CONSUMED
 
             if r.new_state:
-
                 self.g.prev_state = self.g.state
                 self.g.state = r.new_state
 
                 log.info('%s -> %s', self.g.prev_state, self.g.state)
+
+                if self.g.state == States.HERO_DEAD:
+                    break
 
             if r.msg:
                 self.g.msg_log.add(r.msg)
@@ -207,6 +214,7 @@ class Engine(object):
             # alternate actions
             if r.alt:
                 self.g.action_queue.put(r.alt)
+
 
     def update_rendering(self):
         log.info('update_rendering:')

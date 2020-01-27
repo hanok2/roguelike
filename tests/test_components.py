@@ -1,6 +1,7 @@
 import pytest
 from ..src import components
 from ..src import config
+from ..src import entity
 from ..src import factory
 from ..src import player
 
@@ -396,3 +397,56 @@ def test_Equipment_unequip__unequipped_item_returns_False():
     shield = factory.mk_entity('shield', 0, 0)
     e = components.Equipment()
     assert e.unequip(shield) is False
+
+
+""" Tests for EnergyMeter """
+
+
+def test_EnergyMeter__init():
+    am = components.EnergyMeter(threshold=100)
+    assert am.threshold == 100
+    assert am.energy == 0
+
+
+def test_EnergyMeter__burn_turn__not_enough_returns_False():
+    am = components.EnergyMeter(threshold=100)
+
+    result = am.burn_turn()
+    assert result is False
+
+
+def test_EnergyMeter__burn_turn__at_threshold_returns_True():
+    am = components.EnergyMeter(threshold=100)
+    am.add_energy(100)
+
+    result = am.burn_turn()
+    assert result
+
+def test_EnergyMeter__burn_turn__at_threshold__energy_eq_0():
+    am = components.EnergyMeter(threshold=100)
+    am.add_energy(100)
+    am.burn_turn()
+
+    assert am.energy == 0
+
+def test_EnergyMeter__burn_turn__above_threshold_returns_True():
+    am = components.EnergyMeter(threshold=100)
+
+    am.add_energy(110)
+    result = am.burn_turn()
+    assert result
+
+
+def test_EnergyMeter__burn_turn__above_threshold__energy_eq_remainder():
+    am = components.EnergyMeter(threshold=100)
+
+    am.add_energy(110)
+    am.burn_turn()
+    assert am.energy == 10
+
+
+def test_EnergyMeter__add_energy():
+    am = components.EnergyMeter(threshold=100)
+
+    am.add_energy(10)
+    assert am.energy == 10
