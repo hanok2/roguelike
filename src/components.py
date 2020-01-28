@@ -246,3 +246,6 @@ class EnergyMeter(object):
             self.energy -= self.threshold
             return True
         return False
+
+    def burned_out(self):
+        return self.energy < self.threshold

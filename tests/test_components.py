@@ -450,3 +450,15 @@ def test_EnergyMeter__add_energy():
 
     am.add_energy(10)
     assert am.energy == 10
+
+
+def test_EnergyMeter__burned_out__sufficient_energy_returns_False():
+    am = components.EnergyMeter(threshold=100)
+    am.add_energy(100)
+    assert am.burned_out() is False
+
+
+def test_EnergyMeter__burned_out__insufficient_energy_returns_True():
+    am = components.EnergyMeter(threshold=100)
+    am.add_energy(10)
+    assert am.burned_out()
