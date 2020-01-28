@@ -14,9 +14,9 @@ def test_handle_keys__invalid_state__returns_NullAction():
     assert str(result) == 'NullAction'
 
 
-def test_handle_keys__ACTOR_TURN__calls_handle_hero_turn_keys(mocker):
+def test_handle_keys__PLAYING__calls_handle_hero_turn_keys(mocker):
     mocker.patch.object(input_handling, 'handle_hero_turn_keys')
-    input_handling.handle_keys(state=States.ACTOR_TURN, key='a')
+    input_handling.handle_keys(state=States.PLAYING, key='a')
     input_handling.handle_hero_turn_keys.assert_called()
 
 
@@ -453,7 +453,7 @@ def test_process_tcod_input__numpad9__returns_u():
 
 
 def test_handle_mouse__NOT_TARGETING_returns_None():
-    state = States.ACTOR_TURN
+    state = States.PLAYING
     rclick = tcod.Mouse(x=100, y=115, cx=11, cy=19, rbutton_pressed=True)
     result = input_handling.handle_mouse(state, rclick)
     assert result is None

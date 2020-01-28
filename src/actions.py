@@ -331,7 +331,6 @@ class DropItemAction(Action):
 
         return ActionResult(
             success=True,
-            new_state=States.ACTOR_TURN,
             msg='You dropped the {}.'.format(item.name)
         )
 
@@ -422,16 +421,16 @@ class LevelUpAction(Action):
         if self.stat == 'hp':
             entity.fighter.base_max_hp += 20
             entity.fighter.hp += 20
-            return ActionResult(success=True, msg='Boosted max HP!', new_state=States.ACTOR_TURN)
+            return ActionResult(success=True, msg='Boosted max HP!', new_state=States.PLAYING)
 
 
         elif self.stat == 'str':
             entity.fighter.base_power += 1
-            return ActionResult(success=True, msg='Boosted strength!', new_state=States.ACTOR_TURN)
+            return ActionResult(success=True, msg='Boosted strength!', new_state=States.PLAYING)
 
         elif self.stat == 'def':
             entity.fighter.base_defense += 1
-            return ActionResult(success=True, msg='Boosted defense!', new_state=States.ACTOR_TURN)
+            return ActionResult(success=True, msg='Boosted defense!', new_state=States.PLAYING)
 
         else:
             raise ValueError('invalid stat!')
@@ -455,12 +454,7 @@ class ExitAction(Action):
                 msg='Targeting cancelled.',
             )
 
-        else:
-            return ActionResult(success=True, new_state=States.MAIN_MENU)
-            # return ActionResult(
-                # success=True,
-                # alt=MainMenuAction()
-            # )
+        return ActionResult(success=True, new_state=States.MAIN_MENU)
 
 
 class FullScreenAction(Action):

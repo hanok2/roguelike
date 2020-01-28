@@ -1,9 +1,9 @@
 import pytest
 from pytest_mock import mocker
 from ..src import entity
+from ..src import factory
 from ..src import stages
 from ..src import tile
-from .test_death_functions import orc
 from ..src.config import RenderOrder
 from ..src.components import Fighter, Item, Level, Equipment, Equippable, ApproachAI
 from ..src.inventory import Inventory
@@ -16,6 +16,12 @@ def open_map():
     m = stages.Stage(10, 10)
     m.tiles = [[tile.Tile(False) for y in range(10)] for x in range(10)]
     return m
+
+
+@pytest.fixture
+def orc():
+    return factory.mk_entity('orc', 0, 0)
+
 
 
 def test_Entity_init__defaults():

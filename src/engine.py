@@ -92,9 +92,14 @@ def main():
 class Engine(object):
     def __init__(self, _game, render_eng):
         self.g = _game
+        # self.g.fov_recompute = True
+        self.g.redraw = True
+
         self.render_eng = render_eng
         self.key = tcod.Key()
         self.mouse = tcod.Mouse()
+
+        self.activate_main_menu = False
 
 
     def play_game(self):
@@ -115,18 +120,16 @@ class Engine(object):
 
             # Save and go to main menu
             if self.g.state == States.MAIN_MENU:
-                log.info('trying to enter the MAIN_MENU')
-
-                # self.g.state = States.ACTOR_TURN  # Maybe previous state instead?
-                self.g.state = self.g.prev_state
-                self.g.redraw = True
-                self.g.fov_recompute = True
                 save_game(config.savefile, self.g)
                 return
 
             # All other entities on the stage get a turn
-            # if not self.g.state == States.HERO_DEAD:
             self.world_turn()
+
+            if self.g.hero.fighter.hp <= 0:
+                self.player_dead()
+                # todo: Delete the save game!
+                return
 
             self.g.fov_recompute = True
 
@@ -134,38 +137,43 @@ class Engine(object):
         return [e for e in self.g.stage.entities if e.has_comp('ai')]
 
     def player_turn(self):
-        self.g.state = States.ACTOR_TURN
         log.info('Turn: %s: Player', self.g.turns)
+
         self.g.hero.energymeter.add_energy(config.energy_per_turn)
 
+        while not self.g.hero.energymeter.burned_out():
+            self.update_rendering()
+            action = self.g.hero.get_action(self.g, self.key, self.mouse)
 
-        while self.g.hero.energymeter.burn_turn():
-            while not self.g.state in (States.TURN_CONSUMED, States.MAIN_MENU):
-                self.update_rendering()
-                action = self.g.hero.get_action(self.g, self.key, self.mouse)
-
-                self.g.action_queue.put(action)
-                self.resolve_actions(self.g.hero)
+            self.g.action_queue.put(action)
+            self.resolve_actions(self.g.hero)
 
             if self.g.state == States.MAIN_MENU:
-                break
+                return
 
-            self.g.turns += 1
-
+        self.g.turns += 1
 
     def world_turn(self):
-        self.g.state = States.ACTOR_TURN
-
         for actor in self.get_actors():
             actor.energymeter.add_energy(config.energy_per_turn)
 
-            while actor.energymeter.burn_turn():
-
+            while not actor.energymeter.burned_out():
                 print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
 
                 action = actor.ai.get_action(self.g)
                 self.g.action_queue.put(action)
                 self.resolve_actions(actor)
+
+    def player_dead(self):
+        while True:
+            self.update_rendering()
+            action = self.g.hero.get_action(self.g, self.key, self.mouse)
+
+            self.g.action_queue.put(action)
+            self.resolve_actions(self.g.hero)
+
+            if self.g.states == States.MAIN_MENU:
+                return
 
     def resolve_actions(self, actor):
         print('Resolving actions')
@@ -203,16 +211,13 @@ class Engine(object):
 
             # Increment turn if necessary
             if r.success and action.consumes_turn:
-                self.g.state = States.TURN_CONSUMED
+                # Use the actor's energy
+                entity.energymeter.burn_turn()
 
             if r.new_state:
                 self.g.prev_state = self.g.state
                 self.g.state = r.new_state
-
                 log.info('%s -> %s', self.g.prev_state, self.g.state)
-
-                if self.g.state == States.HERO_DEAD:
-                    break
 
             if r.msg:
                 self.g.msg_log.add(r.msg)

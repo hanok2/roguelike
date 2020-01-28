@@ -17,7 +17,7 @@ def handle_keys(state, key):
     # Put this here for now... move later when doing other ports
     # key = process_tcod_input(key)
 
-    if state == States.ACTOR_TURN:
+    if state == States.PLAYING:
         return handle_hero_turn_keys(state, key)
 
     elif state == States.HERO_DEAD:

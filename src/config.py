@@ -13,15 +13,19 @@ class RenderOrder(Enum):
 
 class States(Enum):
     # Note: In Python 3.6+, we can use "auto" feature to auto-increment
-    ACTOR_TURN = auto()
-    TURN_CONSUMED = auto()
-    HERO_DEAD = auto()
+    # Add a SETUP state for pre-game initialization?
+    PLAYING = auto()
+    HERO_DEAD = auto()       # X
     SHOW_INV = auto()
     DROP_INV = auto()
     TARGETING = auto()
     LEVEL_UP = auto()
     SHOW_STATS = auto()
     MAIN_MENU = auto()
+
+    # Deprecated
+    # ACTOR_TURN = auto()      # X
+    # TURN_CONSUMED = auto()   # X
 
 VERSION = 1.2
 window_title = 'Infinity Dronez'
