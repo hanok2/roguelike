@@ -1,0 +1,259 @@
+++ Rogue Like
+
+*Game Environment*
+	Passable Terrain
+		Dirt Path, Mud path, snowy path, icy path
+		Dirt, Rocky Dirt, weedy dirt, Sand/beach
+		Rock, Marble, Slate, Metal, Rock, Wood floor, bamboo, bridge,
+		Lawn grass, light grass/bush, tall grass, light brambles,
+		Swamp, Puddle, acid pool, mutagen pool,
+		Spiked Floor, Quicksand, pit
+		Hallowed ground: protected or something
+
+	Obstacles/Not passable:
+		Large bush, deep water
+		tree:  Acorn(of course), maple
+		Wall structure: wall or fence
+		Doors, Gates
+		magical doors
+
+	Interactive dungeon features:
+		unmovable, and permanent or semi-permanent
+		fountain: how can you not have the classic fountain?
+		soda machine; vending machine; slot machine lol
+		Firepit: Now this is something you don't see in many games.
+		Appliances: stove, fountain, sink, radiator, drain, electrical socket, refrigerator,
+			grandfather clock: shows turns, time etc.
+			transformer: some source of huge electricity
+			breaker:
+			appliances might be an interesting source of light for the game
+		2way Teleporter/1 way teleporter: I'm sure we could put some twists on the ol 'porter
+		pipe (water pipe, sewage pipe, gas pipe, mutagen pipe, you name it)
+		paintings
+		chest
+		shackles; rack; electric chair (yikes), jail cell.
+		Boulder: test pushing
+		check: test as a container for other objects (this could get complex)
+		broken down car
+
+	Objects(moveable, able to pickup):
+		Beach ball: for testing collision and bouncing, and kicking
+		Rock: test throwing
+		Tumbleweed: test movement
+		Towel: test water/inventory stuff
+		lamp/torch: test lighting
+
+Environmental Conditions:
+	Time, Day/Night, Hunger/Thirst, Fatigue/sleep
+	Wind:
+
+Beginning Action Set:
+	Inventory
+	Walk – move 1 space in any direction
+	Look
+	Kick/Fight
+	Use/Manipulate
+
+Characters!
+Scientist
+Or Cyrogenist, pyromaniac, geneticist, blood worker, surgeon
+
+Pyromanic
+Easy to kill
+Good  bonus
+Fire as pet (you had a pet bat, you burned it to death!)
+Explosive Expert
+Start with reduced hearing
+Box of strike anywhere matches or lighter
+Goggles
+Firecracker
+Blowtorch, propane
+Bottle of ever clear
+Brochure of fire safety
+
+Robotics Expert
+John Conner
+Terminator Pet
+ATM hacking
+Moped
+Sack
+Droid master?
+
+Taxidermist
+
+Machinist
+
+Maugwai
+
+Kithkin Beekieeper
+Tale tellers
+Limited magical skill
+Use small creatures as messengers
+Summons bees
+Hive mind
+If you are harmed bees get attack bonus
+
+Alchemist
+
+Seaman
+
+Intergalactic Princess
+
+Plumber
+
+Fugitive
+Always running from law.  A little crazy?
+Conman?
+
+Machanic
+
+Boy Genius?
+Similar to pokemon trainer, strong pets. Good hacker.
+Policeman
+K9 pet?
+Blind character
+
+Handicapped ?
+
+Baddies
+Freddy Kruegar, Jason, jafar, cruella devil,
+Robot Master?
+Transformer?
+Gunslinger
+Starts with oy.
+Gangster
+No pet, but starts with strong stats.
+Secret Agent
+Starts with badge.  No murder penalties, queens orders, watch, string choke, stealth.
+Woodsman
+Can turn anything into food, knows where water is, uses fire as weapon, bolas, vines into bolas, any weapon.  Carrier pidgeons,
+Gorilla Suit Man
+Has identical pet gorilla.  Fast, climbing, bananas, dexterity, music box
+Dude can control gorilla with telepathic link.  Wand of probing,
+Solid Snake
+Starts with smokes, box.
+Vampire
+
+Ninja assassin
+
+Drunken master
+360 degree attack
+Hobbit
+
+Lilo and stitch
+
+Other Stuffs!:
+Forest Level
+Trees, Wells, Firepits, wizard tree, water fall, snare traps, pondu sticks, poison ivy, pits graves,
+Rare bird feathers - tradable, magic, mixture ingredient
+
+Travelling Merchants
+Game maps
+Mostly horizontal
+Like original CASTLE game?
+Land and Terrain types
+Taiga, badlands, savannash, island sanctuary, painland, dual lands
+Tar pits
+
+Dyhydration
+Fountains work a little differently to accomidate this
+Cooking
+Most corpses will now be required to be cooked
+Stealing
+Should be a little harder than before, pets shouldn’t be able to just walk out with stuff…
+Junk
+More twists than just polyp ling. Take it to smith, dump, pawn shop, forge, donate it…
+Followers
+Peaceful but annoying beggers, kids, wannabes, faireys, dogs, cons, gypsys
+Your own traps
+Flypaper, smoke bombs, horn of defeaning, trip wire,
+Make your own dart and arrow traps.  Proxy mines
+Underground railroad
+Lets you travel between lands, only accessible through mines
+Armors
+Specialized for different resistances and applications
+Poison protection
+Stinger Protection
+Bulletproof
+Undead Proof
+Disguise
+Policeman clothes
+Sticky - theft prevent
+Scary armor? Or blinding armor - wings of icarus
+Difficulty
+
+Advancing in the game by scumming doesn’t necessarily allow you to get
+by easy. Maybe getting a resistant doesn’t make you 100% protected
+against that thing
+
+Voodoo doll
+
+Creature generators
+Bat generators, pudding farm
+Baskets - Snakes
+Hives - Bees
+Hole - bats
+Hill - ants
+Egg Nest - Spiders
+Run these through a polymorph trap and you have a polymorph machine
+
+Land Progression
+Forest, mountain, plains, swaps, sea, artifacts/metropolis
+Colorless, multicolored
+
+Metropolis to space. When you get to space, a space race or fight, u
+try to reach the citadel of truth/light(but are sidetracked by a
+wormhole to your greedy nemesis who surrounds you. Even after
+defeating you are left in a foreign solar system with no fuel.
+
+Forest of Woe, desert of nothing, valley of renewal, mountains of
+katakysm, mines of moria, bog of eternal stench, metropolis, citadel
+
+Peacefuls
+Can easily turn to hostile if infected
+Memo pad
+Permanent ingame item, lets player take notes throughout game
+Fire
+Boil mixtures
+Cooking
+Smoking
+
+Beginning
+Face a series of tests/tutorial to start and build stats
+
+Maybe build an escape vehicle to desert…. Raft, repair ship, call for
+help, blaze your way through and out with compass, cannonball out,
+teleport. Fly away, eagles, dig to underground railroad. Climb trees,
+navigate canopy.
+
+Upgrades
+Easier and better stack management
+Better naming management
+Incorporate time
+
+Luck and karma?
+
+Barfights
+
+Intrinsics
+Through microchips?
+Electronic enemies
+Viruses, Trojans, worms
+Cameras, security
+Using lines of vision
+Windows on buildings
+
+Skynet, fallout
+
+Pixies
+Can steal through bag of holding
+Grave diggers
+Can dig up things
+Unstoners
+Anything acid, other special beasts
+Polymorph floods
+
+Influences: Magic of Shezarahade, fallout, terminator, lord of the
+rings, space quest, kings quest
+
+

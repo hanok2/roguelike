@@ -115,35 +115,38 @@ class Engine(object):
 
         # Change to while not dead or main menu?
         while True:
-            # Player goes first
-            self.player_turn()
+            for e in self.get_actors():
+                log.info('Turn: %s: %s', self.g.turns, e.name)
+                self.actor_turn(e)
 
-            # Save and go to main menu
-            if self.g.state == States.MAIN_MENU:
-                save_game(config.savefile, self.g)
-                return
+                # Save and go to main menu
+                if self.g.state == States.MAIN_MENU:
+                    save_game(config.savefile, self.g)
+                    return
 
-            # All other entities on the stage get a turn
-            self.world_turn()
+                if self.g.hero.fighter.hp <= 0:
+                    self.player_dead()
+                    # todo: Delete the save game!
+                    return
 
-            if self.g.hero.fighter.hp <= 0:
-                self.player_dead()
-                # todo: Delete the save game!
-                return
+                self.g.fov_recompute = True
 
-            self.g.fov_recompute = True
+            self.g.turns += 1
 
     def get_actors(self):
-        return [e for e in self.g.stage.entities if e.has_comp('ai')]
+        return [e for e in self.g.stage.entities if e.has_comp('ai') or e.has_comp('human')]
 
-    def player_turn(self):
-        log.info('Turn: %s: Player', self.g.turns)
+    def actor_turn(self, actor):
+        actor.energymeter.add_energy(config.energy_per_turn)
 
-        self.g.hero.energymeter.add_energy(config.energy_per_turn)
-
-        while not self.g.hero.energymeter.burned_out():
+        while not actor.energymeter.burned_out():
+            # elif actor.get_comp('human'):
             self.update_rendering()
-            action = self.g.hero.get_action(self.g, self.key, self.mouse)
+
+            if actor.has_comp('ai'):
+                action = actor.ai.get_action(self.g)
+            elif actor.has_comp('human'):
+                action = actor.get_action(self.g, self.key, self.mouse)
 
             self.g.action_queue.put(action)
             self.resolve_actions(self.g.hero)
@@ -151,18 +154,6 @@ class Engine(object):
             if self.g.state == States.MAIN_MENU:
                 return
 
-        self.g.turns += 1
-
-    def world_turn(self):
-        for actor in self.get_actors():
-            actor.energymeter.add_energy(config.energy_per_turn)
-
-            while not actor.energymeter.burned_out():
-                print('Turn: {} Actor: {}'.format(self.g.turns, actor.name))
-
-                action = actor.ai.get_action(self.g)
-                self.g.action_queue.put(action)
-                self.resolve_actions(actor)
 
     def player_dead(self):
         while True:
